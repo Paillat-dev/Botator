@@ -192,4 +192,4 @@ async def clear(ctx):
 
 #run the bot
 # Replace the following with your bot's token
-bot.run("MTA0NjA1MTg3NTc1NTEzNDk5Ng.G_-SJl.GmGltmsIp6lD_HsaiS0XI4v48lEhTkUXtGcP_0")
+bot.run("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
