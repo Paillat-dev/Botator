@@ -13,6 +13,8 @@ First **/setchannel** and select the channel where you want the bot to talk.
 
 Then **/setkey** and put in your openai api key.
 
+Please note that we can possibly log the messages that are sent for **no more than 24h**, and that we will store your openai API key. Ypu can delete your API key from our servers by doing **/delete**. Please note that this action is irreversible.
+
 You can now enable your bot by doing **/enable**.
 
-You can always disable the bot by doing **/disable** and delete your api key & channel from our server by doing **/delete**.
+You can always disable the bot by doing **/disable** and delete your api key from our server by doing **/delete**.
