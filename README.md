@@ -7,6 +7,6 @@ In order to add the bot to your discord server, you will need  an OpenAI API key
 You can add the bot to your server by clcking [here](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=2214808576&scope=applications.commands%20bot)
 Then, run the following commands to set your bot up:
 First **/setchannel** and select the channel where you want the bot to talk.
-Then **/setkey** and put in your openai api key.
-You can now enable your bot by doing **/enable**.
-You can always disable the bot by doing **/disable** and delete your api key & channel from our servers by doing **/delete**.
+\nThen **/setkey** and put in your openai api key.
+\nYou can now enable your bot by doing **/enable**.
+\nYou can always disable the bot by doing **/disable** and delete your api key & channel from our servers by doing **/delete**.
