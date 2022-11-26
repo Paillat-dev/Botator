@@ -15,4 +15,4 @@ Then **/setkey** and put in your openai api key.
 
 You can now enable your bot by doing **/enable**.
 
-You can always disable the bot by doing **/disable** and delete your api key & channel from our servers by doing **/delete**.
+You can always disable the bot by doing **/disable** and delete your api key & channel from our server by doing **/delete**.
