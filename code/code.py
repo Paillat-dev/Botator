@@ -43,12 +43,12 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
             #in this case, the guild is already in the database, so we update the channel id and the api key
             c.execute("UPDATE data SET channel_id = ?, api_key = ? WHERE guild_id = ?", (channel.id, api_key, ctx.guild.id))
             #we will also set the advanced settings to their default values
-            c.execute("UPDATE data SET is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, uses_count_today = ?, prompt_size = ? WHERE guild_id = ?", (False, 64, 0.9, 0.0, 0.0, 0, 5, ctx.guild.id))
+            c.execute("UPDATE data SET is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (False, 64, 0.9, 0.0, 0.0, 5, ctx.guild.id))
             conn.commit()
             await ctx.respond("The channel id and the api key have been updated", ephemeral=True)
     else:
         #in this case, the guild is not in the database, so we add it
-        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 64, 0.9, 0.0, 0.0, 0, 5))
+        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, api_key, channel.id, False, 64, 0.9, 0.0, 0.0, 0, 5))
         conn.commit()
         await ctx.respond("The channel id and the api key have been added", ephemeral=True)
 #create a command called "enable" taht only admins can use
@@ -138,8 +138,8 @@ async def info(ctx):
     #send the data
     embed = discord.Embed(title="Info", description="Here is the info page", color=0x00ff00)
     embed.add_field(name="guild_id", value=data[0], inline=False)
-    embed.add_field(name="API Key", value=data[1], inline=False)
-    embed.add_field(name="Channel ID", value=data[2], inline=False)
+    embed.add_field(name="API Key", value=data[2], inline=False)
+    embed.add_field(name="Channel ID", value=data[1], inline=False)
     embed.add_field(name="Is Active", value=data[3], inline=False)
     embed.add_field(name="Max Tokens", value=data[4], inline=False)
     embed.add_field(name="Temperature", value=data[5], inline=False)
