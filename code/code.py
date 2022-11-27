@@ -82,7 +82,7 @@ async def disable(ctx):
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
 #set the fifth argument: prompt_size, with a default value of 5
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=150, temperature=0.5, frequency_penalty=0.5, presence_penalty=0.5, prompt_size=5):
+async def advanced(ctx, max_tokens=256, temperature=0.9, frequency_penalty=0, presence_penalty=0.6, prompt_size=5):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -154,7 +154,7 @@ async def on_message(message):
             prompt += f"AI: {msg.content}\n"
         else:
             prompt += f"{msg.author.display_name}: {msg.content}\n"
-    prompt = f"This is a conversation with an AI. Only the {prompt_size} last messages are used as a prompt. The AI will continue the conversation. The AI is very intelligent and smart. \n\n" + prompt
+    prompt = f"This is a conversation with an AI. Only the {prompt_size} last messages are used as a prompt.\n\n" + prompt + f"\n AI:"
     #send the request to the api
     debug("Sending request to the api")
     debug(prompt)
@@ -167,8 +167,7 @@ async def on_message(message):
         temperature=float(temperature),
         frequency_penalty=float(frequency_penalty),
         presence_penalty=float(presence_penalty),
-        stop=[" Human:", " AI:"]
-    )
+        stop=[" Human:", " AI:", "AI:", "Human:"]    )
     #send the response
     if response["choices"][0]   ["text"] != "":
         await message.channel.send(response["choices"][0]["text"])
@@ -201,4 +200,6 @@ bot.loop.create_task(reset_uses_count_today())
 
 #run the bot
 # Replace the following with your bot's token
-bot.run("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+with open("key.txt") as f:
+    key = f.read()
+bot.run(key)
