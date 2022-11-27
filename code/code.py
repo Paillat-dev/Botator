@@ -118,6 +118,30 @@ async def help(ctx):
     embed.add_field(name="/help", value="Show this message", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
+@bot.command()
+async def info(ctx):
+    #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
+    #check if the guild is in the database
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    if c.fetchone() is None:
+        await ctx.respond("This server is not setup", ephemeral=True)
+        return
+    #get all the data from the database
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    data = c.fetchone()
+    #send the data
+    embed = discord.Embed(title="Info", description="Here is the info page", color=0x00ff00)
+    embed.add_field(name="guild_id", value=data[0], inline=False)
+    embed.add_field(name="API Key", value=data[1], inline=False)
+    embed.add_field(name="Channel ID", value=data[2], inline=False)
+    embed.add_field(name="Is Active", value=data[3], inline=False)
+    embed.add_field(name="Max Tokens", value=data[4], inline=False)
+    embed.add_field(name="Temperature", value=data[5], inline=False)
+    embed.add_field(name="Frequency Penalty", value=data[6], inline=False)
+    embed.add_field(name="Presence Penalty", value=data[7], inline=False)
+    embed.add_field(name="Prompt Size", value=data[8], inline=False)
+    embed.add_field(name="Uses Count Today", value=data[9], inline=False)
+    await ctx.respond(embed=embed, ephemeral=True)
 
 @bot.event
 async def on_message(message):
