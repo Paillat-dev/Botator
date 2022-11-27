@@ -6,6 +6,7 @@ import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
+
 def debug(message):
     logging.info(message)
 
@@ -101,8 +102,8 @@ async def delete(ctx):
     if c.fetchone() is None:
         await ctx.respond("This server is not setup", ephemeral=True)
         return
-    #delete the guild from the database
-    c.execute("DELETE FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    #delete the guild from the database, except the guild id and the uses_count_today
+    c.execute("UPDATE data SET api_key = ?, channel_id = ?, is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx.guild.id))
     conn.commit()
     await ctx.send("The guild has been deleted from the database")
 @bot.command()
@@ -116,6 +117,7 @@ async def help(ctx):
     embed.add_field(name="/help", value="Show this message", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
+
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
@@ -178,6 +180,8 @@ async def on_message(message):
 
     #get the message content
     # add a slash command called "say" that sends a message to the channel
+'''
+#these are debug commands and should not be used in production
 @bot.slash_command()
 async def say(ctx, message: str):
     await ctx.respond("message sent!", ephemeral=True)
@@ -187,7 +191,7 @@ async def say(ctx, message: str):
 async def clear(ctx):
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
-
+'''
 #at the end of the day reset the uses_count_today to 0 for all the guilds
 async def reset_uses_count_today():
     await bot.wait_until_ready()
