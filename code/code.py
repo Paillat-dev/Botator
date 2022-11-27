@@ -37,12 +37,12 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
     if channel is None:
         await ctx.respond("Invalid channel id", ephemeral=True)
         return
-    #check if the guild is already in the database
+    #check if the guild is already in the database bi checking if there is a key for the guild
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-    if c.fetchone() is not None:
-        await ctx.respond("This server is already setup", ephemeral=True)
+    if c.fetchone()[2] is not None:
+        await ctx.respond("This guild is already setup", ephemeral=True)
         return
-    #add the guild to the database
+    #add the guild to the database 
     c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 150, 1, 0, 0.6, 0, 5))
     conn.commit()
     await ctx.respond("Setup complete", ephemeral=True)
