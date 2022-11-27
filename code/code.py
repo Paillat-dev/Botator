@@ -4,6 +4,7 @@ from discord import File, Intents # pip install pycord
 import logging # pip install logging
 import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
+import os # pip install os
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 
@@ -43,7 +44,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
     #add the guild to the database
     c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 50, 0.9, 0.0, 0.0, 0, 0))
     conn.commit()
-    await ctx.send("The guild has been added to the database")
+    await ctx.respond("Setup complete", ephemeral=True)
 #create a command called "enable" taht only admins can use
 @bot.command()
 ##@discord.commands.permissions(administrator=True)
@@ -56,7 +57,7 @@ async def enable(ctx):
     #enable the guild
     c.execute("UPDATE data SET is_active = ? WHERE guild_id = ?", (True, ctx.guild.id))
     conn.commit()
-    await ctx.send("The guild has been enabled")
+    await ctx.respond("Enabled", ephemeral=True)
 #create a command called "disable" that only admins can use
 @bot.command()
 ##@discord.commands.permissions(administrator=True)
@@ -69,7 +70,7 @@ async def disable(ctx):
     #disable the guild
     c.execute("UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx.guild.id))
     conn.commit()
-    await ctx.send("The guild has been disabled")
+    await ctx.respond("Disabled", ephemeral=True)
 #create a command called "advanced" that only admins can use, wich sets the advanced settings up: max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size
 @bot.command()
 ##@discord.commands.permissions(administrator=True)
@@ -105,7 +106,7 @@ async def delete(ctx):
     #delete the guild from the database, except the guild id and the uses_count_today
     c.execute("UPDATE data SET api_key = ?, channel_id = ?, is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx.guild.id))
     conn.commit()
-    await ctx.send("The guild has been deleted from the database")
+    await ctx.respond("Deleted", ephemeral=True)
 @bot.command()
 async def help(ctx):
     embed = discord.Embed(title="Help", description="Here is the help page", color=0x00ff00)
@@ -182,6 +183,27 @@ async def on_message(message):
 
     #get the message content
     # add a slash command called "say" that sends a message to the channel
+@bot.command()
+async def transcript(ctx):
+#save all the messages in the channel in a txt file and send it
+    messages = await ctx.channel.history(limit=None).flatten()
+    messages.reverse()
+    transcript = ""
+    #defer the response
+    await ctx.defer()
+    for msg in messages:
+        if msg.author.bot:
+            transcript += f"AI: {msg.content}\n"
+        else:
+            transcript += f"{msg.author.display_name}: {msg.content}\n"
+#save the transcript in a txt file called transcript.txt. If the file already exists, delete it and create a new one
+#check if the file exists
+    if os.path.exists("transcript.txt"):
+        os.remove("transcript.txt")
+    f = open("transcript.txt", "w")
+    f.write(transcript)
+    f.close()
+    await ctx.respond(file=discord.File("transcript.txt"))
 '''
 #these are debug commands and should not be used in production
 @bot.slash_command()
@@ -194,7 +216,6 @@ async def clear(ctx):
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
 '''
-#at the end of the day reset the uses_count_today to 0 for all the guilds
 async def reset_uses_count_today():
     await bot.wait_until_ready()
     while not bot.is_closed():
