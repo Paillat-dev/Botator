@@ -40,12 +40,12 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
         await ctx.respond("This server is already setup", ephemeral=True)
         return
     #add the guild to the database
-    c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 150, 0.5, 0.5, 0.5))
+    c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 50, 0.9, 0.0, 0.0, 0, 0))
     conn.commit()
     await ctx.send("The guild has been added to the database")
 #create a command called "enable" taht only admins can use
 @bot.command()
-@discord.commands.has_permissions(administrator=True)
+##@discord.commands.permissions(administrator=True)
 async def enable(ctx):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -58,7 +58,7 @@ async def enable(ctx):
     await ctx.send("The guild has been enabled")
 #create a command called "disable" that only admins can use
 @bot.command()
-@discord.commands.has_permissions(administrator=True)
+##@discord.commands.permissions(administrator=True)
 async def disable(ctx):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -71,7 +71,7 @@ async def disable(ctx):
     await ctx.send("The guild has been disabled")
 #create a command called "advanced" that only admins can use, wich sets the advanced settings up: max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size
 @bot.command()
-@discord.commands.has_permissions(administrator=True)
+##@discord.commands.permissions(administrator=True)
 #set the first argument: max_tokens, with a default value of 150
 @discord.commands.option(name="max_tokens", description="The max tokens", required=False)
 #set the second argument: temperature, with a default value of 0.5
@@ -94,7 +94,7 @@ async def advanced(ctx, max_tokens=150, temperature=0.5, frequency_penalty=0.5, 
     await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 @bot.command()
-@discord.commands.has_permissions(administrator=True)
+##@discord.commands.permissions(administrator=True)
 async def delete(ctx):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -132,6 +132,7 @@ async def on_message(message):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     if str(message.channel.id) != str(c.fetchone()[0]):
+        debug("The message has been sent in the wrong channel")
         return
     #check if the bot hasn't been used more than 200 times in the last 24 hours (uses_count_today)
     c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -200,4 +201,4 @@ bot.loop.create_task(reset_uses_count_today())
 
 #run the bot
 # Replace the following with your bot's token
-bot.run("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+bot.run("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
