@@ -83,7 +83,7 @@ async def disable(ctx):
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
 #set the fifth argument: prompt_size, with a default value of 5
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=256, temperature=0.9, frequency_penalty=0, presence_penalty=0.6, prompt_size=5):
+async def advanced(ctx, max_tokens=256, temperature=1, frequency_penalty=0, presence_penalty=0.6, prompt_size=5):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
