@@ -3,6 +3,7 @@ import discord # pip install pycord
 from discord import File, Intents # pip install pycord
 import logging # pip install logging
 import sqlite3 # pip install sqlite3
+import asyncio # pip install asyncio
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 def debug(message):
@@ -13,7 +14,7 @@ conn = sqlite3.connect('data.db')
 c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
-c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real)''')
+c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer)''')
 Intents =discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
@@ -132,7 +133,12 @@ async def on_message(message):
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     if str(message.channel.id) != str(c.fetchone()[0]):
         return
-
+    #check if the bot hasn't been used more than 200 times in the last 24 hours (uses_count_today)
+    c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
+    if c.fetchone()[0] >= 200:
+        return
+    #add 1 to the uses_count_today
+    c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
     #get the api key from the database
     c.execute("SELECT api_key FROM data WHERE guild_id = ?", (message.guild.id,))
     api_key = c.fetchone()[0]
@@ -169,7 +175,7 @@ async def on_message(message):
         await message.channel.send("The AI is not sure what to say (the response was empty)")
         debug("The response was empty")
     debug("The response has been sent")
-    
+
     #get the message content
     # add a slash command called "say" that sends a message to the channel
 @bot.slash_command()
@@ -181,6 +187,16 @@ async def say(ctx, message: str):
 async def clear(ctx):
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
+
+#at the end of the day reset the uses_count_today to 0 for all the guilds
+async def reset_uses_count_today():
+    await bot.wait_until_ready()
+    while not bot.is_closed():
+        c.execute("UPDATE data SET uses_count_today = 0")
+        conn.commit()
+        await asyncio.sleep(86400)
+# on startup run the reset_uses_count_today function
+bot.loop.create_task(reset_uses_count_today())
 
 #run the bot
 # Replace the following with your bot's token
