@@ -26,4 +26,4 @@ You can run this bot with docker. First clone this repository. Now replace the t
 
 Now create a directory called `botator` where you want the database files to be stored, and run the following command into that directory to run the container.
 
-`docker run -d --name botatordef -v **your botator folder directory**:/Botator/database botator:latest`
+`docker run -d --name botatordef -v `**`your botator folder directory`**`:/Botator/database botator:latest`
