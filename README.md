@@ -18,3 +18,12 @@ Please note that we can possibly log the messages that are sent for **no more th
 You can now enable your bot by doing **/enable**.
 
 You can always disable the bot by doing **/disable** and delete your api key from our server by doing **/delete**.
+
+# Docker
+You can run this bot with docker. First clone this repository, then run the following command in the /Botator/docker/Build directory.
+
+`docker build . -t botator:latest --no-cache`
+
+You cann then run the contaier with this command:
+
+`docker run -d --name botatordef -v ./botator/:/Botator/database botator:latest`
