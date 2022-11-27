@@ -10,7 +10,7 @@ def debug(message):
     logging.info(message)
 
 #create a database called "database.db" if the database does not exist, else connect to it
-conn = sqlite3.connect('data.db')
+conn = sqlite3.connect('../database/data.db')
 c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
