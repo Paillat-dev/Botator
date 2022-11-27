@@ -9,11 +9,11 @@ You can add the bot to your server by clcking [here](https://discord.com/api/oau
 
 Then, run the following commands to set your bot up:
 
-First **/setchannel** and select the channel where you want the bot to talk.
+First **/setup**, define the channel you want the bot to talk into and your OPENAI api key.
 
-Then **/setkey** and put in your openai api key.
+Then, if you want, **/advanced** to define some more advanced parameters..
 
-Please note that we can possibly log the messages that are sent for **no more than 24h**, and that we will store your openai API key. Ypu can delete your API key from our servers by doing **/delete**. Please note that this action is irreversible.
+Please note that we can possibly log the messages that are sent for **no more than 24h**, and that we will store your openai API key. You can always delete your API key from our servers by doing **/delete**. Please note that this action is irreversible.
 
 You can now enable your bot by doing **/enable**.
 
