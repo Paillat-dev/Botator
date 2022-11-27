@@ -5,6 +5,7 @@ import logging # pip install logging
 import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
 import os # pip install os
+
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 
@@ -17,7 +18,7 @@ c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
 c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer)''')
-Intents =discord.Intents.all() # enable all intents
+Intents=discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
 #create a command called "setup" that takes 2 arguments: the channel id and the api key
@@ -42,7 +43,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
         await ctx.respond("This server is already setup", ephemeral=True)
         return
     #add the guild to the database
-    c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 50, 0.9, 0.0, 0.0, 0, 0))
+    c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 150, 1, 0, 0.6, 0, 5))
     conn.commit()
     await ctx.respond("Setup complete", ephemeral=True)
 #create a command called "enable" taht only admins can use
@@ -76,7 +77,7 @@ async def disable(ctx):
 ##@discord.commands.permissions(administrator=True)
 #set the first argument: max_tokens, with a default value of 150
 @discord.commands.option(name="max_tokens", description="The max tokens", required=False)
-#set the second argument: temperature, with a default value of 0.5
+#set the second argument: temperature, with a default value of 1
 @discord.commands.option(name="temperature", description="The temperature", required=False)
 #set the third argument: frequency_penalty, with a default value of 0.5
 @discord.commands.option(name="frequency_penalty", description="The frequency penalty", required=False)
