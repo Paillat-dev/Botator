@@ -195,7 +195,7 @@ async def on_message(message):
     prompt = ""
     for msg in messages:
         if msg.author.bot:
-            prompt += f"Donald Bot \"Botator\"": {msg.content}\n"
+            prompt += f"Donald Bot \"Botator\": {msg.content}\n"
         else:
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     prompt = f"This is a conversation with an AI. Only the {prompt_size} last messages are used as a prompt.\n\n" + prompt + f"\n Donald Bot \"Botator\":"
