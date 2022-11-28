@@ -149,13 +149,13 @@ async def info(ctx):
     embed.add_field(name="Prompt Size", value=data[8], inline=False)
     embed.add_field(name="Uses Count Today", value=data[9], inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
-@bot.command(name="advanced help", description="Show the advanced settings meanings")
+@bot.command(name="advanced_help", description="Show the advanced settings meanings")
 async def advanced_help(ctx):
     embed = discord.Embed(title="Advanced Help", description="Here is the advanced help page", color=0x00ff00)
     embed.add_field(name="max_tokens", value="The maximum number of tokens to generate. Higher values will result in more coherent text, but will take longer to complete. (default: 50)", inline=False)
     embed.add_field(name="temperature", value="The higher the temperature, the crazier the text (default: 0.9)", inline=False)
     embed.add_field(name="frequency_penalty", value="The higher the frequency penalty, the more new words the model will introduce (default: 0.0)", inline=False)
-    embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.6)", inline=False)
+    embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.0)", inline=False)
     embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5)", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 @bot.event
