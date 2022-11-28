@@ -208,7 +208,7 @@ async def on_message(message):
     prompt = ""
     for msg in messages:
         if msg.author.bot:
-            prompt += f"Donald Bot \"Botator\": {msg.content}\n"
+            prompt += f"Botator: {msg.content}\n"
         else:
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
@@ -250,7 +250,7 @@ async def transcript(ctx):
     await ctx.defer()
     for msg in messages:
         if msg.author.bot:
-            transcript += f"Donald Bot \"Botator\": {msg.content}\n"
+            transcript += f"Botator: {msg.content}\n"
         else:
             transcript += f"{msg.author.display_name}: {msg.content}\n"
 #save the transcript in a txt file called transcript.txt. If the file already exists, delete it and create a new one
