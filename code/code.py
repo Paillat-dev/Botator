@@ -5,7 +5,7 @@ import logging # pip install logging
 import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
 import os # pip install os
-
+import random # pip install random
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 
@@ -91,15 +91,25 @@ async def disable(ctx):
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
 #set the fifth argument: prompt_size, with a default value of 5
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=64, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, prompt_size=5):
+async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=None, presence_penalty=None, prompt_size=None):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
         await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
         return
     #update the advanced settings
+    '''
+    current_max_tokens = c.execute("SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+    current_temperature = c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+    current_frequency_penalty = c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+    current_presence_penalty = c.execute("SELECT presence_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+    current_max_tokens = max_tokens if max_tokens is not None else current_max_tokens
+    #if a value changed, it will be updated, otherwise it will keep its default value
+    #default values: max_tokens=64, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, prompt_size=5
+    #if a value is None, it means that the user didn't specify it, so we will keep the current value, if the current value is None, we will use the default value
+'''
     c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
-    conn.commit()
+#    conn.commit()
     await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 @bot.command(name="delete", description="Delete the information about this server")
@@ -183,6 +193,8 @@ async def on_message(message):
         await message.channel.send("The bot has been used more than 200 times in the last 24 hours in this guild. Please try again in 24h.")
         return
     #add 1 to the uses_count_today
+    #show that the bot is typing
+    await message.channel.trigger_typing()
     c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
     #get the api key from the database
     c.execute("SELECT api_key FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -213,6 +225,9 @@ async def on_message(message):
         presence_penalty=float(presence_penalty),
         stop=[" Human:", " AI:", "AI:", "Human:"]    )
     #send the response
+    #wait a random amount of time between 0 and 5 seconds
+    #dont show that the bot is typing anymore
+    await asyncio.sleep(random.randint(0, 5))
     if response["choices"][0]   ["text"] != "":
         await message.channel.send(response["choices"][0]["text"])
     else:
