@@ -17,7 +17,7 @@ conn = sqlite3.connect('../database/data.db')
 c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
-c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_preifx text)''')
+c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text)''')
 Intents=discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
@@ -49,7 +49,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
             await ctx.respond("The channel id and the api key have been updated", ephemeral=True)
     else:
         #in this case, the guild is not in the database, so we add it
-        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, api_key, channel.id, False, 64, 0.9, 0.0, 0.0, 0, 5, ""))
+        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 64, 0.9, 0.0, 0.0, 0, 5, ""))
         conn.commit()
         await ctx.respond("The channel id and the api key have been added", ephemeral=True)
 #create a command called "enable" taht only admins can use
