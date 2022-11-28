@@ -103,6 +103,7 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
     current_temperature = c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
     current_frequency_penalty = c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
     current_presence_penalty = c.execute("SELECT presence_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+    current_prompt_size = c.execute("SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
     current_max_tokens = max_tokens if max_tokens is not None else current_max_tokens
     #if a value changed, it will be updated, otherwise it will keep its default value
     #default values: max_tokens=64, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, prompt_size=5
