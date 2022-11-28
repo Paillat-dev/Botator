@@ -22,9 +22,10 @@ Intents=discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
 #create a command called "setup" that takes 2 arguments: the channel id and the api key
-@bot.command()
+@bot.command(name="setup", description="Setup the bot")
 @discord.commands.option(name="channel_id", description="The channel id", required=True)
 @discord.commands.option(name="api_key", description="The api key", required=True)
+#add a description to the command
 async def setup(ctx, channel: discord.TextChannel, api_key):
     #check if the api key is valid
     openai.api_key = api_key
@@ -52,7 +53,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
         conn.commit()
         await ctx.respond("The channel id and the api key have been added", ephemeral=True)
 #create a command called "enable" taht only admins can use
-@bot.command()
+@bot.command(name="enable", description="Enable the bot")
 ##@discord.commands.permissions(administrator=True)
 async def enable(ctx):
     #check if the guild is in the database
@@ -65,7 +66,7 @@ async def enable(ctx):
     conn.commit()
     await ctx.respond("Enabled", ephemeral=True)
 #create a command called "disable" that only admins can use
-@bot.command()
+@bot.command(name="disable", description="Disable the bot")
 ##@discord.commands.permissions(administrator=True)
 async def disable(ctx):
     #check if the guild is in the database
@@ -78,19 +79,19 @@ async def disable(ctx):
     conn.commit()
     await ctx.respond("Disabled", ephemeral=True)
 #create a command called "advanced" that only admins can use, wich sets the advanced settings up: max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size
-@bot.command()
+@bot.command(name="advanced", description="Advanced settings")
 ##@discord.commands.permissions(administrator=True)
-#set the first argument: max_tokens, with a default value of 150
+#set the first argument: max_tokens, with a default value of 64
 @discord.commands.option(name="max_tokens", description="The max tokens", required=False)
-#set the second argument: temperature, with a default value of 1
+#set the second argument: temperature, with a default value of 0.9
 @discord.commands.option(name="temperature", description="The temperature", required=False)
-#set the third argument: frequency_penalty, with a default value of 0.5
+#set the third argument: frequency_penalty, with a default value of 0.0
 @discord.commands.option(name="frequency_penalty", description="The frequency penalty", required=False)
-#set the fourth argument: presence_penalty, with a default value of 0.5
+#set the fourth argument: presence_penalty, with a default value of 0.0
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
 #set the fifth argument: prompt_size, with a default value of 5
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=256, temperature=1, frequency_penalty=0, presence_penalty=0.6, prompt_size=5):
+async def advanced(ctx, max_tokens=64, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, prompt_size=5):
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -101,7 +102,7 @@ async def advanced(ctx, max_tokens=256, temperature=1, frequency_penalty=0, pres
     conn.commit()
     await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
-@bot.command()
+@bot.command(name="delete", description="Delete the information about this server")
 ##@discord.commands.permissions(administrator=True)
 async def delete(ctx):
     #check if the guild is in the database
@@ -124,7 +125,7 @@ async def help(ctx):
     embed.add_field(name="/help", value="Show this message", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
-@bot.command()
+@bot.command(name="info", description="Show the information stored about this server")
 async def info(ctx):
     #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
     #check if the guild is in the database
@@ -148,7 +149,15 @@ async def info(ctx):
     embed.add_field(name="Prompt Size", value=data[8], inline=False)
     embed.add_field(name="Uses Count Today", value=data[9], inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
-
+@bot.command(name="advanced help", description="Show the advanced settings meanings")
+async def advanced_help(ctx):
+    embed = discord.Embed(title="Advanced Help", description="Here is the advanced help page", color=0x00ff00)
+    embed.add_field(name="max_tokens", value="The maximum number of tokens to generate. Higher values will result in more coherent text, but will take longer to complete. (default: 50)", inline=False)
+    embed.add_field(name="temperature", value="The higher the temperature, the crazier the text (default: 0.9)", inline=False)
+    embed.add_field(name="frequency_penalty", value="The higher the frequency penalty, the more new words the model will introduce (default: 0.0)", inline=False)
+    embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.6)", inline=False)
+    embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5)", inline=False)
+    await ctx.respond(embed=embed, ephemeral=True)
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
@@ -213,7 +222,7 @@ async def on_message(message):
 
     #get the message content
     # add a slash command called "say" that sends a message to the channel
-@bot.command()
+@bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
 async def transcript(ctx):
 #save all the messages in the channel in a txt file and send it
     messages = await ctx.channel.history(limit=None).flatten()
