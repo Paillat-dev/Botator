@@ -17,7 +17,7 @@ conn = sqlite3.connect('../database/data.db')
 c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
-c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer)''')
+c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_preifx text)''')
 Intents=discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
@@ -49,7 +49,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
             await ctx.respond("The channel id and the api key have been updated", ephemeral=True)
     else:
         #in this case, the guild is not in the database, so we add it
-        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, api_key, channel.id, False, 64, 0.9, 0.0, 0.0, 0, 5))
+        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, api_key, channel.id, False, 64, 0.9, 0.0, 0.0, 0, 5, ""))
         conn.commit()
         await ctx.respond("The channel id and the api key have been added", ephemeral=True)
 #create a command called "enable" taht only admins can use
@@ -211,7 +211,9 @@ async def on_message(message):
             prompt += f"Donald Bot \"Botator\": {msg.content}\n"
         else:
             prompt += f"{msg.author.display_name}: {msg.content}\n"
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called Donald Bot \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n\n" + prompt + f"\n Donald Bot \"Botator\":"
+    #get the prompt_prefix from the database
+    c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called Donald Bot \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n\n" + str(c.fetchone()[0]) + prompt + f"\n Donald Bot \"Botator\":"
     #send the request to the api
     debug("Sending request to the api")
     debug(prompt)
@@ -269,7 +271,12 @@ async def say(ctx, message: str):
 async def clear(ctx):
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
-
+#add a slash command called "prefix" that changes the prefix of the bot
+@bot.command(name="prefix", description="Change the prefix of the prompt")
+async def prefix(ctx, prefix: str):
+    await ctx.respond("prefix changed!", ephemeral=True)
+    c.execute("UPDATE data SET prompt_prefix = ? WHERE guild_id = ?", (prefix, ctx.guild.id))
+    conn.commit()
 async def reset_uses_count_today():
     await bot.wait_until_ready()
     while not bot.is_closed():
