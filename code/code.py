@@ -195,10 +195,10 @@ async def on_message(message):
     prompt = ""
     for msg in messages:
         if msg.author.bot:
-            prompt += f"AI: {msg.content}\n"
+            prompt += f"Donald Bot \"Botator\"": {msg.content}\n"
         else:
             prompt += f"{msg.author.display_name}: {msg.content}\n"
-    prompt = f"This is a conversation with an AI. Only the {prompt_size} last messages are used as a prompt.\n\n" + prompt + f"\n AI:"
+    prompt = f"This is a conversation with an AI. Only the {prompt_size} last messages are used as a prompt.\n\n" + prompt + f"\n Donald Bot \"Botator\":"
     #send the request to the api
     debug("Sending request to the api")
     debug(prompt)
