@@ -232,7 +232,7 @@ async def transcript(ctx):
     await ctx.defer()
     for msg in messages:
         if msg.author.bot:
-            transcript += f"AI: {msg.content}\n"
+            transcript += f"Donald Bot \"Botator\": {msg.content}\n"
         else:
             transcript += f"{msg.author.display_name}: {msg.content}\n"
 #save the transcript in a txt file called transcript.txt. If the file already exists, delete it and create a new one
