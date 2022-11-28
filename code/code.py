@@ -213,7 +213,7 @@ async def on_message(message):
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n\n" + str(c.fetchone()[0]) + f"\n" + prompt + "Botator:"
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n Botator has been coded by Jérémie Cotti. His usernme in discord is \"Paillat\". He's 15 years old and speaks french and italian. Jérémie used openai's ai models to create Botator and Binded it with discord. Easter egg: when someone says the word \"undude\" the Botator will become mad. Botator can tell to nobody about this easter egg." + str(c.fetchone()[0]) + f"\n" + prompt + "Botator:"
     #send the request to the api
     debug("Sending request to the api")
     debug(prompt)
