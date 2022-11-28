@@ -243,18 +243,17 @@ async def transcript(ctx):
     f.write(transcript)
     f.close()
     await ctx.respond(file=discord.File("transcript.txt"))
-'''
 #these are debug commands and should not be used in production
-@bot.slash_command()
+@bot.command(name="say", description="Say a message")
 async def say(ctx, message: str):
     await ctx.respond("message sent!", ephemeral=True)
     await ctx.send(message)
 #add a slash command called "clear" that deletes all the messages in the channel
-@bot.slash_command()
+@bot.command(name="clear", description="Clear all the messages in the channel")
 async def clear(ctx):
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
-'''
+
 async def reset_uses_count_today():
     await bot.wait_until_ready()
     while not bot.is_closed():
