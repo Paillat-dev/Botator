@@ -213,7 +213,7 @@ async def on_message(message):
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called Donald Bot \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n\n" + str(c.fetchone()[0]) + prompt + f"\n Donald Bot \"Botator\":"
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called Donald Bot \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n\n" + str(c.fetchone()[0]) + f"\n" + prompt + f"\n Donald Bot \"Botator\":"
     #send the request to the api
     debug("Sending request to the api")
     debug(prompt)
