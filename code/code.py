@@ -86,40 +86,51 @@ async def disable(ctx):
 #create a command called "advanced" that only admins can use, wich sets the advanced settings up: max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size
 @bot.command(name="advanced", description="Advanced settings")
 ##@discord.commands.permissions(administrator=True)
-#set the first argument: max_tokens, with a default value of 64
+#add the options
 @discord.commands.option(name="max_tokens", description="The max tokens", required=False)
-#set the second argument: temperature, with a default value of 0.9
 @discord.commands.option(name="temperature", description="The temperature", required=False)
-#set the third argument: frequency_penalty, with a default value of 0.0
 @discord.commands.option(name="frequency_penalty", description="The frequency penalty", required=False)
-#set the fourth argument: presence_penalty, with a default value of 0.0
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
-#set the fifth argument: prompt_size, with a default value of 5
-@discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=12345, temperature=123.4, frequency_penalty=0.444555, presence_penalty=0.444555, prompt_size=23456):
-    #check if the guild is in the database
+@discord.commands.option(name="prompt_size", description="The prompt size", required=False)
+async def advanced(ctx, max_tokens: int = None, temperature: float = None, frequency_penalty: float = None, presence_penalty: float = None, prompt_size: int = None):
     debug(f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+    #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-    if not c.fetchone():
-        await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
+    if c.fetchone() is None:
+        await ctx.respond("This server is not setup", ephemeral=True)
         return
-    #save the current settings into a list: is_active, max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, prompt_prefix
-    print(c.fetchone())
-    current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
-    #get the new settings
-    if max_tokens == 12345:
-        max_tokens = current_settings[1]
-    if temperature == 123.4:
-        temperature = current_settings[2]
-    if frequency_penalty == 0.444555:
-        frequency_penalty = current_settings[3]
-    if presence_penalty == 0.444555:
-        presence_penalty = current_settings[4]
-    if prompt_size == 23456:
-        prompt_size = current_settings[5]
-    #update the settings
+    #check if the user has entered at least one argument
+    if max_tokens is None and temperature is None and frequency_penalty is None and presence_penalty is None and prompt_size is None:
+        await ctx.respond("You must enter at least one argument", ephemeral=True)
+        return
+    #check if the user has entered valid arguments
+    if max_tokens is not None and (max_tokens < 1 or max_tokens > 2048):
+        await ctx.respond("Invalid max tokens", ephemeral=True)
+        return
+    if temperature is not None and (temperature < 0.0 or temperature > 1.0):
+        await ctx.respond("Invalid temperature", ephemeral=True)
+        return
+    if frequency_penalty is not None and (frequency_penalty < 0.0 or frequency_penalty > 1.0):
+        await ctx.respond("Invalid frequency penalty", ephemeral=True)
+        return
+    if presence_penalty is not None and (presence_penalty < 0.0 or presence_penalty > 1.0):
+        await ctx.respond("Invalid presence penalty", ephemeral=True)
+        return
+    if prompt_size is not None and (prompt_size < 1 or prompt_size > 10):
+        await ctx.respond("Invalid prompt size", ephemeral=True)
+        return
+    if max_tokens is None:
+        max_tokens = 64
+    if temperature is None:
+        temperature = 0.9
+    if frequency_penalty is None:
+        frequency_penalty = 0.0
+    if presence_penalty is None:
+        presence_penalty = 0.0
+    if prompt_size is None:
+        prompt_size = 5
+    #update the database
     c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
-    await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 @bot.command(name="default", description="Default settings")
 ##@discord.commands.permissions(administrator=True)
