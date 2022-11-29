@@ -223,22 +223,24 @@ async def on_message(message):
         prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
     if message.content.lower().find("hello there") != -1:
         #if the last message contains the word "hello there" add Easter egg: when someone says the word \"hello there\" Botator will say \"General Kenobi\" to the prompt and the bot will send a message containing the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918
-        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\"\n"
+        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\"\n in reference to star wars\n"
         #whait 1 second
         await asyncio.sleep(1)
         await message.channel.send("https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif")
         await message.channel.trigger_typing()    
     if message.content.lower().find("i am the senate") != -1:
-        prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
+        prompt += "System: I am the senate detected. Botator will now say \"Not yet\", in reference to the star wars prequels.\n"
     if message.content.lower().find("i am your father") != -1:
-        prompt += "System: I am your father detected. Botator will now say \"No. It's not true! That's impossible!\".\n"
+        prompt += "System: I am your father detected. Botator will now say \"No. It's not true! That's impossible!\". in reference to the star wars prequels.\n"
     if message.content.lower().find("i have the high ground") != -1:
-        prompt += "System: I have the high ground detected. Botator will now say \"You underestimate my power!\".\n"
+        prompt += "System: I have the high ground detected. Botator will now say \"You underestimate my power!\" in reference to the star wars prequels.\n"
     if message.content.lower().find("you underestimate my power") != -1:
-        prompt += "System: You underestimate my power detected. Botator will now say \"Don't try it.\".\n"
+        prompt += "System: You underestimate my power detected. Botator will now say \"Don't try it.\" in reference to the star wars prequels.\n"
     if message.content.lower().find("carpet") != -1:
         #When someone says the word carpet, the ai is going to be mad and say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere.
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
+    if message.content.lower().find("mail") != -1 and message.author.display_name.lower().find("latouff") != -1:
+        prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam?\" because Latouff's name is Liam.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
     debug("Sending request to the api")
