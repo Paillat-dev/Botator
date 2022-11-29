@@ -104,6 +104,7 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
         await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
         return
     #save the current settings into a list: is_active, max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, prompt_prefix
+    debug(f"Current settings: {c.fetchone()}")
     current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
     #get the new settings
     if max_tokens is None:
