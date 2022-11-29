@@ -189,7 +189,7 @@ async def on_message(message):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     if str(message.channel.id) != str(c.fetchone()[0]):
-        if message.content.find(bot.user.mention):
+        if message.content.find("<@1046051875755134996>") != -1:
             debug("wrong channel, but mention")
         else :
             debug("The message has been sent in the wrong channel")
