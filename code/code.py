@@ -7,6 +7,7 @@ import asyncio # pip install asyncio
 import os # pip install os
 import random # pip install random
 import re # pip install re
+import datetime # pip install datetime
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 
@@ -29,6 +30,7 @@ bot = discord.Bot(intents=Intents.all())
 #add a description to the command
 async def setup(ctx, channel: discord.TextChannel, api_key):
     #check if the api key is valid
+    debug(f"The user {ctx.author} ran the setup command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     openai.api_key = api_key
     try:
         openai.Completion.create(engine="davinci", prompt="Hello world", max_tokens=1)
@@ -58,6 +60,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
 ##@discord.commands.permissions(administrator=True)
 async def enable(ctx):
     #check if the guild is in the database
+    debug(f"The user {ctx.author} ran the enable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
         await ctx.respond("This server is not setup", ephemeral=True)
@@ -70,6 +73,7 @@ async def enable(ctx):
 @bot.command(name="disable", description="Disable the bot")
 ##@discord.commands.permissions(administrator=True)
 async def disable(ctx):
+    debug(f"The user {ctx.author} ran the disable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -94,6 +98,7 @@ async def disable(ctx):
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
 async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=None, presence_penalty=None, prompt_size=None):
     #check if the guild is in the database
+    debug(f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
         await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
@@ -121,6 +126,7 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
 @bot.command(name="default", description="Default settings")
 ##@discord.commands.permissions(administrator=True)
 async def default(ctx):
+    debug(f"The user {ctx.author} ran the default command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -133,6 +139,7 @@ async def default(ctx):
 #create a command called "cancel" that deletes the last message sent by the bot in the response channel
 @bot.command(name="cancel", description="Cancel the last message sent into a channel")
 async def cancel(ctx):
+    debug(f"The user {ctx.author} ran the cancel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -146,6 +153,7 @@ async def cancel(ctx):
 @bot.command(name="delete", description="Delete the information about this server")
 ##@discord.commands.permissions(administrator=True)
 async def delete(ctx):
+    debug(f"The user {ctx.author} ran the delete command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone() is None:
@@ -157,6 +165,7 @@ async def delete(ctx):
     await ctx.respond("Deleted", ephemeral=True)
 @bot.command()
 async def help(ctx):
+    debug(f"The user {ctx.author} ran the help command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     embed = discord.Embed(title="Help", description="Here is the help page", color=0x00ff00)
     embed.add_field(name="/setup", value="Setup the bot", inline=False)
     embed.add_field(name="/enable", value="Enable the bot", inline=False)
@@ -172,6 +181,7 @@ async def help(ctx):
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
 @bot.command(name="info", description="Show the information stored about this server")
 async def info(ctx):
+    debug(f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -197,6 +207,7 @@ async def info(ctx):
     await ctx.respond(embed=embed, ephemeral=True)
 @bot.command(name="advanced_help", description="Show the advanced settings meanings")
 async def advanced_help(ctx):
+    debug(f"The user {ctx.author} ran the advanced_help command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     embed = discord.Embed(title="Advanced Help", description="Here is the advanced help page", color=0x00ff00)
     embed.add_field(name="max_tokens", value="The maximum number of tokens to generate. Higher values will result in more coherent text, but will take longer to complete. (default: 50)", inline=False)
     embed.add_field(name="temperature", value="The higher the temperature, the crazier the text (default: 0.9)", inline=False)
@@ -323,6 +334,7 @@ async def on_message(message):
     # add a slash command called "say" that sends a message to the channel
 @bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
 async def transcript(ctx):
+    debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
 #save all the messages in the channel in a txt file and send it
     messages = await ctx.channel.history(limit=None).flatten()
     messages.reverse()
@@ -345,28 +357,44 @@ async def transcript(ctx):
 #these are debug commands and should not be used in production
 @bot.command(name="say", description="Say a message")
 async def say(ctx, message: str):
+    debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     await ctx.respond("message sent!", ephemeral=True)
     await ctx.send(message)
 #add a slash command called "clear" that deletes all the messages in the channel
 @bot.command(name="clear", description="Clear all the messages in the channel")
 async def clear(ctx):
+    debug(f"The user {ctx.author.display_name} ran the clear command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     await ctx.respond("messages deleted!", ephemeral=True)
     return await ctx.channel.purge()
 #add a slash command called "prefix" that changes the prefix of the bot
 @bot.command(name="prefix", description="Change the prefix of the prompt")
 async def prefix(ctx, prefix: str):
+    debug(f"The user {ctx.author.display_name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     await ctx.respond("prefix changed!", ephemeral=True)
     c.execute("UPDATE data SET prompt_prefix = ? WHERE guild_id = ?", (prefix, ctx.guild.id))
     conn.commit()
-async def reset_uses_count_today():
-    await bot.wait_until_ready()
-    while not bot.is_closed():
-        c.execute("UPDATE data SET uses_count_today = 0")
-        conn.commit()
-        await asyncio.sleep(86400)
-# on startup run the reset_uses_count_today function
-bot.loop.create_task(reset_uses_count_today())
-
+def reset_uses_count_today():
+    c.execute("UPDATE data SET uses_count_today = 0")
+    conn.commit()
+#get the current date and save it in the previous_date variable
+#if the day number is different from the previous day number, reset the uses count today
+def check_day():
+    global previous_date
+    if datetime.datetime.now().day != previous_date.day:
+        previous_date = datetime.datetime.now()
+        reset_uses_count_today()
+        previous_date = datetime.datetime.now()
+        return True
+    else:
+        previous_date = datetime.datetime.now()
+        return False
+#run check_day every 10 seconds
+async def check_day_task():
+    while True:
+        check_day()
+        await asyncio.sleep(60)
+#add a task to the bot that runs check_day every 1 minute
+bot.loop.create_task(check_day_task())
 #run the bot
 # Replace the following with your bot's token
 with open("key.txt") as f:
