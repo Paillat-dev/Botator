@@ -157,8 +157,8 @@ async def info(ctx):
     embed.add_field(name="Temperature", value=data[5], inline=False)
     embed.add_field(name="Frequency Penalty", value=data[6], inline=False)
     embed.add_field(name="Presence Penalty", value=data[7], inline=False)
-    embed.add_field(name="Prompt Size", value=data[8], inline=False)
-    embed.add_field(name="Uses Count Today", value=data[9], inline=False)
+    embed.add_field(name="Prompt Size", value=data[9], inline=False)
+    embed.add_field(name="Uses Count Today", value=data[8], inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 @bot.command(name="advanced_help", description="Show the advanced settings meanings")
 async def advanced_help(ctx):
@@ -219,7 +219,7 @@ async def on_message(message):
     debug(prompt)
     openai.api_key = api_key
     response = openai.Completion.create(
-        engine="text-davinci-002",
+        engine="text-davinci-003",
         prompt=str(prompt),
         max_tokens=int(max_tokens),
         top_p=1,
