@@ -98,22 +98,51 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
     if c.fetchone() is None:
         await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
         return
-    #update the advanced settings
-    '''
-    current_max_tokens = c.execute("SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
-    current_temperature = c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
-    current_frequency_penalty = c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
-    current_presence_penalty = c.execute("SELECT presence_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
-    current_prompt_size = c.execute("SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
-    current_max_tokens = max_tokens if max_tokens is not None else current_max_tokens
-    #if a value changed, it will be updated, otherwise it will keep its default value
-    #default values: max_tokens=64, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, prompt_size=5
-    #if a value is None, it means that the user didn't specify it, so we will keep the current value, if the current value is None, we will use the default value
-'''
-    c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
-#    conn.commit()
+    #save the current settings into a list: is_active, max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, prompt_prefix
+    current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
+    #get the new settings
+    new_settings = [max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size]
+    #for each setting, if it is not None, we update it in the database
+    for i in range(len(new_settings)):
+        if new_settings[i] is not None:
+            if i == 0:
+                c.execute("UPDATE data SET max_tokens = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
+            elif i == 1:
+                c.execute("UPDATE data SET temperature = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
+            elif i == 2:
+                c.execute("UPDATE data SET frequency_penalty = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
+            elif i == 3:
+                c.execute("UPDATE data SET presence_penalty = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
+            elif i == 4:
+                c.execute("UPDATE data SET prompt_size = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
+    conn.commit()
     await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
+@bot.command(name="default", description="Default settings")
+##@discord.commands.permissions(administrator=True)
+async def default(ctx):
+    #check if the guild is in the database
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    if c.fetchone() is None:
+        await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
+        return
+    #set the advanced settings (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size) and also prompt_prefix to their default values
+    c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (64, 0.9, 0.0, 0.0, 5, ctx.guild.id))
+    conn.commit()
+    await ctx.respond("The advanced settings have been set to their default values", ephemeral=True)
+#create a command called "cancel" that deletes the last message sent by the bot in the response channel
+@bot.command(name="cancel", description="Cancel the last message sent into a channel")
+async def cancel(ctx):
+    #check if the guild is in the database
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    if c.fetchone() is None:
+        await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
+        return
+    #get the last message sent by the bot in the cha where the command was sent
+    last_message = await ctx.channel.fetch_message(ctx.channel.last_message_id)
+    #delete the message
+    await last_message.delete()
+    await ctx.respond("The last message has been deleted", ephemeral=True)
 @bot.command(name="delete", description="Delete the information about this server")
 ##@discord.commands.permissions(administrator=True)
 async def delete(ctx):
@@ -134,6 +163,8 @@ async def help(ctx):
     embed.add_field(name="/disable", value="Disable the bot", inline=False)
     embed.add_field(name="/advanced", value="Set the advanced settings", inline=False)
     embed.add_field(name="/delete", value="Delete all your data from our server", inline=False)
+    embed.add_field(name="/cancel", value="Cancel the last message sent by the bot", inline=False)
+    embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)
     embed.add_field(name="/help", value="Show this message", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
