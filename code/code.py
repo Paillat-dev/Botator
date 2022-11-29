@@ -223,7 +223,7 @@ async def on_message(message):
         prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
     if message.content.lower().find("hello there") != -1:
         #if the last message contains the word "hello there" add Easter egg: when someone says the word \"hello there\" Botator will say \"General Kenobi\" to the prompt and the bot will send a message containing the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918
-        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\" and send the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918\n"
+        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\" and send the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918 \n"
     if message.content.lower().find("i am the senate") != -1:
         prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
     if message.content.lower().find("i am your father") != -1:
