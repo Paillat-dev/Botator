@@ -106,21 +106,18 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
     #save the current settings into a list: is_active, max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, prompt_prefix
     current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
     #get the new settings
-    new_settings = [max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size]
-    #for each setting, if it is not None, we update it in the database
-    for i in range(len(new_settings)):
-        if new_settings[i] is not None:
-            if i == 0:
-                c.execute("UPDATE data SET max_tokens = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
-            elif i == 1:
-                c.execute("UPDATE data SET temperature = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
-            elif i == 2:
-                c.execute("UPDATE data SET frequency_penalty = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
-            elif i == 3:
-                c.execute("UPDATE data SET presence_penalty = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
-            elif i == 4:
-                c.execute("UPDATE data SET prompt_size = ? WHERE guild_id = ?", (new_settings[i], ctx.guild.id))
-    conn.commit()
+    if max_tokens is None:
+        max_tokens = current_settings[1]
+    if temperature is None:
+        temperature = current_settings[2]
+    if frequency_penalty is None:
+        frequency_penalty = current_settings[3]
+    if presence_penalty is None:
+        presence_penalty = current_settings[4]
+    if prompt_size is None:
+        prompt_size = current_settings[5]
+    #update the settings
+    c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
     await ctx.respond("The advanced settings have been updated", ephemeral=True)
 #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 @bot.command(name="default", description="Default settings")
