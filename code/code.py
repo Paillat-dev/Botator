@@ -229,6 +229,9 @@ async def on_message(message):
         prompt += "System: I have the high ground detected. Botator will now say \"You underestimate my power!\".\n"
     if message.content.lower().find("you underestimate my power") != -1:
         prompt += "System: You underestimate my power detected. Botator will now say \"Don't try it.\".\n"
+    if message.content.lower().find("carpet") != -1:
+        #When someone says the word carpet, the ai is going to be mad and say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere.
+        prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
     debug("Sending request to the api")
