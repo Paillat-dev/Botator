@@ -367,6 +367,7 @@ async def prefix(ctx, prefix: str):
     await ctx.respond("prefix changed!", ephemeral=True)
     c.execute("UPDATE data SET prompt_prefix = ? WHERE guild_id = ?", (prefix, ctx.guild.id))
     conn.commit()
+'''
 def reset_uses_count_today():
     c.execute("UPDATE data SET uses_count_today = 0")
     conn.commit()
@@ -389,6 +390,7 @@ async def check_day_task():
         await asyncio.sleep(60)
 #add a task to the bot that runs check_day every 1 minute
 bot.loop.create_task(check_day_task())
+'''
 #run the bot
 # Replace the following with your bot's token
 with open("key.txt") as f:
