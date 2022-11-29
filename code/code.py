@@ -131,7 +131,9 @@ async def advanced(ctx, max_tokens: int = None, temperature: float = None, frequ
         prompt_size = 5
     #update the database
     c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
-#create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
+    conn.commit()
+    await ctx.respond("Advanced settings updated", ephemeral=True)
+    #create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 @bot.command(name="default", description="Default settings")
 ##@discord.commands.permissions(administrator=True)
 async def default(ctx):
