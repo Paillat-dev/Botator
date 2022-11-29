@@ -240,7 +240,7 @@ async def on_message(message):
         #When someone says the word carpet, the ai is going to be mad and say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere.
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     if message.content.lower().find("mail") != -1 and message.author.display_name.lower().find("latouff") != -1:
-        prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam?\" because Latouff's name is Liam.\n"
+        prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam?\" because Latouff's name is Liam, and mail in reverse is Liam.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
     debug("Sending request to the api")
