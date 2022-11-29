@@ -249,7 +249,7 @@ async def on_message(message):
     #get the channel id from the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     if str(message.channel.id) != str(c.fetchone()[0]):
-        prompt = msg.author.display_name + ":" + message.content + "\n"
+        prompt = message.author.display_name + ":" + message.content + "\n"
     else:
         for msg in messages:
             if msg.author.bot:
