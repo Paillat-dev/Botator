@@ -170,6 +170,8 @@ async def advanced_help(ctx):
     embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.0)", inline=False)
     embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5)", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
+#when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
+
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
@@ -220,7 +222,8 @@ async def on_message(message):
     if message.content.lower().find("undude") != -1:
         prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
     if message.content.lower().find("hello there") != -1:
-        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\".\n"
+        #if the last message contains the word "hello there" add Easter egg: when someone says the word \"hello there\" Botator will say \"General Kenobi\" to the prompt and the bot will send a message containing the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918
+        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\" and send the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918\n"
     if message.content.lower().find("i am the senate") != -1:
         prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
     if message.content.lower().find("i am your father") != -1:
