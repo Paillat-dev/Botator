@@ -6,6 +6,7 @@ import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
 import os # pip install os
 import random # pip install random
+import re # pip install re
 #set the debug mode to the maximum
 logging.basicConfig(level=logging.INFO)
 
@@ -188,8 +189,11 @@ async def on_message(message):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     if str(message.channel.id) != str(c.fetchone()[0]):
-        debug("The message has been sent in the wrong channel")
-        return
+        if message.content.find(bot.user.mention):
+            debug("wrong channel, but mention")
+        else :
+            debug("The message has been sent in the wrong channel")
+            return
     #check if the bot hasn't been used more than 200 times in the last 24 hours (uses_count_today)
     c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
     if c.fetchone()[0] >= 200:
@@ -213,6 +217,17 @@ async def on_message(message):
         if msg.author.bot:
             prompt += f"Botator: {msg.content}\n"
         else:
+            #replace the mentions of each user with their name
+            #first get all the mentions in the message
+            mentions = re.findall(r"<@!?\d+>", msg.content)
+            #then replace each mention with the name of the user
+            for mention in mentions:
+                #get the user id
+                id = mention[2:-1]
+                #get the user
+                user = await bot.fetch_user(id)
+                #replace the mention with the name
+                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -240,7 +255,7 @@ async def on_message(message):
         #When someone says the word carpet, the ai is going to be mad and say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere.
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     if message.content.lower().find("mail") != -1 and message.author.display_name.lower().find("latouff") != -1:
-        prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam?\" because Latouff's name is Liam, and mail in reverse is Liam.\n"
+        prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam? Mail is your name in reverse.\" because Latouff's name is Liam, and mail in reverse is Liam.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
     debug("Sending request to the api")
