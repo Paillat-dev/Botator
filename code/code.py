@@ -100,11 +100,11 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
     #check if the guild is in the database
     debug(f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-    if c.fetchone() is None:
+    if not c.fetchone():
         await ctx.respond("This server is not setup, please run /setup", ephemeral=True)
         return
     #save the current settings into a list: is_active, max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, prompt_prefix
-    debug(f"Current settings: {c.fetchone()}")
+    debug(f"Current settings: {c.fetchone()[4]}")
     current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
     #get the new settings
     if max_tokens is None:
