@@ -224,7 +224,9 @@ async def on_message(message):
     if message.content.lower().find("hello there") != -1:
         #if the last message contains the word "hello there" add Easter egg: when someone says the word \"hello there\" Botator will say \"General Kenobi\" to the prompt and the bot will send a message containing the gif https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918
         prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\"\n"
-        await message.channel.send("https://tenor.com/fr/view/star-wars-general-grievous-general-kenobi-revenge-of-the-sith-gif-22697918")
+        #whait 1 second
+        await asyncio.sleep(1)
+        await message.channel.send("https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif")
     if message.content.lower().find("i am the senate") != -1:
         prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
     if message.content.lower().find("i am your father") != -1:
@@ -251,9 +253,9 @@ async def on_message(message):
         presence_penalty=float(presence_penalty),
         stop=[" Human:", " AI:", "AI:", "Human:"]    )
     #send the response
-    #wait a random amount of time between 0 and 5 seconds
+    #wait a random amount of time between 0 and 2 seconds in order to make the bot look more human
     #dont show that the bot is typing anymore
-    await asyncio.sleep(random.randint(0, 5))
+    await asyncio.sleep(random.randint(0, 2))
     if response["choices"][0]   ["text"] != "":
         await message.channel.send(response["choices"][0]["text"])
     else:
