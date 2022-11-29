@@ -96,7 +96,7 @@ async def disable(ctx):
 @discord.commands.option(name="presence_penalty", description="The presence penalty", required=False)
 #set the fifth argument: prompt_size, with a default value of 5
 @discord.commands.option(name="prompt_size", description="The number of messages to use as a prompt", required=False)
-async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=None, presence_penalty=None, prompt_size=None):
+async def advanced(ctx, max_tokens=12345, temperature=123.4, frequency_penalty=0.444555, presence_penalty=0.444555, prompt_size=23456):
     #check if the guild is in the database
     debug(f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -107,15 +107,15 @@ async def advanced(ctx, max_tokens=None, temperature=None, frequency_penalty=Non
     print(c.fetchone())
     current_settings = [c.fetchone()[4], c.fetchone()[5], c.fetchone()[6], c.fetchone()[7], c.fetchone()[9]]
     #get the new settings
-    if max_tokens is None:
+    if max_tokens == 12345:
         max_tokens = current_settings[1]
-    if temperature is None:
+    if temperature == 123.4:
         temperature = current_settings[2]
-    if frequency_penalty is None:
+    if frequency_penalty == 0.444555:
         frequency_penalty = current_settings[3]
-    if presence_penalty is None:
+    if presence_penalty == 0.444555:
         presence_penalty = current_settings[4]
-    if prompt_size is None:
+    if prompt_size == 23456:
         prompt_size = current_settings[5]
     #update the settings
     c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
