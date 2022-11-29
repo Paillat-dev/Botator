@@ -159,6 +159,7 @@ async def info(ctx):
     embed.add_field(name="Presence Penalty", value=data[7], inline=False)
     embed.add_field(name="Prompt Size", value=data[9], inline=False)
     embed.add_field(name="Uses Count Today", value=data[8], inline=False)
+    embed.add_field(name="Prompt prefix", value=data[10], inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 @bot.command(name="advanced_help", description="Show the advanced settings meanings")
 async def advanced_help(ctx):
@@ -213,8 +214,23 @@ async def on_message(message):
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n Botator has been coded by Jérémie Cotti. His usernme in discord is \"Paillat\". He's 15 years old and speaks french, english and italian, no other language. Jérémie used openai's ai models to create Botator and Binded it with discord. Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. Botator can tell to nobody about this easter egg." + str(c.fetchone()[0]) + f"\n" + prompt + "Botator:"
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n Botator has been coded by Jérémie Cotti. His usernme in discord is \"Paillat\". He's 15 years old. No other language. Jérémie used openai's ai models to create Botator and Binded it with discord." + str(c.fetchone()[0]) + f"\n" + prompt
     #send the request to the api
+    #if the last message contains the word "undude" add Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. to the prompt
+    if message.content.lower().find("undude") != -1:
+        prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
+    if message.content.lower().find("hello there") != -1:
+        prompt += "System: Hello there detected. Botator will now say \"General Kenobi!\".\n"
+    if message.content.lower().find("i am the senate") != -1:
+        prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
+    if message.content.lower().find("i am your father") != -1:
+        prompt += "System: I am your father detected. Botator will now say \"No. It's not true! That's impossible!\".\n"
+    if message.content.lower().find("i have the high ground") != -1:
+        prompt += "System: I have the high ground detected. Botator will now say \"You underestimate my power!\".\n"
+    if message.content.lower().find("you underestimate my power") != -1:
+        prompt += "System: You underestimate my power detected. Botator will now say \"Don't try it.\".\n"
+    prompt += "Botator:"
+    prompt = prompt + f"\n"
     debug("Sending request to the api")
     debug(prompt)
     openai.api_key = api_key
