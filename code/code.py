@@ -165,6 +165,8 @@ async def help(ctx):
     embed.add_field(name="/delete", value="Delete all your data from our server", inline=False)
     embed.add_field(name="/cancel", value="Cancel the last message sent by the bot", inline=False)
     embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)
+#   embed.add_field(name="/help", value="Show this message", inline=False)
+    
     embed.add_field(name="/help", value="Show this message", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
@@ -244,22 +246,27 @@ async def on_message(message):
     messages = await message.channel.history(limit=prompt_size).flatten()
     messages.reverse()
     prompt = ""
-    for msg in messages:
-        if msg.author.bot:
-            prompt += f"Botator: {msg.content}\n"
-        else:
-            #replace the mentions of each user with their name
-            #first get all the mentions in the message
-            mentions = re.findall(r"<@!?\d+>", msg.content)
-            #then replace each mention with the name of the user
-            for mention in mentions:
-                #get the user id
-                id = mention[2:-1]
-                #get the user
-                user = await bot.fetch_user(id)
-                #replace the mention with the name
-                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
-            prompt += f"{msg.author.display_name}: {msg.content}\n"
+    #get the channel id from the database
+    c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
+    if str(message.channel.id) != str(c.fetchone()[0]):
+        prompt = msg.author.display_name + ":" + message.content + "\n"
+    else:
+        for msg in messages:
+            if msg.author.bot:
+                prompt += f"Botator: {msg.content}\n"
+            else:
+                #replace the mentions of each user with their name
+                #first get all the mentions in the message
+                mentions = re.findall(r"<@!?\d+>", msg.content)
+                #then replace each mention with the name of the user
+                for mention in mentions:
+                    #get the user id
+                    id = mention[2:-1]
+                    #get the user
+                    user = await bot.fetch_user(id)
+                    #replace the mention with the name
+                    msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
+                prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
     prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n Botator has been coded by Jérémie Cotti. His usernme in discord is \"Paillat\". He's 15 years old. No other language. Jérémie used openai's ai models to create Botator and Binded it with discord." + str(c.fetchone()[0]) + f"\n" + prompt
