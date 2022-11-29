@@ -227,6 +227,7 @@ async def on_message(message):
         #whait 1 second
         await asyncio.sleep(1)
         await message.channel.send("https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif")
+        await message.channel.trigger_typing()    
     if message.content.lower().find("i am the senate") != -1:
         prompt += "System: I am the senate detected. Botator will now say \"Not yet\".\n"
     if message.content.lower().find("i am your father") != -1:
