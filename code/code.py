@@ -314,6 +314,9 @@ async def on_message(message):
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     if message.content.lower().find("mail") != -1 and message.author.display_name.lower().find("latouff") != -1:
         prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam? Mail is your name in reverse.\" because Latouff's name is Liam, and mail in reverse is Liam. Then, after saying that in the sentence, botato will continue his sentence saying something else.\n"
+    if message.author.display_name.lower().find("fives3dprint") != -1:
+        #if the author of the last message is fives3dprint, add Easter egg: when someone says the word \"fives3dprint\" Botator will say \"Fives3dprint is the best discord bot\" to the prompt
+        prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
     debug("Sending request to the api")
