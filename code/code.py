@@ -1,3 +1,4 @@
+#coucou c'est fives
 import openai # pip install openai
 import discord # pip install pycord
 from discord import File, Intents # pip install pycord
