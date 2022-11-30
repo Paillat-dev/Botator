@@ -361,6 +361,8 @@ async def transcript(ctx):
     f = open("transcript.txt", "w")
     f.write(transcript)
     f.close()
+#send the file in a private message to the user who ran the command
+    await ctx.author.send(file=discord.File("transcript.txt"))
     await ctx.respond(file=discord.File("transcript.txt"))
 #these are debug commands and should not be used in production
 @bot.command(name="say", description="Say a message")
