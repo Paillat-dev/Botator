@@ -353,6 +353,15 @@ async def transcript(ctx):
         if msg.author.bot:
             transcript += f"Botator: {msg.content}\n"
         else:
+            mentions = re.findall(r"<@!?\d+>", msg.content)
+            #then replace each mention with the name of the user
+            for mention in mentions:
+                #get the user id
+                id = mention[2:-1]
+                #get the user
+                user = await bot.fetch_user(id)
+                #replace the mention with the name
+                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
             transcript += f"{msg.author.display_name}: {msg.content}\n"
 #save the transcript in a txt file called transcript.txt. If the file already exists, delete it and create a new one
 #check if the file exists
