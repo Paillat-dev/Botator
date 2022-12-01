@@ -228,7 +228,6 @@ async def advanced_help(ctx):
     embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5)", inline=False)
     await ctx.respond(embed=embed, ephemeral=True)
 #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
-
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
@@ -290,7 +289,7 @@ async def on_message(message):
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\" Only the {prompt_size} last messages are used as a prompt.\n Botator has been coded by Jérémie Cotti. His usernme in discord is \"Paillat\". He's 15 years old. No other language. Jérémie used openai's ai models to create Botator and Binded it with discord." + str(c.fetchone()[0]) + f"\n" + prompt
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
     #send the request to the api
     #if the last message contains the word "undude" add Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. to the prompt
     if message.content.lower().find("undude") != -1:
