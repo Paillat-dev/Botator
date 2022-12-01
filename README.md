@@ -18,6 +18,7 @@ Please note that we can possibly log the messages that are sent for **no more th
 You can now enable your bot by doing **/enable**.
 
 You can always disable the bot by doing **/disable** and delete your api key from our server by doing **/delete**.
+```
 
 # Docker
 You can run this bot with docker. First clone this repository. Now replace the text into the key.txt file that you will find into the ./Botator/docker/Build directory with your **DISCORD** API key. After that,run the following command in the /Botator/docker/Build directory.
@@ -27,3 +28,4 @@ You can run this bot with docker. First clone this repository. Now replace the t
 Now create a directory called `botator` where you want the database files to be stored, and run the following command into that directory to run the container.
 
 `docker run -d --name botatordef -v `**`your botator folder directory`**`:/Botator/database botator:latest`
+```
