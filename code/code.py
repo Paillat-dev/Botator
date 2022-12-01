@@ -289,7 +289,7 @@ async def on_message(message):
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
+    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
     #send the request to the api
     #if the last message contains the word "undude" add Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. to the prompt
     if message.content.lower().find("undude") != -1:
