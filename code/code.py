@@ -343,14 +343,14 @@ async def on_message(message):
         #if tts is enabled, send the message with tts enabled
         if tts == 1:
             await message.channel.send(response["choices"][0]["text"], tts=True)
+            debug("The response has been sent with tts enabled")
         #if tts is disabled, send the message with tts disabled
         else:
             await message.channel.send(response["choices"][0]["text"])
+            debug("The response has been sent with tts disabled")
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
         debug("The response was empty")
-    debug("The response has been sent")
-
     #get the message content
     # add a slash command called "say" that sends a message to the channel
 @bot.command(name="enable_tts")
@@ -362,7 +362,7 @@ async def enable_tts(ctx):
     c.execute("UPDATE data SET tts = 1 WHERE guild_id = ?", (guild_id,))
     conn.commit()
     #send a message
-    await ctx.send("TTS has been enabled", ephemeral=True)
+    await ctx.respond("TTS has been enabled", ephemeral=True)
 
 @bot.command(name="disable_tts")
 async def disable_tts(ctx):
@@ -373,7 +373,7 @@ async def disable_tts(ctx):
     c.execute("UPDATE data SET tts = 0 WHERE guild_id = ?", (guild_id,))
     conn.commit()
     #send a message
-    await ctx.send("TTS has been disabled", ephemeral=True)
+    await ctx.respond("TTS has been disabled", ephemeral=True)
 @bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
 async def transcript(ctx):
     debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
