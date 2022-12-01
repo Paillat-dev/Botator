@@ -337,7 +337,15 @@ async def on_message(message):
     #dont show that the bot is typing anymore
     await asyncio.sleep(random.randint(0, 2))
     if response["choices"][0]   ["text"] != "":
-        await message.channel.send(response["choices"][0]["text"])
+        #check if tts is enabled in the database
+        c.execute("SELECT tts FROM data WHERE guild_id = ?", (message.guild.id,))
+        tts = c.fetchone()[0]
+        #if tts is enabled, send the message with tts enabled
+        if tts == 1:
+            await message.channel.send(response["choices"][0]["text"], tts=True)
+        #if tts is disabled, send the message with tts disabled
+        else:
+            await message.channel.send(response["choices"][0]["text"])
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
         debug("The response was empty")
@@ -345,6 +353,27 @@ async def on_message(message):
 
     #get the message content
     # add a slash command called "say" that sends a message to the channel
+@bot.command(name="enable_tts")
+async def enable_tts(ctx):
+    #get the guild id
+    guild_id = ctx.guild.id
+    #connect to the database
+    #update the tts value in the database
+    c.execute("UPDATE data SET tts = 1 WHERE guild_id = ?", (guild_id,))
+    conn.commit()
+    #send a message
+    await ctx.send("TTS has been enabled", ephemeral=True)
+
+@bot.command(name="disable_tts")
+async def disable_tts(ctx):
+    #get the guild id
+    guild_id = ctx.guild.id
+    #connect to the database
+    #update the tts value in the database
+    c.execute("UPDATE data SET tts = 0 WHERE guild_id = ?", (guild_id,))
+    conn.commit()
+    #send a message
+    await ctx.send("TTS has been disabled", ephemeral=True)
 @bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
 async def transcript(ctx):
     debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
