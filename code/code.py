@@ -121,15 +121,30 @@ async def advanced(ctx, max_tokens: int = None, temperature: float = None, frequ
         await ctx.respond("Invalid prompt size", ephemeral=True)
         return
     if max_tokens is None:
-        max_tokens = 64
+        if c.execute("SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and max_tokens is None:
+            max_tokens = c.execute("SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+        else:
+            max_tokens = 64
     if temperature is None:
-        temperature = 0.9
+        if c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and temperature is None:
+            temperature = c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+        else:
+            temperature = 0.9
     if frequency_penalty is None:
-        frequency_penalty = 0.0
+        if c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and frequency_penalty is None:
+            frequency_penalty = c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+        else:
+            frequency_penalty = 0.0
     if presence_penalty is None:
-        presence_penalty = 0.0
+        if c.execute("SELECT presence_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and presence_penalty is None:
+            presence_penalty = c.execute("SELECT presence_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+        else:
+            presence_penalty = 0.0
     if prompt_size is None:
-        prompt_size = 5
+        if c.execute("SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and prompt_size is None:
+            prompt_size = c.execute("SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
+        else:
+            prompt_size = 1
     #update the database
     c.execute("UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size, ctx.guild.id))
     conn.commit()
