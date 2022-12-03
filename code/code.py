@@ -198,12 +198,15 @@ async def help(ctx):
     embed.add_field(name="/enable", value="Enable the bot", inline=False)
     embed.add_field(name="/disable", value="Disable the bot", inline=False)
     embed.add_field(name="/advanced", value="Set the advanced settings", inline=False)
+    embed.add_field(name="/advanced_help", value="Get help about the advanced settings", inline=False)
+    embed.add_field(name="/enable_tts", value="Enable the Text To Speech", inline=False)
+    embed.add_field(name="/disable_tts", value="Disable the Text To Speech", inline=False)
     embed.add_field(name="/delete", value="Delete all your data from our server", inline=False)
     embed.add_field(name="/cancel", value="Cancel the last message sent by the bot", inline=False)
-    embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)
-#   embed.add_field(name="/help", value="Show this message", inline=False)
-    
+    embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)    
     embed.add_field(name="/help", value="Show this message", inline=False)
+    #add a footer
+    embed.set_footer(text="Made by @Paillat#0001")
     await ctx.respond(embed=embed, ephemeral=True)
 #when a message is sent into a channel check if the guild is in the database and if the bot is enabled
 @bot.command(name="info", description="Show the information stored about this server")
@@ -241,6 +244,8 @@ async def advanced_help(ctx):
     embed.add_field(name="frequency_penalty", value="The higher the frequency penalty, the more new words the model will introduce (default: 0.0)", inline=False)
     embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.0)", inline=False)
     embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5)", inline=False)
+    #add a footer
+    embed.set_footer(text="Made by @Paillat#0001")
     await ctx.respond(embed=embed, ephemeral=True)
 #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
 @bot.event
