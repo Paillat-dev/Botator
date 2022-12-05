@@ -47,7 +47,8 @@ Show this command list
 - [ ] add image recognition
 - [ ] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
-- [ ] 
+- [ ] Organize code in COGs
+- [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 <!-- 
 
 # Docker
