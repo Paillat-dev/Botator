@@ -20,28 +20,27 @@ You can now enable your bot by doing **/enable**.
 You can always disable the bot by doing **/disable** and delete your api key from our server by doing **/delete**.
 
 # Commands reference
-*/setup*
-Setup the bot
-*/enable*
-Enable the bot
-*/disable*
-Disable the bot
-*/advanced*
-Set the advanced settings
-*/advanced_help*
-Get help about the advanced settings
-*/enable_tts*
-Enable the Text To Speech
-*/disable_tts*
-Disable the Text To Speech
-*/delete*
-Delete all your data from our server
-*/cancel*
-Cancel the last message sent by the bot
-*/default*
-Set the advanced settings to their default values
-*/help*
-Show this command list
+*/setup* - Setup the bot
+
+*/enable* - Enable the bot
+
+*/disable* - Disable the bot
+
+*/advanced* - Set the advanced settings
+
+*/advanced_help* - Get help about the advanced settings
+
+*/enable_tts* - Enable the Text To Speech
+
+*/disable_tts* - Disable the Text To Speech
+
+*/delete* - Delete all your data from our server
+
+*/cancel* - Cancel the last message sent by the bot
+
+*/default* - Set the advanced settings to their default values
+
+*/help* - Show this command list
 
 # ToDo
 - [ ] add image recognition
