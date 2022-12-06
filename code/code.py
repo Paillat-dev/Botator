@@ -250,7 +250,7 @@ async def advanced_help(ctx):
 #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
 @bot.command(name="pretend", description="Make the bot pretend to be someone else")
 @discord.commands.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be", required=True)
-async def pretend(ctx, pretend_to_be: str, message: str):
+async def pretend(ctx, pretend_to_be: str):
     debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -263,7 +263,7 @@ async def pretend(ctx, pretend_to_be: str, message: str):
         await ctx.respond("The bot is disabled", ephemeral=True)
         return
     #enable pretend if it is not enabled, and disable it if it is
-    if c.fetchone()[11] == 0:
+    if c.fetchone()[13] == 0:
         c.execute("UPDATE data SET pretend = 1 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode enabled", ephemeral=True)
