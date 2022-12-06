@@ -273,10 +273,13 @@ async def pretend(ctx, pretend_to_be: str):
         c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode enabled", ephemeral=True)
+        await bot.user.edit(nick=pretend_to_be)
     else:
         c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode disabled", ephemeral=True)
+        #change the bots name on the server
+        await bot.user.edit(nick=None)
     #save the pretend_to_be value
     c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
     conn.commit()
@@ -351,7 +354,7 @@ async def on_message(message):
         #select the prompt_prefix
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt_prefix = c.fetchone()[0]
-        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\".{str(prompt_prefix)}" + f"Botator pretends to be {str(pretend_to_be)}." + f"\n" + prompt
+        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\".{str(prompt_prefix)}" + f"Botator pretends to be {str(pretend_to_be)},Botator change idea." + f"\n" + prompt
     else:
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
