@@ -274,13 +274,12 @@ async def pretend(ctx, pretend_to_be: str):
         conn.commit()
         await ctx.respond("Pretend mode enabled", ephemeral=True)
         botuser = await bot.fetch_user(bot.user.id)
-        await ctx.guild.me.edit(nick=pretend_to_be)
+        await ctx.guild.me.edit(nick=None)
     else:
         c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode disabled", ephemeral=True)
         #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
-        
         await ctx.guild.me.edit(nick=pretend_to_be)
     #save the pretend_to_be value
     c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
