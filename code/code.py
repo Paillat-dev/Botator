@@ -20,7 +20,7 @@ conn = sqlite3.connect('../database/data.db')
 c = conn.cursor()
 
 # Create table called "data" if it does not exist with the following columns: guild_id, channel_id, api_key, is_active, max_tokens, temperature, frequency_penalty, presence_penalty, uses_count_today, prompt_size
-c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean)''')
+c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)''')
 Intents=discord.Intents.all() # enable all intents
 Intents.members = True
 bot = discord.Bot(intents=Intents.all())
@@ -53,7 +53,7 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
             await ctx.respond("The channel id and the api key have been updated", ephemeral=True)
     else:
         #in this case, the guild is not in the database, so we add it
-        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 64, 0.9, 0.0, 0.0, 0, 5, "", False))
+        c.execute("INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, api_key, False, 64, 0.9, 0.0, 0.0, 0, 5, "", False, "", False))
         conn.commit()
         await ctx.respond("The channel id and the api key have been added", ephemeral=True)
 #create a command called "enable" taht only admins can use
@@ -248,9 +248,8 @@ async def advanced_help(ctx):
     embed.set_footer(text="Made by @Paillat#0001")
     await ctx.respond(embed=embed, ephemeral=True)
 #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
-@bot.command(name="pretend", description="Make the bot pretend to be a human")
+@bot.command(name="pretend", description="Make the bot pretend to be someone else")
 @discord.commands.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be", required=True)
-@discord.commands.option(name="message", description="The message you want the bot to send", required=True)
 async def pretend(ctx, pretend_to_be: str, message: str):
     debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #check if the guild is in the database
@@ -260,26 +259,21 @@ async def pretend(ctx, pretend_to_be: str, message: str):
         return
     #check if the bot is enabled
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-    data = c.fetchone()
-    if data[3] == 0:
+    if c.fetchone()[3] == 0:
         await ctx.respond("The bot is disabled", ephemeral=True)
         return
-        #set the openai api key
-    openai.api_key = data[2]
-    prompt = f"An AI pretends to be {pretend_to_be} and answer the following question: \n Human:{message} \n AI:"
-    debug(f"The prompt is: {prompt}")
-    #defer the response
-    await ctx.defer()
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        temperature=1,
-        max_tokens=128,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
-    )
-    #send the message
-    await ctx.respond(response["choices"][0]["text"])
+    #enable pretend if it is not enabled, and disable it if it is
+    if c.fetchone()[11] == 0:
+        c.execute("UPDATE data SET pretend = 1 WHERE guild_id = ?", (ctx.guild.id,))
+        conn.commit()
+        await ctx.respond("Pretend mode enabled", ephemeral=True)
+    else:
+        c.execute("UPDATE data SET pretend = 0 WHERE guild_id = ?", (ctx.guild.id,))
+        conn.commit()
+        await ctx.respond("Pretend mode disabled", ephemeral=True)
+    #save the pretend_to_be value
+    c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
+    conn.commit()
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
@@ -340,8 +334,19 @@ async def on_message(message):
                 msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
-    c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
-    prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
+    #check if the bot is in pretend mode
+    c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
+    if c.fetchone()[0] == 1:
+        #get the pretend_to_be value from the database
+        c.execute("SELECT pretend_to_be FROM data WHERE guild_id = ?", (message.guild.id,))
+        pretend_to_be = c.fetchone()[0]
+        #select the prompt_prefix
+        c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
+        prompt_prefix = c.fetchone()[0]
+        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"Botator pretends to be {pretend_to_be}." + f"\n" + prompt
+    else:
+        c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
+        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
     #send the request to the api
     #if the last message contains the word "undude" add Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. to the prompt
     if message.content.lower().find("undude") != -1:
