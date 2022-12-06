@@ -264,6 +264,8 @@ async def pretend(ctx, pretend_to_be: str, message: str):
     if data[3] == 0:
         await ctx.respond("The bot is disabled", ephemeral=True)
         return
+        #set the openai api key
+    openai.api_key = data[2]
     response = openai.Completion.create(engine="davinci", prompt=f"{pretend_to_be} and answer to {ctx.author.mention}:\n{message} \n AI:", max_tokens=50, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, stop=["\n"])
     #send the message
     await ctx.respond(response["choices"][0]["text"])
