@@ -32,17 +32,6 @@ bot = discord.Bot(intents=Intents.all())
 async def setup(ctx, channel: discord.TextChannel, api_key):
     #check if the api key is valid
     debug(f"The user {ctx.author} ran the setup command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
-    openai.api_key = api_key
-    try:
-        openai.Completion.create(engine="davinci", prompt="Hello world", max_tokens=1)
-    except:
-        await ctx.respond("Invalid api key", ephemeral=True)
-        return
-        #if there is not enough tokens remaining, send a message to the user
-    if openai.Completion.create(engine="davinci", prompt="Hello world", max_tokens=1).headers["X-RateLimit-Remaining"] == 0:
-        await ctx.respond("Not enough tokens remaining", ephemeral=True)
-        debug("Not enough tokens remaining")
-        return
     #check if the channel is valid
     if channel is None:
         await ctx.respond("Invalid channel id", ephemeral=True)
