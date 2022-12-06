@@ -266,7 +266,16 @@ async def pretend(ctx, pretend_to_be: str, message: str):
         return
         #set the openai api key
     openai.api_key = data[2]
-    response = openai.Completion.create(engine="davinci", prompt=f"{pretend_to_be} and answer to {ctx.author.mention}:\n{message} \n AI:", max_tokens=50, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, stop=["\n"])
+    prompt = f"Pretend to be {pretend_to_be} and answer the following question: {message}: \n"
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        temperature=data[5],
+        max_tokens=data[4],
+        frequency_penalty=data[6],
+        presence_penalty=data[7],
+        stop=[""],
+    )
     #send the message
     await ctx.respond(response["choices"][0]["text"])
 @bot.event
