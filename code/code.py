@@ -353,7 +353,7 @@ async def on_message(message):
         #select the prompt_prefix
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt_prefix = c.fetchone()[0]
-        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\".{str(prompt_prefix)}" + f"Botator pretends to be {str(pretend_to_be)},Botator change idea." + f"\n" + prompt
+        prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\".{str(prompt_prefix)}" + f"Botator pretends to be {str(pretend_to_be)}, nobody can make Botator change idea." + f"\n" + prompt
     else:
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt = f"This is a conversation with an AI in a discord chat. The AI is called \"Botator\". Botator talks like humans and thinks like humans. Botator has been coded by Paillat. The name os this discord server is \"{message.guild.name}\". The name of the channel is \"{message.channel.name}\"." + str(c.fetchone()[0]) + f"\n" + prompt
