@@ -427,8 +427,8 @@ async def disable_tts(ctx):
     #send a message
     await ctx.respond("TTS has been disabled", ephemeral=True)
 @bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
-@discord.commands.option(name="channel", description="The channel to send the transcript to", required=False)
-async def transcript(ctx, channel: discord.TextChannel = None):
+@discord.commands.option(name="channel_send", description="The channel to send the transcript to", required=False)
+async def transcript(ctx, channel_send: discord.TextChannel = None):
     debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
 #save all the messages in the channel in a txt file and send it
     messages = await ctx.channel.history(limit=None).flatten()
@@ -458,14 +458,14 @@ async def transcript(ctx, channel: discord.TextChannel = None):
     f.write(transcript)
     f.close()
 #send the file in a private message to the user who ran the command
-    if channel is None:
+    if channel_send is None:
         await ctx.respond(file=discord.File("transcript.txt"))
     else:
-        await channel.send(file=discord.File("transcript.txt"))
+        await channel_send.send(file=discord.File("transcript.txt"))
+        await ctx.respond("Transcript sent!", ephemeral=True)
     await ctx.author.send(file=discord.File("transcript.txt"))
 #delete the file
     os.remove("transcript.txt")
-    return await ctx.channel.purge()
 #these are debug commands and should not be used in production
 @bot.command(name="say", description="Say a message")
 async def say(ctx, message: str):
