@@ -270,17 +270,17 @@ async def pretend(ctx, pretend_to_be: str):
     #enable pretend if it is not enabled, and disable it if it is
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone()[0] == 1:
-        c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
-        conn.commit()
-        await ctx.respond("Pretend mode enabled", ephemeral=True)
-        botuser = await bot.fetch_user(bot.user.id)
-        await ctx.guild.me.edit(nick=pretend_to_be)
-    else:
         c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode disabled", ephemeral=True)
-        #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
+        botuser = await bot.fetch_user(bot.user.id)
         await ctx.guild.me.edit(nick=None)
+    else:
+        c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
+        conn.commit()
+        await ctx.respond("Pretend mode enabled", ephemeral=True)
+        #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
+        await ctx.guild.me.edit(nick=pretend_to_be)
     #save the pretend_to_be value
     c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
     conn.commit()
