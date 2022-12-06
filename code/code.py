@@ -265,11 +265,11 @@ async def pretend(ctx, pretend_to_be: str):
     #enable pretend if it is not enabled, and disable it if it is
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (ctx.guild.id,))
     if c.fetchone()[0] == 0:
-        c.execute("UPDATE data SET pretend = 1 WHERE guild_id = ?", (ctx.guild.id,))
+        c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode enabled", ephemeral=True)
     else:
-        c.execute("UPDATE data SET pretend = 0 WHERE guild_id = ?", (ctx.guild.id,))
+        c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
         conn.commit()
         await ctx.respond("Pretend mode disabled", ephemeral=True)
     #save the pretend_to_be value
