@@ -427,7 +427,7 @@ async def disable_tts(ctx):
     #send a message
     await ctx.respond("TTS has been disabled", ephemeral=True)
 @bot.command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
-@discord.commands.options(name="channel", description="The channel to send the transcript to", required=False)
+@discord.commands.option(name="channel", description="The channel to send the transcript to", required=False)
 async def transcript(ctx, channel: discord.TextChannel = None):
     debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
 #save all the messages in the channel in a txt file and send it
