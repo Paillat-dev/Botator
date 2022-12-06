@@ -248,6 +248,25 @@ async def advanced_help(ctx):
     embed.set_footer(text="Made by @Paillat#0001")
     await ctx.respond(embed=embed, ephemeral=True)
 #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
+@bot.command(name="pretend", description="Make the bot pretend to be a human")
+@discord.commands.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be", required=True)
+@discord.commands.option(name="message", description="The message you want the bot to send", required=True)
+async def pretend(ctx, pretend_to_be: str, message: str):
+    debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+    #check if the guild is in the database
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    if c.fetchone() is None:
+        await ctx.respond("This server is not setup", ephemeral=True)
+        return
+    #check if the bot is enabled
+    c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+    data = c.fetchone()
+    if data[3] == 0:
+        await ctx.respond("The bot is disabled", ephemeral=True)
+        return
+    response = openai.Completion.create(engine="davinci", prompt=f"{pretend_to_be} and answer to {ctx.author.mention}:\n{message} \n AI:", max_tokens=50, temperature=0.9, frequency_penalty=0.0, presence_penalty=0.0, stop=["\n"])
+    #send the message
+    await ctx.respond(response["choices"][0]["text"])
 @bot.event
 async def on_message(message):
     #check if the message is from a bot
