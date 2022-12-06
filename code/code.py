@@ -272,7 +272,7 @@ async def pretend(ctx, pretend_to_be: str, message: str):
         engine="text-davinci-003",
         prompt=prompt,
         temperature=1,
-        max_tokens=64,
+        max_tokens=128,
         frequency_penalty=0.0,
         presence_penalty=0.0,
     )
