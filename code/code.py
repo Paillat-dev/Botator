@@ -399,9 +399,6 @@ async def on_message(message):
         presence_penalty=float(presence_penalty),
         stop=[" Human:", " AI:", "AI:", "Human:"]    )
     #send the response
-    #wait a random amount of time between 0 and 2 seconds in order to make the bot look more human
-    #dont show that the bot is typing anymore
-    await asyncio.sleep(random.randint(0, 2))
     if response["choices"][0]   ["text"] != "":
         #check if tts is enabled in the database
         c.execute("SELECT tts FROM data WHERE guild_id = ?", (message.guild.id,))
