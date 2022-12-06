@@ -268,6 +268,8 @@ async def pretend(ctx, pretend_to_be: str, message: str):
     openai.api_key = data[2]
     prompt = f"An AI pretends to be {pretend_to_be} and answer the following question: \n Human:{message} \n AI:"
     debug(f"The prompt is: {prompt}")
+    #defer the response
+    await ctx.defer()
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
