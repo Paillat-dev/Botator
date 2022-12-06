@@ -310,6 +310,8 @@ async def on_message(message):
     #add 1 to the uses_count_today
     #show that the bot is typing
     await message.channel.trigger_typing()
+    #defer the message
+    await message.defer()
     if message.guild.id != 1021872219888033903:
         c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
     #get the api key from the database
