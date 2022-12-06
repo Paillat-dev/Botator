@@ -435,6 +435,7 @@ async def transcript(ctx, channel: discord.TextChannel = None):
     messages.reverse()
     transcript = ""
     #defer the response
+    await ctx.defer() #defer the response so that the bot doesn't say that it's thinking 
     for msg in messages:
         if msg.author.bot:
             transcript += f"Botator: {msg.content}\n"
@@ -464,6 +465,7 @@ async def transcript(ctx, channel: discord.TextChannel = None):
     await ctx.author.send(file=discord.File("transcript.txt"))
 #delete the file
     os.remove("transcript.txt")
+    return await ctx.channel.purge()
 #these are debug commands and should not be used in production
 @bot.command(name="say", description="Say a message")
 async def say(ctx, message: str):
