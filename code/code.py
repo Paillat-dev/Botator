@@ -6,7 +6,6 @@ import logging # pip install logging
 import sqlite3 # pip install sqlite3
 import asyncio # pip install asyncio
 import os # pip install os
-import random # pip install random
 import re # pip install re
 import datetime # pip install datetime
 #set the debug mode to the maximum
@@ -278,7 +277,7 @@ async def pretend(ctx, pretend_to_be: str):
     c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
     conn.commit()
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     #check if the message is from a bot
     if message.author.bot:
         return
@@ -292,9 +291,12 @@ async def on_message(message):
         return
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
+    try : replied_message: discord.Message = await message.to_reference()
+    except : replied_message = None
     if str(message.channel.id) != str(c.fetchone()[0]):
-        if message.content.find("<@1046051875755134996>") != -1:
-            debug("wrong channel, but mention")
+        #check if the message is a mention or if the message replies to the bot
+        if message.content.find("<@1046051875755134996>") != -1 or replied_message != None:
+            debug("wrong channel, but mention or reply")
         else :
             debug("The message has been sent in the wrong channel")
             return
@@ -315,8 +317,14 @@ async def on_message(message):
     #get the advanced settings from the database
     c.execute("SELECT max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size FROM data WHERE guild_id = ?", (message.guild.id,))
     max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size = c.fetchone()
-    messages = await message.channel.history(limit=prompt_size).flatten()
-    messages.reverse()
+    if replied_message == None:
+        messages = await message.channel.history(limit=prompt_size).flatten()
+        messages.reverse()
+    else :
+        messages = await message.channel.history(limit=prompt_size, before=replied_message.created_at).flatten()
+        messages.reverse()
+        messages.append(replied_message)
+        messages.append(message)
     prompt = ""
     #get the channel id from the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
