@@ -54,6 +54,10 @@ async def setup(ctx, channel: discord.TextChannel, api_key):
 @bot.command(name="enable", description="Enable the bot")
 ##@discord.commands.permissions(administrator=True)
 async def enable(ctx):
+    #if the guild is eqal to 1014156298226515970, the guild is banned
+    if ctx.guild.id == 1014156298226515970:
+        await ctx.respond("This server is banned for bad and nsfw use.", ephemeral=True)
+        return
     #check if the guild is in the database
     debug(f"The user {ctx.author} ran the enable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
