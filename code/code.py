@@ -293,6 +293,9 @@ async def on_message(message: discord.Message):
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     try : replied_message: discord.Message = await message.to_reference()
     except : replied_message = None
+    else : 
+        if replied_message.author.id != bot.user.id:
+            replied_message = None
     if str(message.channel.id) != str(c.fetchone()[0]):
         #check if the message is a mention or if the message replies to the bot
         if message.content.find("<@1046051875755134996>") != -1 or replied_message != None:
