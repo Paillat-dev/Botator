@@ -291,15 +291,16 @@ async def on_message(message: discord.Message):
         return
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
-    try : replied_message: discord.Message = await message.to_reference()
-    except : replied_message = None
-    else : 
-        if replied_message.author.id != bot.user.id:
-            replied_message = None
+    try : original_message = await message.channel.fetch_message(message.reference.message_id)
+    except : original_message = None
+    if original_message != None and original_message.author.id != bot.user.id:
+        original_message = None
     if str(message.channel.id) != str(c.fetchone()[0]):
         #check if the message is a mention or if the message replies to the bot
-        if message.content.find("<@1046051875755134996>") != -1 or replied_message != None:
-            debug("wrong channel, but mention or reply")
+        if original_message != None:
+            debug("wrong channel, but reply")
+        elif message.content.find("<@"+str(bot.user.id)+">") != -1:
+            debug("wrong channel, but mention")
         else :
             debug("The message has been sent in the wrong channel")
             return
@@ -320,13 +321,13 @@ async def on_message(message: discord.Message):
     #get the advanced settings from the database
     c.execute("SELECT max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size FROM data WHERE guild_id = ?", (message.guild.id,))
     max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size = c.fetchone()
-    if replied_message == None:
+    if original_message == None:
         messages = await message.channel.history(limit=prompt_size).flatten()
         messages.reverse()
     else :
-        messages = await message.channel.history(limit=prompt_size, before=replied_message.created_at).flatten()
+        messages = await message.channel.history(limit=prompt_size, before=original_message).flatten()
         messages.reverse()
-        messages.append(replied_message)
+        messages.append(original_message)
         messages.append(message)
     prompt = ""
     #get the channel id from the database
@@ -528,4 +529,5 @@ bot.loop.create_task(check_day_task())
 # Replace the following with your bot's token
 with open("key.txt") as f:
     key = f.read()
+   
 bot.run(key)
