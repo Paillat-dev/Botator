@@ -50,7 +50,7 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [ ] Add uses count reset after 24h
 - [ ] Add moderation.
-- [ ] add way to consider the answers to the bot's messages.
+- [x] add way to consider the answers to the bot's messages.
 <!-- 
 
 # Docker
