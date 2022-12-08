@@ -439,7 +439,7 @@ async def transcript(ctx, channel_send: discord.TextChannel = None):
     messages.reverse()
     transcript = ""
     #defer the response
-    await ctx.defer() #defer the response so that the bot doesn't say that it's thinking 
+    await ctx.defer() #defer the response so that the bot doesn't say that it's thinking
     for msg in messages:
         if msg.author.bot:
             transcript += f"Botator: {msg.content}\n"
