@@ -39,7 +39,7 @@ bot.loop.create_task(check_day_task())
 '''
 #run the bot
 # Replace the following with your bot's token
-with open("key.txt") as f:
+with open("./key.txt") as f:
     key = f.read()
    
 bot.run(key)
