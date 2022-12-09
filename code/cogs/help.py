@@ -22,7 +22,7 @@ class Help (discord.Cog) :
         embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)    
         embed.add_field(name="/help", value="Show this message", inline=False)
         #add a footer
-        embed.set_footer(text="Made by @Paillat#0001")
+        embed.set_footer(text="Made by @Paillat#7777")
         await ctx.respond(embed=embed, ephemeral=True)
 
     @discord.slash_command(name="advanced_help", description="Show the advanced settings meanings")
@@ -35,5 +35,5 @@ class Help (discord.Cog) :
         embed.add_field(name="presence_penalty", value="The higher the presence penalty, the more new words the model will introduce (default: 0.0)", inline=False)
         embed.add_field(name="prompt_size", value="The number of messages to use as a prompt (default: 5). The more messages, the more coherent the text will be, but the more it will take to generate and the more it will cost.", inline=False)
         #add a footer
-        embed.set_footer(text="Made by @Paillat#0001")
+        embed.set_footer(text="Made by @Paillat#7777")
         await ctx.respond(embed=embed, ephemeral=True)
