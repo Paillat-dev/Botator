@@ -24,7 +24,6 @@ def check_day():
     global previous_date
     if datetime.datetime.now().day != previous_date.day:
         previous_date = datetime.datetime.now()
-        reset_uses_count_today()
         previous_date = datetime.datetime.now()
         return True
     else:
