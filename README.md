@@ -46,7 +46,7 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 - [ ] add image recognition
 - [ ] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
-- [ ] Organize code in COGs
+- [x] Organize code in COGs
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [ ] Add uses count reset after 24h
 - [ ] Add moderation.
