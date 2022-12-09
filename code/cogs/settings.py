@@ -113,7 +113,8 @@ class Settings (discord.Cog) :
         embed.add_field(name="Presence Penalty", value=data[7], inline=False)
         embed.add_field(name="Prompt Size", value=data[9], inline=False)
         embed.add_field(name="Uses Count Today", value=data[8], inline=False)
-        embed.add_field(name="Prompt prefix", value=data[10], inline=False)
+        if data[10]:
+            embed.add_field(name="Prompt prefix", value=data[10], inline=False)
         await ctx.respond(embed=embed, ephemeral=True)
 
     #add a slash command called "prefix" that changes the prefix of the bot
