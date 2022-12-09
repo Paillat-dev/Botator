@@ -2,8 +2,8 @@ import discord
 import re
 import asyncio
 import openai
-from config import debug, c
-
+from config import debug, c, max_uses, cp
+import random
 class Chat (discord.Cog) :
     def __init__(self, bot: discord.Bot):
         super().__init__()
@@ -39,7 +39,7 @@ class Chat (discord.Cog) :
                 return
         #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
         c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
-        if c.fetchone()[0] >= 5000:
+        if c.fetchone()[0] >= max_uses:
             debug("The bot has been used more than 4000 times in the last 24 hours in this guild")
             await message.channel.send("The bot has been used more than 5000 times in the last 24 hours in this guild. Please try again in 24h.")
             return
@@ -152,10 +152,25 @@ class Chat (discord.Cog) :
         else:
             await message.channel.send("The AI is not sure what to say (the response was empty)")
             debug("The response was empty")
-    
+        
+        #now try to get the premium status of the server, but if it fails, set premium to 0
+        try:
+            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
+            premium = cp.fetchone()[0]
+        except:
+            premium = 0
+        if not premium:
+            #get a random number between 1 and 5 , 1 and 4
+            # 5 included
+            random_number = random.randint(1, 10)
+            if random_number == 1:
+                embed = discord.Embed(title="Support us by donating here!", url="https://www.buymeacoffee.com/paillat", description="Botator is a free discord bot, but it costs money to run our servers. If you want to support us, you can donate here: https://www.buymeacoffee.com/paillat. For only **2$** a month, you can remove this message and have a daliy maximal usage of **4000** uses instead of **400**. You will acces also to restricted help channels on our discord server,", color=0x00ff00)
+                await message.channel.send("**This message has 10% chance to appear. It will disappear in 60 seconds.**", embed=embed, delete_after=60)
+            elif random_number == 2:
+                embed = discord.Embed(title="Join our discord server!", url="https://discord.gg/pB6hXtUeDv", description="You need help with Botator? You can join our discord server and ask for help in the help channel. You can also suggest new features and report bugs. You can also join our discord server to talk with other Botator users and the Botator team, by on the following link: https://discord.gg/pB6hXtUeDv", color=0x00ff00)
+                await message.channel.send("**This message has 10% chance to appear. It will disappear in 60 seconds.**", embed=embed, delete_after=60)
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
-       
