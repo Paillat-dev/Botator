@@ -42,7 +42,7 @@ class Chat (discord.Cog) :
         uses = c.fetchone()[0]
         cp.execute("SELECT premium FROM data WHERE user_id = ? AND guild_id = ?", (message.author.id, message.guild.id))
         premium = cp.fetchone()
-        if c.fetchone()[0] >= 500 and premium != 1:
+        if c.fetchone()[0] >= 500 and premium is None:
             debug(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
             await message.channel.send("The bot has been used more than 500 times in the last 24 hours in this guild. Please try again in 24h.")
             return
