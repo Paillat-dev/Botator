@@ -42,23 +42,23 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 
 */help* - Show this command list
 
-#Support me
-You can support me by getting Botator premium, or donating [here](https://www.buymeacoffee.com/paillat). More informations here below:
-##Why?
+# Support me
+You can support me by getting Botator premium, or donating [here](https://www.buymeacoffee.com/paillat). More informations about botator premium here below:
+### Why?
 At the beginning, Botator was just a project between friends, but now many people are using it, so we need something to pay for our servers. Premium is also a way to support us and our work.
-##Is this mandatory?
+### Is this mandatory?
 Not at all! You can still continue using botator for free, but in order to limit our servers overload, we limit your requests at 500 per server per day.
 
-##What are my advantages with premium?
+### What are my advantages with premium?
 With premium, we will increase the maximal number of requests to 5000 for the server of your choice. You will also have access to exclusive Discord channels and get help if you want to self-host Botator. Discord server self promote and "support us" messages will not be shown on this server
 
-##Am I going to have unlimited tokens with premium?
+### Am I going to have unlimited tokens with premium?
 No! With premium, Botator will still use tokens from YOUR OpenAI account, but you will be able to use it 5000 times per day instead of 500.
 
-##How much doe it cost?
+### How much doe it cost?
 Premium subscription costs 1$ per month.
 
-##How can I get premium?
+### How can I get premium?
 First join our discord server [here](https://discord.gg/pB6hXtUeDv).
 Then subscribe to botator premium by clicking here:
 
