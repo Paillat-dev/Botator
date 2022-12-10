@@ -1,6 +1,6 @@
 import logging
 import sqlite3
-max_uses: int = 500
+max_uses: int = 400
 logging.basicConfig(level=logging.INFO)
 
 def debug(message):
