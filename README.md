@@ -3,7 +3,7 @@ Botator is a discord bot that binds openai's gpt3 AI with discord. You will be a
 ![discord com_channels_1021872219888033903_1046119234033434734](https://user-images.githubusercontent.com/75439456/204105583-2abb2d77-9404-4558-bd3e-c1a70b939758.png)
 
 # Adding the bot to your discord server
-In order to add the bot to your discord server, you will need  an OpenAI API key. You can create an account and take one [here](https://beta.openai.com/account/api-keys)
+In order to add the bot to your discord server, you will need  an OpenAI API key. You can create an account and take one [here](https://beta.openai.com/account/api-keys). **Please note that you'll have 18 free credits when creating your account. They will be slowly used, and will expire 3 months after you created your accound, and when they gave all been used, you'll need to buy new tokens. You can check your tokens usage [here](https://beta.openai.com/account/usage).**
 
 You can add the bot to your server by clicking [here](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=2214808576&scope=applications.commands%20bot). **PLEASE NOTE THAT WE ARE NOT RESPONSIBLE FOR ANY MISUSE YOU'LL DO WITH THE BOT..**
 
