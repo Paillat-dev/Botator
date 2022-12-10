@@ -44,7 +44,7 @@ class Chat (discord.Cog) :
         
         try: premium = cp.fetchone()[0]
         except: premium = 0
-        if c.fetchone()[0] >= 500 and premium == 0:
+        if uses >= 500 and premium == 0:
             debug(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
             await message.channel.send("The bot has been used more than 500 times in the last 24 hours in this guild. Please try again in 24h.")
             return
