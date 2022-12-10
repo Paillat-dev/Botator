@@ -2,7 +2,7 @@ import discord
 import re
 import asyncio
 import openai
-from config import debug, c, max_uses, cp
+from config import debug, c, max_uses, cp, conn, connp
 import random
 class Chat (discord.Cog) :
     def __init__(self, bot: discord.Bot):
@@ -39,15 +39,19 @@ class Chat (discord.Cog) :
                 return
         #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
         c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
-        if c.fetchone()[0] >= 500:
+        uses = c.fetchone()[0]
+        cp.execute("SELECT premium FROM data WHERE user_id = ? AND guild_id = ?", (message.author.id, message.guild.id))
+        premium = cp.fetchone()
+        if c.fetchone()[0] >= 500 and premium != 1:
             debug(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
-            await message.channel.send("The bot has been used more than 5000 times in the last 24 hours in this guild. Please try again in 24h.")
+            await message.channel.send("The bot has been used more than 500 times in the last 24 hours in this guild. Please try again in 24h.")
             return
         #add 1 to the uses_count_today
         #show that the bot is typing
         await message.channel.trigger_typing()
         if message.guild.id != 1021872219888033903:
             c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
+            conn.commit()
         #get the api key from the database
         c.execute("SELECT api_key FROM data WHERE guild_id = ?", (message.guild.id,))
         api_key = c.fetchone()[0]
