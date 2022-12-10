@@ -42,6 +42,31 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 
 */help* - Show this command list
 
+#Support me
+You can support me by getting Botator premium, or donating [here](https://www.buymeacoffee.com/paillat). More informations here below:
+##Why?
+At the beginning, Botator was just a project between friends, but now many people are using it, so we need something to pay for our servers. Premium is also a way to support us and our work.
+##Is this mandatory?
+Not at all! You can still continue using botator for free, but in order to limit our servers overload, we limit your requests at 500 per server per day.
+
+##What are my advantages with premium?
+With premium, we will increase the maximal number of requests to 5000 for the server of your choice. You will also have access to exclusive Discord channels and get help if you want to self-host Botator. Discord server self promote and "support us" messages will not be shown on this server
+
+##Am I going to have unlimited tokens with premium?
+No! With premium, Botator will still use tokens from YOUR OpenAI account, but you will be able to use it 5000 times per day instead of 500.
+
+##How much doe it cost?
+Premium subscription costs 1$ per month.
+
+##How can I get premium?
+First join our discord server [here](https://discord.gg/pB6hXtUeDv).
+Then subscribe to botator premium by clicking here:
+
+<a href="https://www.buymeacoffee.com/paillat"><img src="https://img.buymeacoffee.com/button-api/?text=Get botator premium&emoji=&slug=paillat&button_colour=5F7FFF&font_colour=ffffff&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" /></a>
+
+Then, link your discord account to BuyMeACoffe by following [these instructions](https://help.buymeacoffee.com/en/articles/4601477-how-do-i-access-my-discord-role).
+After that you will normally be able to access some new channels in our discord server. In the Verify Premium channel, run the /premium_activate command and give your server's ID. You can learn about how to get your server's ID by clicking [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-). If you have any question, you can ask here: [help-getting-premium](https://discord.com/channels/1050769643180146749/1050828186159685743).
+
 # ToDo
 - [ ] add image recognition
 - [ ] When chatgpt API is released, add that api instead of davinci-003
