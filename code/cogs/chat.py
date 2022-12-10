@@ -125,7 +125,7 @@ class Chat (discord.Cog) :
         prompt += "Botator:"
         prompt = prompt + f"\n"
         debug("Sending request to the api")
-        debug(prompt)
+        #debug(prompt)
         openai.api_key = api_key
         response = openai.Completion.create(
             engine="text-davinci-003",
@@ -162,6 +162,7 @@ class Chat (discord.Cog) :
         if not premium:
             #get a random number between 1 and 5 , 1 and 4
             # 5 included
+            debug("User is not premium, sending a random message")
             random_number = random.randint(1, 10)
             if random_number == 1:
                 embed = discord.Embed(title="Support us by donating here!", url="https://www.buymeacoffee.com/paillat", description="Botator is a free discord bot, but it costs money to run our servers. If you want to support us, you can donate here: https://www.buymeacoffee.com/paillat. For only **2$** a month, you can remove this message and have a daliy maximal usage of **4000** uses instead of **400**. You will acces also to restricted help channels on our discord server,", color=0x00ff00)
