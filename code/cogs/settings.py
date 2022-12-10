@@ -155,6 +155,7 @@ class Settings (discord.Cog) :
             ctx.guild.me.edit(nick=pretend_to_be)
             c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
             conn.commit()
+            await ctx.guild.me.edit(nick=pretend_to_be)
             return
 
     @discord.slash_command(name="enable_tts", description="Enable TTS when chatting")
