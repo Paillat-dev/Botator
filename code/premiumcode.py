@@ -4,9 +4,10 @@ import sqlite3 # pip install sqlite3
 import logging # pip install logging
 import os # pip install os
 intents = discord.Intents.all()
-conn = sqlite3.connect('premium.db')
+conn = sqlite3.connect('../database/premium.db')
 c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS data (user_id text, guild_id text, premium boolean)''')
+conn.commit()
 bot = discord.Bot()
 logging.basicConfig(level=logging.INFO)
 @bot.command()

@@ -127,8 +127,8 @@ class Settings (discord.Cog) :
 
     #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
     @discord.slash_command(name="pretend", description="Make the bot pretend to be someone else")
-    @discord.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be", required=True)
-    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str):
+    @discord.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be. Leave blank to disable pretend mode", required=False)
+    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = None):
         debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         #check if the guild is in the database
         c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -140,23 +140,23 @@ class Settings (discord.Cog) :
         if c.fetchone()[3] == 0:
             await ctx.respond("The bot is disabled", ephemeral=True)
             return
-        #enable pretend if it is not enabled, and disable it if it is
-        c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone()[0] == 1:
+        if pretend_to_be is None:
+            pretend_to_be = ""
             c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()
             await ctx.respond("Pretend mode disabled", ephemeral=True)
-            botuser = await self.bot.fetch_user(self.bot.user.id)
             await ctx.guild.me.edit(nick=None)
+            return
         else:
             c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()
             await ctx.respond("Pretend mode enabled", ephemeral=True)
             #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
+            ctx.guild.me.edit(nick=pretend_to_be)
+            c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
+            conn.commit()
             await ctx.guild.me.edit(nick=pretend_to_be)
-        #save the pretend_to_be value
-        c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
-        conn.commit()
+            return
 
     @discord.slash_command(name="enable_tts", description="Enable TTS when chatting")
     async def enable_tts(self, ctx: discord.ApplicationContext):
