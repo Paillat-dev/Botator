@@ -128,7 +128,7 @@ class Settings (discord.Cog) :
     #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
     @discord.slash_command(name="pretend", description="Make the bot pretend to be someone else")
     @discord.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be. Leave blank to disable pretend mode", required=False)
-    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str):
+    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = None):
         debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         #check if the guild is in the database
         c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
