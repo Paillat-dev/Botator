@@ -172,7 +172,7 @@ class Chat (discord.Cog) :
                 #add the picture https://cdn.discordapp.com/attachments/800029200886923318/1050935509930754058/icons8-discord-new-480.png
                 embed = discord.Embed(title="Join our discord server!", url="https://discord.gg/pB6hXtUeDv", description="You need help with Botator? You can join our discord server and ask for help in the help channel. You can also suggest new features and report bugs. You can also join our discord server to talk with other Botator users and the Botator team, by on the following link: https://discord.gg/pB6hXtUeDv", color=0x00ff00)
                 embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/800029200886923318/1050935509930754058/icons8-discord-new-480.png")
-                await message.channel.send("**This message has 10% chance to appear. It will disappear in 60 seconds.**", embed=embed, delete_after=60)                
+                await message.channel.send("**This message has 10% chance to appear. It will disappear in 60 seconds.** \nhttps://discord.gg/pB6hXtUeDv", embed=embed, delete_after=60)                
                 debug("The \"join our discord server\" message has been sent") 
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
