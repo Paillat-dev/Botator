@@ -170,6 +170,8 @@ class Chat (discord.Cog) :
             elif random_number == 2:
                 embed = discord.Embed(title="Join our discord server!", url="https://discord.gg/pB6hXtUeDv", description="You need help with Botator? You can join our discord server and ask for help in the help channel. You can also suggest new features and report bugs. You can also join our discord server to talk with other Botator users and the Botator team, by on the following link: https://discord.gg/pB6hXtUeDv", color=0x00ff00)
                 await message.channel.send("**This message has 10% chance to appear. It will disappear in 60 seconds.**", embed=embed, delete_after=60)
+            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
+            debug(c.fetchone()[0])
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
