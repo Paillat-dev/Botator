@@ -40,9 +40,10 @@ class Chat (discord.Cog) :
         #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
         c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
         uses = c.fetchone()[0]
-        cp.execute("SELECT premium FROM data WHERE user_id = ? AND guild_id = ?", (message.author.id, message.guild.id))
         
-        try: premium = cp.fetchone()[0]
+        try:
+            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
+            premium = cp.fetchone()[0]
         except: premium = 0
         if uses >= 500 and premium == 0:
             debug(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
