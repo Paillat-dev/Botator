@@ -15,6 +15,7 @@ class Chat (discord.Cog) :
         loop = asyncio.get_event_loop()
         thread = threading.Thread(target=asyncio.run_coroutine_threadsafe, args=(on_message_process(message, self), loop))
         thread.start()
+
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
