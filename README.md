@@ -1,5 +1,5 @@
 # Botator
-Botator is a discord bot that binds openai's gpt3 AI with discord. You will be able to take the conversation with the AI into a specific channel that you created.
+Botator is a discord bot that binds openai's gpt3 AI with discord. You will be able to take the conversation with the AI into a specific channel that you created, or by pinging/replying to a bot's message.
 ![discord com_channels_1021872219888033903_1046119234033434734](https://user-images.githubusercontent.com/75439456/204105583-2abb2d77-9404-4558-bd3e-c1a70b939758.png)
 
 # Adding the bot to your discord server
