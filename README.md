@@ -71,10 +71,10 @@ After that you will normally be able to access some new channels in our discord 
 - [ ] add image recognition
 - [ ] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
-- [x] Organize code in COGs
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
-- [ ] Add uses count reset after 24h
 - [ ] Add moderation.
+- [x] Add uses count reset after 24h
+- [x] Organize code in COGs
 - [x] add way to consider the answers to the bot's messages.
 <!-- 
 
