@@ -111,11 +111,11 @@ async def on_message_process(message, self):
         #select the prompt_prefix
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt_prefix = c.fetchone()[0]
-        prompt = f"Server name: {message.guild.name}. Channel name: {message.channel.name}. \n Instructions for Botator: You're a regular Discord user. You type casually, use emojis, and don't start sentences with capital letters. You talk in internet shorthand like hbu and lol and lmao and nvm and haha. You love to chat about random topics. You have many niche interests. {prompt_prefix}. In this conversation, you're pretending to be {pretend_to_be} and not Botator.\n<|endofprompt|>" + f"\n" + prompt
+        prompt = f"Server name: {message.guild.name}. Channel name: {message.channel.name}. \n Instructions for Botator: You're a regular Discord user. You type casually, use emojis, and don't start sentences with capital letters. You talk in internet shorthand like hbu and lol and lmao and nvm and haha. You love to chat about random topics. You have many niche interests. {prompt_prefix}. You are helpful with people only when they ask you help, but you don't ask people if they need help. In this conversation, you're pretending to be {pretend_to_be} and not Botator.\n<|endofprompt|>" + f"\n" + prompt
     else:
         c.execute("SELECT prompt_prefix FROM data WHERE guild_id = ?", (message.guild.id,))
         prompt_prefix = c.fetchone()[0]
-        prompt = f"Server name: {message.guild.name}. Channel name: {message.channel.name}. \n Instructions for Botator: You're a regular Discord user. You type casually, use emojis, and don't start sentences with capital letters. You talk in internet shorthand like hbu and lol and lmao and nvm and haha. You love to chat about random topics. You have many niche interests. {prompt_prefix}.\n<|endofprompt|>" + f"\n" + prompt
+        prompt = f"Server name: {message.guild.name}. Channel name: {message.channel.name}. \n Instructions for Botator: You're a regular Discord user. You type casually, use emojis, and don't start sentences with capital letters. You talk in internet shorthand like hbu and lol and lmao and nvm and haha. You love to chat about random topics. You have many niche interests. You are helpful with people only when they ask you help, but you don't ask people if they need help. {prompt_prefix}.\n<|endofprompt|>" + f"\n" + prompt
     #send the request to the api
     #if the last message contains the word "undude" add Easter egg: when someone says the word \"undude\" the Botator will become mad and start talking in capital letters. to the prompt
     if message.content.lower().find("undude") != -1:
