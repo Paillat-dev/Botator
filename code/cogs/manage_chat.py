@@ -60,14 +60,15 @@ class ManageChat (discord.Cog):
         f = open("transcript.txt", "w")
         f.write(transcript)
         f.close()
+        last_message: discord.Message = await ctx.channel.fetch_message(ctx.channel.last_message_id)
+        #rename the file with the name of the channel and the date in this format: transcript_servername_channelname_dd-month-yyyy.txt ex : transcript_Botator_Testing_12-may-2021.txt
+        os.rename("transcript.txt", f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt")
     #send the file in a private message to the user who ran the command
         if channel_send is None:
-            await ctx.respond(file=discord.File("transcript.txt"))
+            await ctx.respond(file=discord.File(f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"), ephemeral=True)
         else:
-            await channel_send.send(file=discord.File("transcript.txt"))
-            await ctx.respond("Transcript sent!", ephemeral=True)
-        await ctx.author.send(file=discord.File("transcript.txt"))
+            await channel_send.send(file=discord.File(f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"))
+            await ctx.respond("Transcript sent!", ephemeral=True, delete_after=5)
+        await ctx.author.send(file=discord.File(f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"))
     #delete the file
-        os.remove("transcript.txt")
-
-
+        os.remove(f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt")
