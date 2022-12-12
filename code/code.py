@@ -5,7 +5,7 @@ import asyncio # pip install asyncio
 import cogs # import the cogs
 import datetime # pip install datetime
 from config import debug, conn, c # import the debug function and the database connection
-
+import apsw # pip install apsw. ApSW is a Python interface to SQLite 3
 bot = discord.Bot(intents=discord.Intents.all(), help_command=None)
 
 bot.add_cog(cogs.Setup(bot))
