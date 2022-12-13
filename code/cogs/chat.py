@@ -99,7 +99,7 @@ async def on_message_process(message, self):
                 #get the user
                 user = await self.bot.fetch_user(id)
                 #replace the mention with the name
-                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
+                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name+f"{mention}: mention")
             prompt += f"{msg.author.display_name}: {msg.content}\n"
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
