@@ -44,3 +44,7 @@ with open("./key.txt") as f:
     key = f.read()
    
 bot.run(key)
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your messages to answer you"))
+    debug("Bot is ready")
