@@ -5,8 +5,9 @@ import asyncio # pip install asyncio
 import cogs # import the cogs
 import datetime # pip install datetime
 from config import debug, conn, c # import the debug function and the database connection
-bot = discord.Bot(intents=discord.Intents.all(), help_command=None)
-
+intents = discord.Intents.default()
+intents.message_content = True
+bot = discord.Bot(intents=intents, help_command=None) # create the bot
 bot.add_cog(cogs.Setup(bot))
 bot.add_cog(cogs.Settings(bot))
 bot.add_cog(cogs.Help(bot))
