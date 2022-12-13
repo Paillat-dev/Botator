@@ -14,6 +14,10 @@ bot.add_cog(cogs.Settings(bot))
 bot.add_cog(cogs.Help(bot))
 bot.add_cog(cogs.Chat(bot))
 bot.add_cog(cogs.ManageChat(bot))
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your messages to answer you"))
+    debug("Bot is ready")
 
 '''
 def reset_uses_count_today():
@@ -44,7 +48,3 @@ with open("./key.txt") as f:
     key = f.read()
    
 bot.run(key)
-@bot.event
-async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your messages to answer you"))
-    debug("Bot is ready")
