@@ -21,7 +21,9 @@ class Chat (discord.Cog) :
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
-async def on_message_process(message: discord.Message, self):
+
+    
+async def on_message_process(message: discord.Message, self: Chat):
     #my code
     #debug the thread id
     debug(f"Thread id: {threading.get_ident()}")
@@ -37,16 +39,23 @@ async def on_message_process(message: discord.Message, self):
         return
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
+    #select channels from the database
+    cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+    channels = cp.fetchone()[1:]
+    debug(f"Channels: {channels}")
+    debug(f"Message channel: {message.channel.id}")
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-    if str(message.channel.id) != str(c.fetchone()[0]):
+    if str(message.channel.id) != str(c.fetchone()[0]) :
         #check if the message is a mention or if the message replies to the bot
         if original_message != None:
             debug("wrong channel, but reply")
         elif message.content.find("<@"+str(self.bot.user.id)+">") != -1:
             debug("wrong channel, but mention")
+        elif str(message.channel.id) in channels:
+            debug("in a channel that is in the database")
         else :
             debug("The message has been sent in the wrong channel")
             return

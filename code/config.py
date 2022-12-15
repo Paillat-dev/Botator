@@ -16,7 +16,4 @@ cp = connp.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)''')
 cp.execute('''CREATE TABLE IF NOT EXISTS data (user_id text, guild_id text, premium boolean)''')
 # create table called "channels" if it does not exist with the following columns: guild_id, channel1, channel2, channel3, channel4, channel5
-cp.execute('''CREATE TABLE IF NOT EXISTS channels (guild_id text, channel1 text, channel2 text, channel3 text, channel4 text, channel5 text)''')
-
-cp.execute("DELETE FROM channels")
-connp.commit()
+cp.execute('''CREATE TABLE IF NOT EXISTS channels (guild_id text, channel0 text, channel1 text, channel2 text, channel3 text, channel4 text)''')
