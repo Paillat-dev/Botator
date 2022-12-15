@@ -4,15 +4,20 @@ import discord # pip install pycord
 import asyncio # pip install asyncio
 import cogs # import the cogs
 import datetime # pip install datetime
-from config import debug, connp, cp # import the debug function and the database connection
-import apsw # pip install apsw. ApSW is a Python interface to SQLite 3
-bot = discord.Bot(intents=discord.Intents.all(), help_command=None)
-
+from config import debug, conn, c # import the debug function and the database connection
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+bot = discord.Bot(intents=intents, help_command=None) # create the bot
 bot.add_cog(cogs.Setup(bot))
 bot.add_cog(cogs.Settings(bot))
 bot.add_cog(cogs.Help(bot))
 bot.add_cog(cogs.Chat(bot))
 bot.add_cog(cogs.ManageChat(bot))
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your messages to answer you"))
+    debug("Bot is ready")
 
 '''
 def reset_uses_count_today():

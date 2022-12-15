@@ -1,17 +1,19 @@
 # Botator
-Botator is a discord bot that binds openai's gpt3 AI with discord. You will be able to take the conversation with the AI into a specific channel that you created.
+Botator is a discord bot that binds [@openai](https://github.com/openai) 's gpt3 AI with [@discord](https://github.com/discord). You will be able to take the conversation with the AI into a specific channel that you created, or by pinging/replying to a bot's message.
 ![discord com_channels_1021872219888033903_1046119234033434734](https://user-images.githubusercontent.com/75439456/204105583-2abb2d77-9404-4558-bd3e-c1a70b939758.png)
 
 # Adding the bot to your discord server
-In order to add the bot to your discord server, you will need  an OpenAI API key. You can create an account and take one [here](https://beta.openai.com/account/api-keys). **Please note that you'll have 18$ free credits (it's really enough if you don't use the bot contineousely) when creating your account. They will be slowly used, and will expire 3 months after you created your accound, and when they gave all been used, you'll need to buy new tokens. You can check your tokens usage [here](https://beta.openai.com/account/usage).**
+In order to add the bot to your discord server, you will need  an OpenAI API key. You can create an account and take one [here](https://beta.openai.com/account/api-keys). **Please note that you'll have 18$ free credits (it's really enough if you don't use the bot contineousely) when creating your account. They will be slowly used, and will expire 3 months after you created your accound, and when they have all been used or expired, you'll need to buy new tokens. You can check your tokens usage [here](https://beta.openai.com/account/usage).**
 
-You can add the bot to your server by clicking [here](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=2214808576&scope=applications.commands%20bot). **PLEASE NOTE THAT WE ARE NOT RESPONSIBLE FOR ANY MISUSE YOU'LL DO WITH THE BOT..**
+When adding the bot to your server you agree to our [privacy policy](https://github.com/Paillat-dev/Botator/blob/main/privacypolicy.md) and our [terms of service](https://github.com/Paillat-dev/Botator/blob/main/tos.md)
+
+You can add the bot to your server by clicking [**here**](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=2214808576&scope=applications.commands%20bot). **PLEASE NOTE THAT WE ARE NOT RESPONSIBLE FOR ANY MISUSE YOU'LL DO WITH THE BOT..**
 
 Then, run the following commands to set your bot up:
 
 First **/setup**, define the channel you want the bot to talk into and your OPENAI api key.
 
-Then, if you want, **/advanced** to define some more advanced parameters..
+Then, if you want, **/advanced** to define some more advanced parameters..)
 
 Please note that we can possibly log the messages that are sent for **no more than 24h**, and that we will store your openai API key. You can always delete your API key from our servers by doing **/delete**. Please note that this action is irreversible.
 
@@ -71,10 +73,13 @@ After that you will normally be able to access some new channels in our discord 
 - [ ] add image recognition
 - [ ] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
-- [x] Organize code in COGs
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
-- [ ] Add uses count reset after 24h
 - [ ] Add moderation.
+- [ ] Add DateHour in prompts
+- [ ] Add /redo
+- [ ] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
+- [x] Add uses count reset after 24h
+- [x] Organize code in COGs
 - [x] add way to consider the answers to the bot's messages.
 <!-- 
 

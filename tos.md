@@ -1,0 +1,8 @@
+# TOS - Terms of Service
+By setting up Botator, you agree to abide by both [OpenAI\'s Terms of Service](https://openai.com/terms/), which you have already agreed to by creating an account with them, which is necessary for the proper operation of the service provided (the bot \"Botator\"), and our own rules described here.
+ 
+1. Respect others: In all interactions with others, respect their dignity as human beings. Do not make offensive remarks or use offensive language towards others, either in guild chat or when interacting with Botator itself via user commands; we cannot verify the application of these rules as we do not have access to the messages sent, but we ask that you use common sense and respect them.
+2. Follow Discord\'s Terms of Service and Community Guidelines: Follow them carefully - they are your best guide to proper online etiquette/conduct! Ignorance is no excuse! Violations may result in warnings and possible exclusion from the Discord platform. So be aware that failure to follow the TOS can jeopardize everyone\'s privilege to access the bots\' services!
+3. We (the providers of the \"Botator\" service) reserve the right to terminate this agreement without notice.
+4. We are not responsible for any misuse and/or use that is harmful to others and/or illegal. We only provide a connection between openai and discord, but all actions performed with the bot will be performed on YOUR account, through the api key you provided us. 
+5. You can find more information about the data we store and how to delete it in our [privacy policy](https://github.com/Paillat-dev/Botator/blob/main/privacypolicy.md).
