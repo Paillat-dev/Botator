@@ -4,7 +4,7 @@ import discord # pip install pycord
 import asyncio # pip install asyncio
 import cogs # import the cogs
 import datetime # pip install datetime
-from config import debug, conn, c # import the debug function and the database connection
+from config import debug, connp, cp # import the debug function and the database connection
 import apsw # pip install apsw. ApSW is a Python interface to SQLite 3
 bot = discord.Bot(intents=discord.Intents.all(), help_command=None)
 
@@ -37,6 +37,8 @@ async def check_day_task():
 #add a task to the bot that runs check_day every 1 minute
 bot.loop.create_task(check_day_task())
 '''
+
+
 #run the bot
 # Replace the following with your bot's token
 with open("./key.txt") as f:

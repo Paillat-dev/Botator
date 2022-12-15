@@ -21,7 +21,7 @@ class Chat (discord.Cog) :
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
-async def on_message_process(message, self):
+async def on_message_process(message: discord.Message, self):
     #my code
     #debug the thread id
     debug(f"Thread id: {threading.get_ident()}")

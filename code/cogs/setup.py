@@ -1,5 +1,5 @@
 import discord
-from config import debug, conn, c
+from config import debug, conn, c, connp, cp
 
 class Setup (discord.Cog) :
     def __init__(self, bot: discord.Bot):
@@ -78,3 +78,47 @@ class Setup (discord.Cog) :
         c.execute("UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx.guild.id))
         conn.commit()
         await ctx.respond("Disabled", ephemeral=True)
+
+    #create a command calles "add channel" that can only be used in premium servers
+    @discord.slash_command(name="add_channel", description="Add a channel to the list of channels")
+    @discord.option(name="channel", description="The channel to add", type=discord.TextChannel, required=False)
+    async def add_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None):
+        debug(f"The user {ctx.author} ran the add_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        #check if the guild is in the database
+        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if c.fetchone() is None:
+            await ctx.respond("This server is not setup", ephemeral=True)
+            return
+        #check if the guild is premium
+        try : 
+            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            premium = cp.fetchone()[0]
+        except :
+            premium = 0
+        if not premium:
+            await ctx.respond("This server is not premium", ephemeral=True)
+            return
+        if channel is None:
+            channel = ctx.channel
+        #check if the channel is already in the list
+        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
+        guild_channels = cp.fetchone()
+        if guild_channels is None:
+            # if the channel is not in the list, add it
+            cp.execute("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (ctx.guild.id, channel.id, None, None, None, None))
+            connp.commit()
+            await ctx.respond("Added", ephemeral=True)
+            return
+        channels = guild_channels[1:]
+        if str(channel.id) in channels:
+            await ctx.respond("This channel is already added", ephemeral=True)
+            return
+        for i in range(5):
+            if channels[i] == None:
+                cp.execute(f"UPDATE channels SET channel{i+1} = ? WHERE guild_id = ?", (channel.id, ctx.guild.id))
+                connp.commit()
+                await ctx.respond("Added", ephemeral=True)
+                return
+        await ctx.respond("You can only add 5 channels", ephemeral=True)
+            
+            
