@@ -40,10 +40,9 @@ async def on_message_process(message: discord.Message, self: Chat):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     #select channels from the database
-    cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
-    channels = cp.fetchone()[1:]
-    debug(f"Channels: {channels}")
-    debug(f"Message channel: {message.channel.id}")
+    try : cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+    except : channels = []
+    else : channels = cp.fetchone()[1:]
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
