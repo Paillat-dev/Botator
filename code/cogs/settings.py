@@ -33,10 +33,10 @@ class Settings (discord.Cog) :
         if temperature is not None and (temperature < 0.0 or temperature > 1.0):
             await ctx.respond("Invalid temperature", ephemeral=True)
             return
-        if frequency_penalty is not None and (frequency_penalty < 0.0 or frequency_penalty > 1.0):
+        if frequency_penalty is not None and (frequency_penalty < 0.0 or frequency_penalty > 2.0):
             await ctx.respond("Invalid frequency penalty", ephemeral=True)
             return
-        if presence_penalty is not None and (presence_penalty < 0.0 or presence_penalty > 1.0):
+        if presence_penalty is not None and (presence_penalty < 0.0 or presence_penalty > 2.0):
             await ctx.respond("Invalid presence penalty", ephemeral=True)
             return
         if prompt_size is not None and (prompt_size < 1 or prompt_size > 10):
