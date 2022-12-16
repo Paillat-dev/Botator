@@ -75,9 +75,9 @@ After that you will normally be able to access some new channels in our discord 
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [ ] Add moderation.
-- [ ] Add DateHour in prompts
-- [ ] Add /redo
 - [ ] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
+- [x] Add DateHour in prompts
+- [x] Add /redo
 - [x] Add uses count reset after 24h
 - [x] Organize code in COGs
 - [x] add way to consider the answers to the bot's messages.
