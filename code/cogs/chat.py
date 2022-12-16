@@ -21,6 +21,31 @@ class Chat (discord.Cog) :
         debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
+    @discord.slash_command(name="redo", description="Redo a message")
+    async def redo(self, ctx: discord.ApplicationContext):
+        #first delete the last message but only if it was sent by the bot
+        # get the last message
+        last_message = await ctx.channel.fetch_message(ctx.channel.last_message_id)
+        # check if the last message was sent by the bot
+        # if it was, delete it
+        if last_message.author.id == self.bot.user.id:
+            await last_message.delete()
+        else:
+            await ctx.respond("The last message wasn't sent by the bot", ephemeral=True)
+            return
+        await ctx.defer()
+        #get the message to redo aka the last message, because the old last message has been deleted
+        #sleep for 1 second to make sure the message has been deleted
+        await asyncio.sleep(4)
+        last_message = await ctx.channel.fetch_message(ctx.channel.last_message_id)
+        #check if the message to redo was sent by the bot
+        if last_message.author.id == self.bot.user.id:
+            await ctx.respond("The message to redo was sent by the bot", ephemeral=True)
+            return
+        loop = asyncio.get_event_loop()
+        thread = threading.Thread(target=asyncio.run_coroutine_threadsafe, args=(on_message_process(last_message, self), loop))
+        thread.start() 
+        await ctx.respond("Message redone !", ephemeral=True)
 async def on_message_process(message, self):
     #my code
     #debug the thread id
