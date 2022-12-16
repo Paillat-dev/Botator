@@ -152,7 +152,7 @@ class Settings (discord.Cog) :
             conn.commit()
             await ctx.respond("Pretend mode enabled", ephemeral=True)
             #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
-            ctx.guild.me.edit(nick=pretend_to_be)
+            await ctx.guild.me.edit(nick=pretend_to_be)
             c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
             conn.commit()
             await ctx.guild.me.edit(nick=pretend_to_be)
