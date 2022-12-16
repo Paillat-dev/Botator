@@ -5,6 +5,7 @@ import openai
 from config import debug, c, max_uses, cp, conn, connp
 import random
 import threading
+import time
 class Chat (discord.Cog) :
     def __init__(self, bot: discord.Bot):
         super().__init__()
@@ -41,7 +42,7 @@ class Chat (discord.Cog) :
         loop = asyncio.get_event_loop()
         thread = threading.Thread(target=asyncio.run_coroutine_threadsafe, args=(on_message_process(message_to_redo, self), loop))
         thread.start() 
-        await ctx.respond("Message redone !", delete_after=5)
+        await ctx.respond("Message redone !", delete_after=1)
 
 async def on_message_process(message: discord.Message, self: Chat):
     #my code
@@ -137,21 +138,19 @@ async def on_message_process(message: discord.Message, self: Chat):
     #get the channel id from the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     for msg in messages:
-        if msg.author.bot:
-            prompt += f"Botator: {msg.content}\n"
-        else:
-            #replace the mentions of each user with their name
-            #first get all the mentions in the message
-            mentions = re.findall(r"<@!?\d+>", msg.content)
-            #then replace each mention with the name of the user
-            for mention in mentions:
-                #get the user id
-                id = mention[2:-1]
-                #get the user
-                user = await self.bot.fetch_user(id)
-                #replace the mention with the name
-                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name + f"<@{id}>")
-            prompt += f"{msg.author.display_name}: {msg.content}\n"
+        mentions = re.findall(r"<@!?\d+>", msg.content)
+        #then replace each mention with the name of the user
+        for mention in mentions:
+            #get the user id
+            id = mention[2:-1]
+            #get the user
+            user = await self.bot.fetch_user(id)
+            #replace the mention with the name
+            msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name + f"<@{id}>")
+        #get the gmt time the message was sent
+        gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{gmt_time}")
+        prompt += f"{msg.author.display_name} ({gmt_time} GMT-0): {msg.content}\n"
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
