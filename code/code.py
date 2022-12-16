@@ -11,10 +11,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 import apsw # pip install apsw. ApSW is a Python interface to SQLite 3
-
-
-# set the intents to 3276543
-print(intents)
 bot = discord.Bot(intents=intents, help_command=None) # create the bot
 bot.add_cog(cogs.Setup(bot))
 bot.add_cog(cogs.Settings(bot))
