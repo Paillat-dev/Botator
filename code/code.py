@@ -9,13 +9,12 @@ from config import debug, conn, c # import the debug function and the database c
 #add the message content intent to the bot, aka discord.Intents.default() and discord.Intents.message_content
 intents = discord.Intents.default()
 intents.message_content = True
-bot = discord.Bot(intents=intents, help_command=None) # create the bot
-
+intents.members = True
 import apsw # pip install apsw. ApSW is a Python interface to SQLite 3
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
+
+# set the intents to 3276543
+print(intents)
 bot = discord.Bot(intents=intents, help_command=None) # create the bot
 bot.add_cog(cogs.Setup(bot))
 bot.add_cog(cogs.Settings(bot))
