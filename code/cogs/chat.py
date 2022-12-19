@@ -198,11 +198,11 @@ async def on_message_process(message: discord.Message, self: Chat):
         prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
     #prompt += "Botator:"
     #get the actual time in a variable
-    print("Getting the time...")
-    now = datetime.now()
-    print(now+"hello1234567890")
-    print(str(now.strftime("%Y-%m-%d %H:%M:%S")))
+    #now = datetime.now()
+    #print(now)
+    #print(str(now.strftime("%Y-%m-%d %H:%M:%S")))
     #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
+    now = message.created_at
     prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     print(prompt)
     print("Sending request to the api")
