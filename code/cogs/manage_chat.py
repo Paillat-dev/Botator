@@ -25,14 +25,14 @@ class ManageChat (discord.Cog):
     #add a slash command called "clear" that deletes all the messages in the channel
     @discord.slash_command(name="clear", description="Clear all the messages in the channel")
     async def clear(self, ctx: discord.ApplicationContext):
-        debug(f"The user {ctx.author.display_name} ran the clear command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        debug(f"The user {ctx.author.name} ran the clear command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("messages deleted!", ephemeral=True)
         return await ctx.channel.purge()
 
     @discord.slash_command(name="transcript", description="Get a transcript of the messages that have been sent in this channel intoa text file")
     @discord.option(name="channel_send", description="The channel to send the transcript to", required=False)
     async def transcript(self, ctx: discord.ApplicationContext, channel_send: discord.TextChannel = None):
-        debug(f"The user {ctx.author.display_name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        debug(f"The user {ctx.author.name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
     #save all the messages in the channel in a txt file and send it
         messages = await ctx.channel.history(limit=None).flatten()
         messages.reverse()
@@ -51,8 +51,8 @@ class ManageChat (discord.Cog):
                     #get the user
                     user = await self.bot.fetch_user(id)
                     #replace the mention with the name
-                    msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name)
-                transcript += f"{msg.author.display_name}: {msg.content}\n"
+                    msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).name)
+                transcript += f"{msg.author.name}: {msg.content}\n"
     #save the transcript in a txt file called transcript.txt. If the file already exists, delete it and create a new one
     #check if the file exists
         if os.path.exists("transcript.txt"):

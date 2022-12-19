@@ -20,7 +20,7 @@ class Chat (discord.Cog) :
 
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
-        print(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        print(f"The user {ctx.author.name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
     @discord.slash_command(name="redo", description="Redo a message")
@@ -147,11 +147,11 @@ async def on_message_process(message: discord.Message, self: Chat):
             #get the user
             user = await self.bot.fetch_user(id)
             #replace the mention with the name
-            msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name + f"<@{id}>")
+            msg.content = msg.content.replace(mention, user.name+ f"<@{id}>")
         #get the gmt time the message was sent
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         print(f"{gmt_time}")
-        prompt += f"{msg.author.display_name} ({gmt_time} GMT-0): {msg.content}\n"
+        prompt += f"{msg.author.name} ({gmt_time} GMT-0): {msg.content}\n"
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -189,9 +189,9 @@ async def on_message_process(message: discord.Message, self: Chat):
     if message.content.lower().find("carpet") != -1:
         #When someone says the word carpet, the ai is going to be mad and say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere.
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
-    if message.content.lower().find("mail") != -1 and message.author.display_name.lower().find("latouff") != -1:
+    if message.content.lower().find("mail") != -1 and message.author.name.lower().find("latouff") != -1:
         prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam? Mail is your name in reverse.\" because Latouff's name is Liam, and mail in reverse is Liam. Then, after saying that in the sentence, botato will continue his sentence saying something else.\n"
-    if message.author.display_name.lower().find("fives3dprint") != -1:
+    if message.author.name.lower().find("fives3dprint") != -1:
         #if the author of the last message is fives3dprint, add Easter egg: when someone says the word \"fives3dprint\" Botator will say \"Fives3dprint is the best discord bot\" to the prompt
         prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
     #prompt += "Botator:"

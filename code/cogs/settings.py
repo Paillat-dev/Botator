@@ -120,7 +120,7 @@ class Settings (discord.Cog) :
     #add a slash command called "prefix" that changes the prefix of the bot
     @discord.slash_command(name="prefix", description="Change the prefix of the prompt")
     async def prefix(self, ctx: discord.ApplicationContext, prefix: str):
-        debug(f"The user {ctx.author.display_name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        debug(f"The user {ctx.author.name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Prefix changed !", ephemeral=True)
         c.execute("UPDATE data SET prompt_prefix = ? WHERE guild_id = ?", (prefix, ctx.guild.id))
         conn.commit()
