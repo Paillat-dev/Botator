@@ -199,7 +199,7 @@ async def on_message_process(message: discord.Message, self: Chat):
     now = datetime.now()
     #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
     prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
-    prompt = prompt + f"\n"
+    print(prompt)
     print("Sending request to the api")
     #print(prompt)
     openai.api_key = api_key
