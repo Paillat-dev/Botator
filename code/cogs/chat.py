@@ -106,6 +106,7 @@ async def on_message_process(message: discord.Message, self: Chat):
     #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
     c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
     uses = c.fetchone()[0]
+    print(uses)
     try:
         cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
         premium = cp.fetchone()[0]
@@ -198,6 +199,7 @@ async def on_message_process(message: discord.Message, self: Chat):
     #prompt += "Botator:"
     #get the actual time in a variable
     now = datetime.now()
+    print(now.strftime("%Y-%m-%d %H:%M:%S"))
     #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
     prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     print(prompt)
