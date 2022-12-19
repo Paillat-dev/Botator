@@ -42,6 +42,8 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 
 */default* - Set the advanced settings to their default values
 
+*/redo* - Redo the last answer
+
 */help* - Show this command list
 
 # Support me
