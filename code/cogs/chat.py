@@ -147,7 +147,7 @@ async def on_message_process(message: discord.Message, self: Chat):
             #get the user
             user = await self.bot.fetch_user(id)
             #replace the mention with the name
-            msg.content = msg.content.replace(mention, user.name+ f"<@{id}>")
+            msg.content = msg.content.replace(mention, user.name + f"<@{id}>")
         #get the gmt time the message was sent
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         print(f"{gmt_time}")
