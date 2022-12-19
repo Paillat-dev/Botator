@@ -40,10 +40,10 @@ class Chat (discord.Cog) :
         if message_to_redo.author.id == self.bot.user.id:
             await ctx.respond("The message to redo was sent by the bot", ephemeral=True)
             return
+        await ctx.respond("Message redone !", ephemeral=True)
         loop = asyncio.get_event_loop()
         thread = threading.Thread(target=asyncio.run_coroutine_threadsafe, args=(on_message_process(message_to_redo, self), loop))
         thread.start() 
-        await ctx.respond("Message redone !", delete_after=1)
 
 async def on_message_process(message: discord.Message, self: Chat):
     #my code
