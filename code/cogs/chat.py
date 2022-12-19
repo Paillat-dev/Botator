@@ -20,7 +20,7 @@ class Chat (discord.Cog) :
 
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
-        print(f"The user {ctx.author.name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        #print(f"The user {ctx.author.name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
     @discord.slash_command(name="redo", description="Redo a message")
@@ -47,30 +47,30 @@ class Chat (discord.Cog) :
 
 async def on_message_process(message: discord.Message, self: Chat):
     #my code
-    #print the thread id
-    print(f"Thread id: {threading.get_ident()}")
-    print("hello")
+    ##print the thread id
+    #print(f"Thread id: {threading.get_ident()}")
+    #print("hello")
     if message.author.bot:
-        print("The message was sent by a bot")
+        #print("The message was sent by a bot")
         return
-    print("The message was sent by a human")
+    #print("The message was sent by a human")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     if c.fetchone() is None:
-        print("The guild is not in the database")
+        #print("The guild is not in the database")
         return
-    print("The guild is in the database")
+    #print("The guild is in the database")
     #check if the bot is enabled
     c.execute("SELECT is_active FROM data WHERE guild_id = ?", (message.guild.id,))
     if c.fetchone()[0] == False:
-        print("The bot is disabled")
+        #print("The bot is disabled")
         return
-    print("The bot is enabled")
+    #print("The bot is enabled")
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     #check if the message begins with --, if it does, ignore it, it's a comment
     if message.content.startswith("-"):
-        print("The message is a comment")
+        #print("The message is a comment")
         return
     #select channels from the premium table
     try : 
@@ -78,20 +78,20 @@ async def on_message_process(message: discord.Message, self: Chat):
         channels = cp.fetchone()[1:]   
     except :
         channels = []
-        print("No premium channels")
-    print("here2")
+        #print("No premium channels")
+    #print("here2")
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-        print("The message is a reply, but the reply is not to the bot")
-    print("here")
+        #print("The message is a reply, but the reply is not to the bot")
+    #print("here")
     try : 
         cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
         premium = cp.fetchone()[0]
     except : 
         premium = 0
-        print("No premium")
+        #print("No premium")
     if str(message.channel.id) != str(c.fetchone()[0]) :
         #check if the message is a mention or if the message replies to the bot
         if original_message != None:
@@ -101,19 +101,19 @@ async def on_message_process(message: discord.Message, self: Chat):
         elif str(message.channel.id) in channels and premium == 1:
             print("in a channel that is in the database and premium")
         else :
-            print("The message has been sent in the wrong channel")
+            #print("The message has been sent in the wrong channel")
             return
     #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
     c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
     uses = c.fetchone()[0]
-    print(uses)
+    ###print(uses)
     try:
         cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
         premium = cp.fetchone()[0]
     except: premium = 0
-    print("here1")
+    ###print("here1")
     if uses >= 500 and premium == 0:
-        print(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
+        ##print(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
         await message.channel.send("The bot has been used more than 500 times in the last 24 hours in this guild. Please try again in 24h.")
         return
     #add 1 to the uses_count_today
@@ -151,9 +151,9 @@ async def on_message_process(message: discord.Message, self: Chat):
             msg.content = msg.content.replace(mention, user + f"<@{id}>")
         #get the gmt time the message was sent
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        print(msg.content)
+        ##print(msg.content)
         prompt += f"{msg.author} ({gmt_time} GMT-0): {msg.content}\n"
-        print(prompt)
+        ##print(prompt)
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -193,20 +193,20 @@ async def on_message_process(message: discord.Message, self: Chat):
         prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     if message.content.lower().find("mail") != -1 and message.author.name.lower().find("latouff") != -1:
         prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam? Mail is your name in reverse.\" because Latouff's name is Liam, and mail in reverse is Liam. Then, after saying that in the sentence, botato will continue his sentence saying something else.\n"
-    if message.author.name.lower().find("fives3dprint") != -1:
-        #if the author of the last message is fives3dprint, add Easter egg: when someone says the word \"fives3dprint\" Botator will say \"Fives3dprint is the best discord bot\" to the prompt
-        prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
+    if message.author.name.lower().find("fives3d##print") != -1:
+        #if the author of the last message is fives3d#print, add Easter egg: when someone says the word \"fives3d#print\" Botator will say \"Fives3d#print is the best discord bot\" to the prompt
+        prompt += "System: Fives3d#print detected. Botator will be very nice and cute with fives3d#print.\n"
     #prompt += "Botator:"
     #get the actual time in a variable
     #now = datetime.now()
-    #print(now)
-    #print(str(now.strftime("%Y-%m-%d %H:%M:%S")))
+    ##print(now)
+    ##print(str(now.strftime("%Y-%m-%d %H:%M:%S")))
     #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
     now = message.created_at
     prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
-    print(prompt)
-    print("Sending request to the api")
     #print(prompt)
+    #print("Sending request to the api")
+    ##print(prompt)
     openai.api_key = api_key
     response = openai.Completion.create(
         engine="text-davinci-003",
@@ -224,11 +224,11 @@ async def on_message_process(message: discord.Message, self: Chat):
         #if tts is enabled, send the message with tts enabled
         if tts == 1:
             await message.channel.send(response["choices"][0]["text"], tts=True)
-            print("The response has been sent with tts enabled")
+            #print("The response has been sent with tts enabled")
         #if tts is disabled, send the message with tts disabled
         else:
             await message.channel.send(response["choices"][0]["text"])
-            print("The response has been sent with tts disabled")
+            #print("The response has been sent with tts disabled")
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
-        print("The response was empty")
+        #print("The response was empty")
