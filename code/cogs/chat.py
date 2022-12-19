@@ -153,6 +153,7 @@ async def on_message_process(message: discord.Message, self: Chat):
         print(f"{gmt_time}")
         print({msg.content})
         prompt += f"{msg.author} ({gmt_time} GMT-0): {msg.content}\n"
+        print(prompt)
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
