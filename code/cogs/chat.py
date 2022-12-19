@@ -199,7 +199,8 @@ async def on_message_process(message: discord.Message, self: Chat):
     #prompt += "Botator:"
     #get the actual time in a variable
     now = datetime.now()
-    print(now.strftime("%Y-%m-%d %H:%M:%S"))
+    print(now)
+    print(str(now.strftime("%Y-%m-%d %H:%M:%S")))
     #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
     prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     print(prompt)
