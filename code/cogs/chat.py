@@ -6,6 +6,7 @@ from config import debug, c, max_uses, cp, conn, connp
 import random
 import threading
 import time
+import datetime
 class Chat (discord.Cog) :
     def __init__(self, bot: discord.Bot):
         super().__init__()
@@ -193,7 +194,11 @@ async def on_message_process(message: discord.Message, self: Chat):
     if message.author.display_name.lower().find("fives3dprint") != -1:
         #if the author of the last message is fives3dprint, add Easter egg: when someone says the word \"fives3dprint\" Botator will say \"Fives3dprint is the best discord bot\" to the prompt
         prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
-    prompt += "Botator:"
+    #prompt += "Botator:"
+    #get the actual time in a variable
+    now = datetime.now()
+    #add the time to the prompt in the strftime("%Y-%m-%d %H:%M:%S") format
+    prompt = prompt + f"{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     prompt = prompt + f"\n"
     print("Sending request to the api")
     #print(prompt)
