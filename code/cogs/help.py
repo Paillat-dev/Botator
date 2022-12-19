@@ -17,6 +17,7 @@ class Help (discord.Cog) :
         embed.add_field(name="/advanced_help", value="Get help about the advanced settings", inline=False)
         embed.add_field(name="/enable_tts", value="Enable the Text To Speech", inline=False)
         embed.add_field(name="/disable_tts", value="Disable the Text To Speech", inline=False)
+        embed.add_field(name="/add|remove_channel", value="Add or remove a channel to the list of channels where the bot will answer. Only available on premium guilds", inline=False)
         embed.add_field(name="/delete", value="Delete all your data from our server", inline=False)
         embed.add_field(name="/cancel", value="Cancel the last message sent by the bot", inline=False)
         embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)    

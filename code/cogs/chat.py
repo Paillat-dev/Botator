@@ -5,6 +5,7 @@ import openai
 from config import debug, c, max_uses, cp, conn, connp
 import random
 import threading
+import time
 class Chat (discord.Cog) :
     def __init__(self, bot: discord.Bot):
         super().__init__()
@@ -18,48 +19,99 @@ class Chat (discord.Cog) :
 
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):
-        debug(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
+        print(f"The user {ctx.author.display_name} ran the say command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         await ctx.respond("Message sent !", ephemeral=True)
         await ctx.send(message)
-async def on_message_process(message, self):
+    @discord.slash_command(name="redo", description="Redo a message")
+    async def redo(self, ctx: discord.ApplicationContext):
+        #first delete the last message but only if it was sent by the bot
+        # get the last message
+        history = await ctx.channel.history(limit=2).flatten()
+        message_to_delete = history[0]
+        message_to_redo = history[1]
+        if message_to_delete.author.id == self.bot.user.id:
+            await message_to_delete.delete()
+        else:
+            await ctx.respond("The last message wasn't sent by the bot", ephemeral=True)
+            return
+        #get the message to redo aka the last message, because the old last message has been deleted
+        #get the message before the  last message, because the new last message is the bot thinking message, so the message before the last message is the message to redo
+        if message_to_redo.author.id == self.bot.user.id:
+            await ctx.respond("The message to redo was sent by the bot", ephemeral=True)
+            return
+        loop = asyncio.get_event_loop()
+        thread = threading.Thread(target=asyncio.run_coroutine_threadsafe, args=(on_message_process(message_to_redo, self), loop))
+        thread.start() 
+        await ctx.respond("Message redone !", delete_after=1)
+
+async def on_message_process(message: discord.Message, self: Chat):
     #my code
-    #debug the thread id
-    debug(f"Thread id: {threading.get_ident()}")
+    #print the thread id
+    print(f"Thread id: {threading.get_ident()}")
+    print("hello")
     if message.author.bot:
+        print("The message was sent by a bot")
         return
+    print("The message was sent by a human")
     #check if the guild is in the database
     c.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     if c.fetchone() is None:
+        print("The guild is not in the database")
         return
+    print("The guild is in the database")
     #check if the bot is enabled
     c.execute("SELECT is_active FROM data WHERE guild_id = ?", (message.guild.id,))
     if c.fetchone()[0] == False:
+        print("The bot is disabled")
         return
+    print("The bot is enabled")
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
+    #check if the message begins with --, if it does, ignore it, it's a comment
+    if message.content.startswith("-"):
+        print("The message is a comment")
+        return
+    #select channels from the premium table
+    try : 
+        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+        channels = cp.fetchone()[1:]   
+    except :
+        channels = []
+        print("No premium channels")
+    print("here2")
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-    if str(message.channel.id) != str(c.fetchone()[0]):
+        print("The message is a reply, but the reply is not to the bot")
+    print("here")
+    try : 
+        cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
+        premium = cp.fetchone()[0]
+    except : 
+        premium = 0
+        print("No premium")
+    if str(message.channel.id) != str(c.fetchone()[0]) :
         #check if the message is a mention or if the message replies to the bot
         if original_message != None:
-            debug("wrong channel, but reply")
+            print("wrong channel, but reply")
         elif message.content.find("<@"+str(self.bot.user.id)+">") != -1:
-            debug("wrong channel, but mention")
+            print("wrong channel, but mention")
+        elif str(message.channel.id) in channels and premium == 1:
+            print("in a channel that is in the database and premium")
         else :
-            debug("The message has been sent in the wrong channel")
+            print("The message has been sent in the wrong channel")
             return
     #check if the bot hasn't been used more than 5000 times in the last 24 hours (uses_count_today)
     c.execute("SELECT uses_count_today FROM data WHERE guild_id = ?", (message.guild.id,))
     uses = c.fetchone()[0]
-    
     try:
         cp.execute("SELECT premium FROM data WHERE guild_id = ?", (message.guild.id,))
         premium = cp.fetchone()[0]
     except: premium = 0
+    print("here1")
     if uses >= 500 and premium == 0:
-        debug(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
+        print(f"The bot has been used more than {max_uses} times in the last 24 hours in this guild. Please try again in 24h.")
         await message.channel.send("The bot has been used more than 500 times in the last 24 hours in this guild. Please try again in 24h.")
         return
     #add 1 to the uses_count_today
@@ -86,21 +138,19 @@ async def on_message_process(message, self):
     #get the channel id from the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     for msg in messages:
-        if msg.author.bot:
-            prompt += f"Botator: {msg.content}\n"
-        else:
-            #replace the mentions of each user with their name
-            #first get all the mentions in the message
-            mentions = re.findall(r"<@!?\d+>", msg.content)
-            #then replace each mention with the name of the user
-            for mention in mentions:
-                #get the user id
-                id = mention[2:-1]
-                #get the user
-                user = await self.bot.fetch_user(id)
-                #replace the mention with the name
-                msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name + f"<@{id}>")
-            prompt += f"{msg.author.display_name}: {msg.content}\n"
+        mentions = re.findall(r"<@!?\d+>", msg.content)
+        #then replace each mention with the name of the user
+        for mention in mentions:
+            #get the user id
+            id = mention[2:-1]
+            #get the user
+            user = await self.bot.fetch_user(id)
+            #replace the mention with the name
+            msg.content = msg.content.replace(mention, msg.guild.get_member(user.id).display_name + f"<@{id}>")
+        #get the gmt time the message was sent
+        gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{gmt_time}")
+        prompt += f"{msg.author.display_name} ({gmt_time} GMT-0): {msg.content}\n"
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
     c.execute("SELECT pretend_enabled FROM data WHERE guild_id = ?", (message.guild.id,))
@@ -145,8 +195,8 @@ async def on_message_process(message, self):
         prompt += "System: Fives3dprint detected. Botator will be very nice and cute with fives3dprint.\n"
     prompt += "Botator:"
     prompt = prompt + f"\n"
-    debug("Sending request to the api")
-    #debug(prompt)
+    print("Sending request to the api")
+    #print(prompt)
     openai.api_key = api_key
     response = openai.Completion.create(
         engine="text-davinci-003",
@@ -164,11 +214,11 @@ async def on_message_process(message, self):
         #if tts is enabled, send the message with tts enabled
         if tts == 1:
             await message.channel.send(response["choices"][0]["text"], tts=True)
-            debug("The response has been sent with tts enabled")
+            print("The response has been sent with tts enabled")
         #if tts is disabled, send the message with tts disabled
         else:
             await message.channel.send(response["choices"][0]["text"])
-            debug("The response has been sent with tts disabled")
+            print("The response has been sent with tts disabled")
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
-        debug("The response was empty")
+        print("The response was empty")
