@@ -151,6 +151,7 @@ async def on_message_process(message: discord.Message, self: Chat):
         #get the gmt time the message was sent
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         print(f"{gmt_time}")
+        print({msg.content})
         prompt += f"{msg.author} ({gmt_time} GMT-0): {msg.content}\n"
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
