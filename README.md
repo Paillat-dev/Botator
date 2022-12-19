@@ -78,6 +78,7 @@ After that you will normally be able to access some new channels in our discord 
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [ ] Add moderation.
 - [ ] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
+- [ ] Add a /continue command - you know
 - [x] Add DateHour in prompts
 - [x] Add /redo
 - [x] Add uses count reset after 24h
