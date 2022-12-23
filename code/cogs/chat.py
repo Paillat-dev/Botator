@@ -69,7 +69,7 @@ async def on_message_process(message: discord.Message, self: Chat):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     #check if the message begins with --, if it does, ignore it, it's a comment
-    if message.content.startswith("-"):
+    if message.content.startswith("-") or message.content.startswith("//"):
         #print("The message is a comment")
         return
     #select channels from the premium table
@@ -140,19 +140,21 @@ async def on_message_process(message: discord.Message, self: Chat):
     #get the channel id from the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     for msg in messages:
-        mentions = re.findall(r"<@!?\d+>", msg.content)
+        content = msg.content
+        mentions = re.findall(r"<@!?\d+>", content)
         #then replace each mention with the name of the user
         for mention in mentions:
             #get the user id
-            id = mention[2:-1]
+            uid = mention[2:-1]
             #get the user
-            user = await self.bot.fetch_user(id)
+            user = await self.bot.fetch_user(uid)
             #replace the mention with the name
-            msg.content = msg.content.replace(mention, user + f"<@{id}>")
+            content = content.replace(mention, f"{user.name}#{user.discriminator}:<@{uid}>")
+            content = content + "\nSYSTEM: Mentions have been replaced with name#discriminator:id. Botator uses only the mention, not the name or the discriminator. The discriminator is only used to prevent name clashes."
         #get the gmt time the message was sent
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         ##print(msg.content)
-        prompt += f"{msg.author} ({gmt_time} GMT-0): {msg.content}\n"
+        prompt += f"{msg.author} ({gmt_time} GMT-0): {content}\n"
         ##print(prompt)
     #get the prompt_prefix from the database
     #check if the bot is in pretend mode
