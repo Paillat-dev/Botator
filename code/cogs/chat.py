@@ -69,7 +69,7 @@ async def on_message_process(message: discord.Message, self: Chat):
     #check if the message has been sent in the channel set in the database
     c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (message.guild.id,))
     #check if the message begins with --, if it does, ignore it, it's a comment
-    if message.content.startswith("-"):
+    if message.content.startswith("-") or message.content.startswith("//"):
         #print("The message is a comment")
         return
     #select channels from the premium table
