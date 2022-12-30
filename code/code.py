@@ -1,5 +1,6 @@
-#coucou c'est fives
-# wesh wesh ici latouff
+from dotenv import load_dotenv
+load_dotenv()
+
 import discord # pip install pycord
 from discord import Intents
 import asyncio # pip install asyncio
@@ -21,12 +22,9 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="your messages to answer you"))
     debug("Bot is ready")
 
-#run the bot
-# Replace the following with your bot's token
-with open("./key.txt") as f:
-    key = f.read()
-   
-bot.run(key)
+
+
+bot.run(os.getenv("PUBLIC_KEY"))
 #set the bot's watching status to watcing your messages to answer you
 @bot.event
 async def on_ready():

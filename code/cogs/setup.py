@@ -40,7 +40,7 @@ class Setup (discord.Cog) :
         if c.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        #delete the guild from the database, except the guild id and the uses_count_today
+        #delete the guild from the database, except the guild id
         c.execute("UPDATE data SET api_key = ?, channel_id = ?, is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx.guild.id))
         conn.commit()
         await ctx.respond("Deleted", ephemeral=True)
@@ -49,10 +49,6 @@ class Setup (discord.Cog) :
     @discord.slash_command(name="enable", description="Enable the bot")
     ##@discord.commands.permissions(administrator=True)
     async def enable(self, ctx: discord.ApplicationContext):
-        #if the guild is eqal to 1014156298226515970, the guild is banned
-        if ctx.guild.id == 1014156298226515970:
-            await ctx.respond("This server is banned for bad and nsfw use.", ephemeral=True)
-            return
         #check if the guild is in the database
         debug(f"The user {ctx.author} ran the enable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
@@ -80,7 +76,7 @@ class Setup (discord.Cog) :
         await ctx.respond("Disabled", ephemeral=True)
 
     #create a command calles "add channel" that can only be used in premium servers
-    @discord.slash_command(name="add_channel", description="Add a channel to the list of channels. Premium only.")
+    @discord.slash_command(name="add_channel", description="Add a channel to the list of channels.")
     @discord.option(name="channel", description="The channel to add", type=discord.TextChannel, required=False)
     async def add_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None):
         debug(f"The user {ctx.author} ran the add_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
@@ -88,15 +84,6 @@ class Setup (discord.Cog) :
         c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if c.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
-            return
-        #check if the guild is premium
-        try : 
-            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
-            premium = cp.fetchone()[0]
-        except :
-            premium = 0
-        if not premium:
-            await ctx.respond("This server is not premium", ephemeral=True)
             return
         if channel is None:
             channel = ctx.channel
@@ -126,7 +113,7 @@ class Setup (discord.Cog) :
         await ctx.respond("You can only add 5 channels", ephemeral=True)
 
     #create a command called "remove channel" that can only be used in premium servers
-    @discord.slash_command(name="remove_channel", description="Remove a channel from the list of channels. Premium only.")
+    @discord.slash_command(name="remove_channel", description="Remove a channel from the list of channels.")
     @discord.option(name="channel", description="The channel to remove", type=discord.TextChannel, required=False)
     async def remove_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None):
         debug(f"The user {ctx.author} ran the remove_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
@@ -136,14 +123,6 @@ class Setup (discord.Cog) :
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         #check if the guild is premium
-        try : 
-            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
-            premium = cp.fetchone()[0]
-        except :
-            premium = 0
-        if not premium:
-            await ctx.respond("This server is not premium", ephemeral=True)
-            return
         if channel is None:
             channel = ctx.channel
         #check if the channel is in the list
