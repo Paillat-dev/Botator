@@ -51,7 +51,7 @@ class Settings (discord.Cog) :
             if c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and temperature is None:
                 temperature = c.execute("SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
             else:
-                temperature = 0.9
+                temperature = 0.5
         if frequency_penalty is None:
             if c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0] is not None and frequency_penalty is None:
                 frequency_penalty = c.execute("SELECT frequency_penalty FROM data WHERE guild_id = ?", (ctx.guild.id,)).fetchone()[0]
@@ -92,7 +92,7 @@ class Settings (discord.Cog) :
     @discord.slash_command(name="info", description="Show the information stored about this server")
     async def info(self, ctx: discord.ApplicationContext):
         debug(f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
-        #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
+        #this command sends all the data about the guild, including the api key, the channel id, the advanced settings
         #check if the guild is in the database
         c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if c.fetchone() is None:
@@ -112,7 +112,6 @@ class Settings (discord.Cog) :
         embed.add_field(name="Frequency Penalty", value=data[6], inline=False)
         embed.add_field(name="Presence Penalty", value=data[7], inline=False)
         embed.add_field(name="Prompt Size", value=data[9], inline=False)
-        embed.add_field(name="Uses Count Today", value=data[8], inline=False)
         if data[10]:
             embed.add_field(name="Prompt prefix", value=data[10], inline=False)
         await ctx.respond(embed=embed, ephemeral=True)
@@ -140,7 +139,7 @@ class Settings (discord.Cog) :
         if c.fetchone()[3] == 0:
             await ctx.respond("The bot is disabled", ephemeral=True)
             return
-        if pretend_to_be is None:
+        if pretend_to_be is (None or "off" or "stfu"):
             pretend_to_be = ""
             c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()

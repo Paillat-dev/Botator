@@ -11,9 +11,9 @@ ENV PYTHONUNBUFFERED=1
 # Install pip requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN git clone https://github.com/Paillat-dev/Botator.git
+RUN git clone https://github.com/mculp/botator-without-a-stupid-prompt.git
 WORKDIR /Botator/code/
-COPY key.txt /Botator/code/
+COPY .env /Botator/code/
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /Botator/code
 USER appuser
