@@ -42,7 +42,6 @@ async def process(self, message):
     try: 
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
         if premium: channels = cp.fetchone()[1:]
-        print (channels)
     except: channels = []
     #channels.append(channel_id)
     if api_key is None:
@@ -135,11 +134,8 @@ If a user asks for code, just in the answer replace the place where the code exa
     #code_descriptions = re.findall(r"\[code:(.*?)\]", response)
     #same as above but working with the code, Code, CODE, etc
     code_descriptions = re.findall(r"\[code:(.*?)\]", response)
-    print(code_descriptions)
     for desc in code_descriptions:
-        print(desc)
         prompt = f"#{desc}\n"
-        print(prompt)
         snippet = await openai.Completion.acreate(
             engine="code-davinci-002",
             prompt=str(prompt),
@@ -150,7 +146,6 @@ If a user asks for code, just in the answer replace the place where the code exa
             presence_penalty=0.2,
         )
         snippet = snippet["choices"][0]["text"]
-        print(snippet)
         language = "python"
         language = languages[language]
         snippet = f"```{language}\n{snippet}\n```"
