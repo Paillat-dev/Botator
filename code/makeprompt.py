@@ -154,6 +154,8 @@ If a user asks for code, just in the answer replace the place where the code exa
         language = "python"
         language = languages[language]
         snippet = f"```{language}\n{snippet}\n```"
+        #we remove any + signs from the beginning of each line of the snippet
+        snippet = re.sub(r"^\+", "", snippet, flags=re.MULTILINE)
         #we replace the corresponding [code:...] with the snippet
         response = response.replace(f"[code:{desc}]", snippet, 1)
     #here we define a list of programming languages and their extensions
