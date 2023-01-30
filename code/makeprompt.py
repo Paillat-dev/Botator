@@ -42,8 +42,9 @@ async def process(self, message):
     try: 
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
         if premium: channels = cp.fetchone()[1:]
+        print (channels)
     except: channels = []
-    channels.append(channel_id)
+    #channels.append(channel_id)
     if api_key is None:
         return
     if uses_count_today >= max_uses and premium == 0:
@@ -60,7 +61,7 @@ async def process(self, message):
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None:
+    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and message.channel.id != channel_id:
         return
     await message.channel.trigger_typing()
     if message.guild.id != 1021872219888033903:
