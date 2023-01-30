@@ -60,7 +60,7 @@ async def process(self, message):
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and message.channel.id != channel_id:
+    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id):
         return
     await message.channel.trigger_typing()
     if message.guild.id != 1021872219888033903:
