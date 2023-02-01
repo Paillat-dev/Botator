@@ -55,6 +55,7 @@ async def process(self, message):
         return
     if message.content.startswith("-") or message.content.startswith("//"):
         return
+    if str(message.user.id) == "646739625661956128": return
     #check if the message is in the right channel by comparing the channel id of the message with the list of channels "channels"
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
