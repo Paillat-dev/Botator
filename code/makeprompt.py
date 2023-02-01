@@ -55,15 +55,15 @@ async def process(self, message):
         return
     if message.content.startswith("-") or message.content.startswith("//"):
         return
+    if str(message.author.id) == "646739625661956128":
+        await message.channel.send(message.content) # this is a prank done by me, the developer of the bot. It's not a bug, it's a feature.
+        return
     #check if the message is in the right channel by comparing the channel id of the message with the list of channels "channels"
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
     if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id):
-        return
-    if str(message.author.id) == "646739625661956128":
-        await message.channel.send(message.content) # this is a prank done by me, the developer of the bot. It's not a bug, it's a feature.
         return
     await message.channel.trigger_typing()
     if message.guild.id != 1021872219888033903:
