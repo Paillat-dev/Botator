@@ -3,6 +3,7 @@ from config import debug, c, max_uses, cp, conn, connp
 import re
 import discord
 import openai
+import random
 languages = {
     "python": "py",
     "javascript": "js",
@@ -56,8 +57,10 @@ async def process(self, message):
     if message.content.startswith("-") or message.content.startswith("//"):
         return
     if str(message.author.id) == "646739625661956128":
-        await message.channel.send(message.content) # this is a prank done by me, the developer of the bot. It's not a bug, it's a feature.
-        return
+        #a random int between 0 and 1 to decide if the bot should respond or not
+        if random.randint(0, 1) == 0:
+            await message.channel.send(message.content) # this is a prank done by me, the developer of the bot. It's not a bug, it's a feature.
+            return
     #check if the message is in the right channel by comparing the channel id of the message with the list of channels "channels"
     try : original_message = await message.channel.fetch_message(message.reference.message_id)
     except : original_message = None
