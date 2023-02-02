@@ -2,3 +2,4 @@
 py-cord
 openai
 apsw
+googleapiclient
