@@ -37,7 +37,6 @@ class Moderation (discord.Cog):
         channel = self.bot.get_channel(int(data[1]))
         is_enabled = data[2]
         moderator_role = message.guild.get_role(int(data[3]))
-        author_roles = message.author.roles
         #we also do that with the manage_messages permission, so the moderators can't be moderated
         if message.author.guild_permissions.manage_messages: return #if the user is a moderator, we don't want to moderate him because he is allowed to say whatever he wants because he is just like a dictator
         if message.author.guild_permissions.administrator: return #if the user is an administrator, we don't want to moderate him because he is allowed to say whatever he wants because he is a DICTATOR
