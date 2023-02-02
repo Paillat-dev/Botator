@@ -3,3 +3,4 @@ py-cord
 openai
 apsw
 google-api-python-client
+python-dotenv
