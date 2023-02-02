@@ -161,6 +161,7 @@ cython_debug/
 
 key.txt
 data.db
+database
 premium-key.txt
 premium.db
 guildscount.py

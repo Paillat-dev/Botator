@@ -19,10 +19,11 @@ async def process(self, message):
     #c.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     #we get all the data from the database into different variables (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)
     try: c.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
-    except: return
+    except:
+        return
     channel = message.channel.id
     data = c.fetchone()
-    guild_id = data[0]
+    guild_id = data[0]  
     channel_id = data[1]
     api_key = data[2]
     is_active = data[3]
@@ -40,7 +41,7 @@ async def process(self, message):
     try: premium = cp.fetchone()[2]
     except: premium = 0
     channels = []
-    try: 
+    try:
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
         if premium: channels = cp.fetchone()[1:]
     except: channels = []

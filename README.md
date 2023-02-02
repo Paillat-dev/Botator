@@ -1,5 +1,5 @@
 # Botator
-Botator is a discord bot that binds [@openai](https://github.com/openai) 's gpt3 AI with [@discord](https://github.com/discord). You will be able to take the conversation with the AI into a specific channel that you created, or by pinging/replying to a bot's message.
+Botator is a discord bot that binds [@openai](https://github.com/openai) 's gpt3 AI with [@discord](https://github.com/discord). You will be able to take the conversation with the AI into a specific channel that you created, or by pinging/replying to a bot's message. He can also AI moderate the chat.
 ![discord com_channels_1021872219888033903_1046119234033434734](https://user-images.githubusercontent.com/75439456/204105583-2abb2d77-9404-4558-bd3e-c1a70b939758.png)
 
 # Adding the bot to your discord server
@@ -46,8 +46,13 @@ You can always disable the bot by doing **/disable** and delete your api key fro
 
 */help* - Show this command list
 
+*/moderation* - Set the AI moderation settings
+
+*/get_toxicity* - Get the toxicity that the AI would have given to a given message
+
 # Support me
 You can support me by getting Botator premium, or donating [here](https://www.buymeacoffee.com/paillat). More informations about botator premium here below:
+
 ### Why?
 At the beginning, Botator was just a project between friends, but now many people are using it, so we need something to pay for our servers. Premium is also a way to support us and our work.
 ### Is this mandatory?
@@ -76,7 +81,7 @@ After that you will normally be able to access some new channels in our discord 
 - [ ] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
 - [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
-- [ ] Add moderation.
+- [x] Add moderation.
 - [ ] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
 - [ ] Add a /continue command - you know
 - [x] Add DateHour in prompts
