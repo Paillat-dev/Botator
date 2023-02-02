@@ -34,6 +34,7 @@ class Moderation (discord.Cog):
         try: c.execute("SELECT * FROM moderation WHERE guild_id = ?", (str(message.guild.id),))
         except: return
         data = c.fetchone()
+        if data is None: return
         channel = self.bot.get_channel(int(data[1]))
         is_enabled = data[2]
         moderator_role = message.guild.get_role(int(data[3]))
