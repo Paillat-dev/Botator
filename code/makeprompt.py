@@ -64,6 +64,8 @@ async def process(self, message):
         original_message = None
     if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id):
         return
+    if original_message != None and message.guild.id == 1050769643180146749 and message.author.id != 707196665668436019:
+        return
     if str(message.author.id) == "646739625661956128":
         #a random int between 0 and 1 to decide if the bot should respond or not
         if random.randint(0, 2) == 0:
