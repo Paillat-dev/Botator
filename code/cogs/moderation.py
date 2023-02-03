@@ -49,7 +49,7 @@ class Moderation (discord.Cog):
             embed = discord.Embed(title="Message deleted", description=f"{message.author.mention} Your message was deleted because it was too toxic. Please keep this server safe and friendly. If you think this was a mistake, please contact a moderator.", color=discord.Color.red())
             await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=15)
             formatted_message_sent_date = message.created_at.strftime("%d/%m/%Y %H:%M:%S")
-            embed = discord.Embed(title="Message deleted", description=f"The message \n***{content}***\n of {message.author.mention} sent in {message.channel.mention} on date **{formatted_message_sent_date}** was deleted because it was too toxic. The toxicity score was of **{message_toxicity}**", color=discord.Color.red())
+            embed = discord.Embed(title="Message deleted", description=f"The message \n***{content}***\n of {message.author.mention} sent in {message.channel.mention} on date **{formatted_message_sent_date}** was deleted because it was too toxic. The toxicity score was of **{message_toxicity*100}%**", color=discord.Color.red())
             await channel.send(embed=embed)
         elif 0.37 < message_toxicity < 0.40: #if the message is not toxic, but it is close to being toxic, we send a warning
             embed = discord.Embed(title="Possible toxic message", description=f"A possible [toxic message: **{content}**]({message.jump_url}) was sent by {message.author.mention} in {message.channel.mention}. Please check it out.", color=discord.Color.orange())
@@ -68,4 +68,4 @@ class Moderation (discord.Cog):
     @default_permissions(administrator=True)
     async def get_toxicity(self, ctx: discord.ApplicationContext, message: str):
         toxicity = tox.get_toxicity(message)
-        await ctx.respond(f"The toxicity of the message **{message}** is **{toxicity}**")
+        await ctx.respond(f"The toxicity of the message **{message}** is **{toxicity*100}%**")
