@@ -138,6 +138,7 @@ class Moderation (discord.Cog):
         await ctx.respond(embed=embed)
 
     @discord.slash_command(name="moderation_help", description="Get help with the moderation AI")
+    @default_permissions(administrator=True)
     async def moderation_help(self, ctx: discord.ApplicationContext):
         embed = discord.Embed(title="Moderation AI help", description="Here is a list of all the moderation commands", color=discord.Color.blurple())
         for definition in tox.toxicity_definitions:
