@@ -46,6 +46,7 @@ class Moderation (discord.Cog):
             c.execute("INSERT INTO moderation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (str(ctx.guild.id), str(log_channel.id), enable, str(moderator_role.id), toxicity, severe_toxicity, identity_attack, insult, profanity, threat, sexually_explicit, flirtation, obscene, spam))
             conn.commit()
             await ctx.respond(content="Moderation has been enabled!", ephemeral=True)
+            return
         else:
             #for each value we check if it's none. If it's none and there's no value in the database, we set it to 0.40, otherwise we set it to the value in the database
             if toxicity is None and data[4] is not None: toxicity = data[4]
