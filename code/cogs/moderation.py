@@ -27,51 +27,12 @@ class Moderation (discord.Cog):
     #we set the default permissions to the administrator permission, so only the server administrators can use this command
     @default_permissions(administrator=True)
     async def moderation(self, ctx: discord.ApplicationContext, enable: bool, log_channel: discord.TextChannel, moderator_role: discord.Role, toxicity: float = None, severe_toxicity: float = None, identity_attack: float = None, insult: float = None, profanity: float = None, threat: float = None, sexually_explicit: float = None, flirtation: float = None, obscene: float = None, spam: float = None):
-        try: 
-            data = c.execute("SELECT * FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
-            data = c.fetchone()
-        except: data = None
-        if data is None:
-            #first we check if any of the values is none. If it's none, we set it to 0.40
-            if toxicity is None: toxicity = 0.40
-            if severe_toxicity is None: severe_toxicity = 0.40
-            if identity_attack is None: identity_attack = 0.40
-            if insult is None: insult = 0.40
-            if profanity is None: profanity = 0.40
-            if threat is None: threat = 0.40
-            if sexually_explicit is None: sexually_explicit = 0.40
-            if flirtation is None: flirtation = 0.40
-            if obscene is None: obscene = 0.40
-            if spam is None: spam = 0.40
-            c.execute("INSERT INTO moderation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (str(ctx.guild.id), str(log_channel.id), enable, str(moderator_role.id), toxicity, severe_toxicity, identity_attack, insult, profanity, threat, sexually_explicit, flirtation, obscene, spam))
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ \n If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
+        if enable == False:
+            c.execute("DELETE FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
             conn.commit()
-            await ctx.respond(content="Moderation has been enabled!", ephemeral=True)
+            await ctx.send("Moderation disabled!")
             return
-        else:
-            #for each value we check if it's none. If it's none and there's no value in the database, we set it to 0.40, otherwise we set it to the value in the database
-            if toxicity is None and data[4] is not None: toxicity = data[4]
-            elif toxicity is None and data[4] is None: toxicity = 0.40
-            if severe_toxicity is None and data[5] is not None: severe_toxicity = data[5]
-            elif severe_toxicity is None and data[5] is None: severe_toxicity = 0.40
-            if identity_attack is None and data[6] is not None: identity_attack = data[6]
-            elif identity_attack is None and data[6] is None: identity_attack = 0.40
-            if insult is None and data[7] is not None: insult = data[7]
-            elif insult is None and data[7] is None: insult = 0.40
-            if profanity is None and data[8] is not None: profanity = data[8]
-            elif profanity is None and data[8] is None: profanity = 0.40
-            if threat is None and data[9] is not None: threat = data[9]
-            elif threat is None and data[9] is None: threat = 0.40
-            if sexually_explicit is None and data[10] is not None: sexually_explicit = data[10]
-            elif sexually_explicit is None and data[10] is None: sexually_explicit = 0.40
-            if flirtation is None and data[11] is not None: flirtation = data[11]
-            elif flirtation is None and data[11] is None: flirtation = 0.40
-            if obscene is None and data[12] is not None: obscene = data[12]
-            elif obscene is None and data[12] is None: obscene = 0.40
-            if spam is None and data[13] is not None: spam = data[13]
-            elif spam is None and data[13] is None: spam = 0.40
-            c.execute("UPDATE moderation SET logs_channel_id = ?, is_enabled = ?, mod_role_id = ?, toxicity = ?, severe_toxicity = ?, identity_attack = ?, insult = ?, profanity = ?, threat = ?, sexually_explicit = ?, flirtation = ?, obscene = ?, spam = ? WHERE guild_id = ?", (str(log_channel.id), enable, str(moderator_role.id), toxicity, severe_toxicity, identity_attack, insult, profanity, threat, sexually_explicit, flirtation, obscene, spam, str(ctx.guild.id)))
-            conn.commit()
-        await ctx.respond("Successfully updated moderation settings for this server", ephemeral=True)
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -118,30 +79,9 @@ class Moderation (discord.Cog):
     @discord.option(name="message", description="The message you want to check", required=True)
     @default_permissions(administrator=True)
     async def get_toxicity(self, ctx: discord.ApplicationContext, message: str):
-        response = tox.get_toxicity(message)
-#        try: toxicity, severe_toxicity, identity_attack, insult, profanity, threat, sexually_explicit, flirtation, obscene, spam = response
-#       except: toxicity, severe_toxicity, identity_attack, insult, profanity, threat = response
-        would_have_been_deleted = []
-        would_have_been_suspicous = []
-        c.execute("SELECT * FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
-        data = c.fetchone()
-        for i in response:
-            if i >= float(data[response.index(i)+4]):
-                would_have_been_deleted.append(tox.toxicity_names[response.index(i)])
-            elif i >= float(data[response.index(i)+4])-0.1:
-                would_have_been_suspicous.append(tox.toxicity_names[response.index(i)])
-        if would_have_been_deleted !=[]: embed = discord.Embed(title="Toxicity", description=f"Here are the different toxicity scores of the message\n***{message}***", color=discord.Color.red())
-        elif would_have_been_suspicous !=[] and would_have_been_deleted ==[]: embed = discord.Embed(title="Toxicity", description=f"Here are the different toxicity scores of the message\n***{message}***", color=discord.Color.orange())
-        else: embed = discord.Embed(title="Toxicity", description=f"Here are the different toxicity scores of the message\n***{message}***", color=discord.Color.green())
-        for i in response: embed.add_field(name=tox.toxicity_names[response.index(i)], value=f"{str( float(i)*100)}%", inline=False)
-        if would_have_been_deleted != []: embed.add_field(name="Would have been deleted", value=f"Yes, the message would have been deleted because of the following toxicity scores: **{'**, **'.join(would_have_been_deleted)}**", inline=False)
-        if would_have_been_suspicous != [] and would_have_been_deleted == []: embed.add_field(name="Would have been marked as suspicious", value=f"Yes, the message would have been marked as suspicious because of the following toxicity scores: {', '.join(would_have_been_suspicous)}", inline=False)
-        await ctx.respond(embed=embed)
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://discord.gg/pB6hXtUeDv . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
 
     @discord.slash_command(name="moderation_help", description="Get help with the moderation AI")
     @default_permissions(administrator=True)
     async def moderation_help(self, ctx: discord.ApplicationContext):
-        embed = discord.Embed(title="Moderation AI help", description="Here is a list of all the moderation commands", color=discord.Color.blurple())
-        for definition in tox.toxicity_definitions:
-            embed.add_field(name=tox.toxicity_names[tox.toxicity_definitions.index(definition)], value=definition, inline=False)
-        await ctx.respond(embed=embed, ephemeral=True)
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
