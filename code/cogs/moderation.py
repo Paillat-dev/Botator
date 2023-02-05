@@ -27,11 +27,11 @@ class Moderation (discord.Cog):
     #we set the default permissions to the administrator permission, so only the server administrators can use this command
     @default_permissions(administrator=True)
     async def moderation(self, ctx: discord.ApplicationContext, enable: bool, log_channel: discord.TextChannel, moderator_role: discord.Role, toxicity: float = None, severe_toxicity: float = None, identity_attack: float = None, insult: float = None, profanity: float = None, threat: float = None, sexually_explicit: float = None, flirtation: float = None, obscene: float = None, spam: float = None):
-        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ \n If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ \n If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv", ephemeral=True)
         if enable == False:
             c.execute("DELETE FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
             conn.commit()
-            await ctx.send("Moderation disabled!")
+            await ctx.respond("Moderation disabled!", ephemeral=True)
             return
 
     @discord.Cog.listener()
@@ -79,9 +79,9 @@ class Moderation (discord.Cog):
     @discord.option(name="message", description="The message you want to check", required=True)
     @default_permissions(administrator=True)
     async def get_toxicity(self, ctx: discord.ApplicationContext, message: str):
-        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://discord.gg/pB6hXtUeDv . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://discord.gg/pB6hXtUeDv . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv", ephemeral=True)
 
     @discord.slash_command(name="moderation_help", description="Get help with the moderation AI")
     @default_permissions(administrator=True)
     async def moderation_help(self, ctx: discord.ApplicationContext):
-        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv")
+        await ctx.respond("Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ . If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv", ephemeral=True)
