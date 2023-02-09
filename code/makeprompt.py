@@ -129,7 +129,6 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
     prompt = prompt + f"\n{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     openai.api_key = api_key
     #we can try up to 10 times to get a response from the API
-    await message.channel.send(f"```diff\n-DEBUG```\n {prompt}") #debug only
     for i in range(10):
         try:
             response = await openai.Completion.acreate(
