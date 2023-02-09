@@ -148,6 +148,9 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
             continue
         break   # why is break here? if the try block fails, it will continue to the next iteration of the loop, which will try again. if the try block succeeds, it will break out of the loop. so why is break here?
     response = response["choices"][0]["text"]
+    Images_capital = re.findall(r"\[Image:(.*?)\]", response)
+    #replace all [Image:...] with [image:...] so that we can use the same code for both
+    for Image_capital in Images_capital: response = response.replace(f"[Image:{Image_capital}]", f"[image:{Image_capital}]")
     images = re.findall(r"\[image:(.*?)\]", response)
     files = []
     filenames = []
