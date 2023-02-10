@@ -184,5 +184,6 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
         await message.channel.send(response, tts=tts, files=files)
         for filename in filenames:
             os.remove(filename)
+        print(url)
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
