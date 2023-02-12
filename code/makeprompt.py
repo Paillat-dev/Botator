@@ -91,7 +91,7 @@ async def process(self, message):
             content = content.replace(mention, f"{user.name}#{user.discriminator}:<@{uid}>")
             content = content + "\nSYSTEM: Mentions have been replaced with name#discriminator:id. Botator uses only the mention, not the name or the discriminator. The discriminator is only used to prevent name clashes."
         if content.endswith("\n*Images from unsplash.com*"):
-            content = content.replace("\n*Images from unsplash.com*", "[image:here was an image]")
+            content = content.replace("\n*Images from unsplash.com*", "")
         gmt_time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         u_prompt += f"{msg.author} ({gmt_time} GMT-0): {content}\n"
     print(pretend_enabled)
