@@ -129,6 +129,7 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
     prompt = prompt + f"\n{self.bot.user.name} ({now.strftime('%Y-%m-%d %H:%M:%S')}):"
     openai.api_key = api_key
     #we can try up to 10 times to get a response from the API
+    response = None
     for i in range(10):
         try:
             response = await openai.Completion.acreate(
@@ -143,7 +144,8 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
             )
         
         except Exception as e:
-            print("Error: when trying to get a response from the API, probly the Rate Limit was reached. Trying again in 15 seconds.")
+            print(e)
+            print("Error: when trying to get a response from the API, probably the Rate Limit was reached. Trying again in 15 seconds.")
             await asyncio.sleep(15)
             continue
         break   # why is break here? if the try block fails, it will continue to the next iteration of the loop, which will try again. if the try block succeeds, it will break out of the loop. so why is break here?
