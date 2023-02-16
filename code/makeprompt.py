@@ -142,15 +142,12 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
                 presence_penalty=float(presence_penalty),
                 stop=[" Human:", " AI:", "AI:", "<|endofprompt|>",]
             )
-        
         except Exception as e:
             print(e)
-            await asyncio.sleep(15)
-            if e == "You exceeded your current quota, please check your plan and billing details.":
-                await message.channel.send("```diff\n-OPENAI ERROR\nYou exceeded your current quota, please check your plan and billing details.```")
-                return
-            else: continue
-        break
+            response = None
+            await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```")
+            return
+        if response != None: break
     response = response["choices"][0]["text"]
     Images_capital = re.findall(r"\[Image:(.*?)\]", response)
     #replace all [Image:...] with [image:...] so that we can use the same code for both
