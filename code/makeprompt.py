@@ -157,6 +157,7 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
     files = []
     filenames = []
     if images != []: response = f"{response}\n\n*Images from unsplash.com*"
+    url = None
     for desc in images:
         #weuse unsplash to get an image with their api (https://source.unsplash.com/1600x900/?{desc})
         #we use the description of the image as a search query
@@ -165,6 +166,7 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
         response = response.replace(f"[image:{desc}]", "", 1)
         #we first get the image url
         desc = desc.replace(" ", "+")
+        desc = desc.replace('"', '')
         url = f"https://source.unsplash.com/1600x900/?{desc}"
         #we then download the image
         image = requests.get(url)
