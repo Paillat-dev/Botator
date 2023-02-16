@@ -143,9 +143,8 @@ To include IMAGES, botator does [image:"here a short title of the image"], then 
                 stop=[" Human:", " AI:", "AI:", "<|endofprompt|>",]
             )
         except Exception as e:
-            print(e)
             response = None
-            await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```")
+            await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10)
             return
         if response != None: break
     response = response["choices"][0]["text"]
