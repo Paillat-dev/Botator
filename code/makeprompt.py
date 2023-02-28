@@ -111,7 +111,6 @@ Botator is an AI and a regular Discord user. He types casually, uses a lot of em
     if message.content.lower().find("carpet") != -1: prompt += "System: Carpet detected. Botator is now mad. He will start talking in capital letters and will say mad things without sense, insulting the person and talk in capital letters with exclamation points everywhere. A lot of exclamation points.\n"
     if message.content.lower().find("mail") != -1 and message.author.name.lower().find("latouff") != -1: prompt += "System: Mail detected. Latouff said mail, Botator will say \"Mail? why did you say mail, Liam? Mail is your name in reverse.\" because Latouff's name is Liam, and mail in reverse is Liam. Then, after saying that in the sentence, botato will continue his sentence saying something else.\n"
     if message.author.name.lower().find("fives3d##print") != -1: prompt += "System: Fives3d#print detected. Botator will be very nice and cute with fives3d#print.\n"
-    now = message.created_at
     prompt = prompt + f"\n{self.bot.user.name}:"
     openai.api_key = api_key
     response = ""

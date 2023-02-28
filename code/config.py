@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 perspective_api_key = os.getenv("PERSPECTIVE_API_KEY")
+discord_token = os.getenv("DISCORD_TOKEN")
 max_uses: int = 400
 logging.basicConfig(level=logging.INFO)
 
