@@ -39,5 +39,6 @@ if actual_columns != expected_columns:
 else:
     print("Table already has the correct number of columns")
     pass
+c.execute('''CREATE TABLE IF NOT EXISTS model (guild_id text, model_name text)''')
 cp.execute('''CREATE TABLE IF NOT EXISTS data (user_id text, guild_id text, premium boolean)''')
 cp.execute('''CREATE TABLE IF NOT EXISTS channels (guild_id text, channel0 text, channel1 text, channel2 text, channel3 text, channel4 text)''')

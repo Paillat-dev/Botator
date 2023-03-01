@@ -12,7 +12,14 @@ class Chat (discord.Cog) :
         self.bot = bot
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        await mp.process(self, message)
+        try: 
+            c.execute("SELECT * FROM model WHERE guild_id = ?", (message.guild.id,))
+            model = c.fetchone()[1]
+        except: model = "davinci"
+        if model == "davinci":
+            await mp.davinci_process(self, message)
+        if model == "chatGPT":
+            await mp.chat_process(self, message)
 
     @discord.slash_command(name="say", description="Say a message")
     async def say(self, ctx: discord.ApplicationContext, message: str):

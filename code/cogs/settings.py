@@ -1,5 +1,6 @@
 import discord
 from config import debug, conn, c
+models = ["davinci", "chatGPT"]
 
 class Settings (discord.Cog) :
     def __init__(self, bot: discord.Bot) -> None:
@@ -179,4 +180,18 @@ class Settings (discord.Cog) :
         conn.commit()
         #send a message
         await ctx.respond("TTS has been disabled", ephemeral=True)
-
+    #autocompletition
+    async def autocomplete(ctx: discord.AutocompleteContext):
+        return [model for model in models if model.startswith(ctx.value)]
+    @discord.slash_command(name="model", description="Change the model used by the bot")
+    @discord.option(name="model", description="The model you want to use. Leave blank to use the davinci model", required=False, autocomplete=autocomplete)
+    async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
+        try: 
+            c.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()[1]
+        except:
+            data = None
+        if data is None: c.execute("INSERT INTO model VALUES (?, ?)", (ctx.guild.id, model))
+        else: c.execute("UPDATE model SET model_name = ? WHERE guild_id = ?", (model, ctx.guild.id))
+        conn.commit()
+        await ctx.respond("Model changed !", ephemeral=True)
