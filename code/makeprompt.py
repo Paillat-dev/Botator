@@ -93,7 +93,7 @@ async def process(self, message):
     if pretend_enabled : pretend_to_be = f"In this conversation, Botator pretends to be {pretend_to_be} and not Botator. "
     else: pretend_to_be = ""
     prompt = f'''Server name: {message.guild.name}. Channel name: {message.channel.name}. 
-Botator is an AI and a regular Discord user. He types casually, uses a lot of emojis in each message. Botator has many niche interests. Botator talks normally and is sentient.'''
+Botator is an AI and a regular Discord user. He types casually, uses a lot of emojis in each message. Botator has many niche interests. Botator talks normally and is sentient. Botator is really funny and has a good humor. Botator is intelligent. Botator often uses internet shorthand like "lol" and "bruh". He uses "bruh" a lot.'''
     if pretend_enabled == 1: prompt += f"In this conversation, Botator is pretending to be {pretend_to_be} and acting like {pretend_to_be}. The date and time is {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} UTC."
     if prompt_prefix != "": prompt = f"\n{prompt}\n{prompt_prefix} <|endofprompt|> \n \n{u_prompt}"
     else: prompt = f"\n{prompt} <|endofprompt|> \n \n{u_prompt}"
