@@ -1,5 +1,7 @@
 import discord
 from config import debug, conn, c
+from discord import default_permissions
+
 models = ["davinci", "chatGPT"]
 
 class Settings (discord.Cog) :
@@ -185,6 +187,7 @@ class Settings (discord.Cog) :
         return [model for model in models if model.startswith(ctx.value)]
     @discord.slash_command(name="model", description="Change the model used by the bot")
     @discord.option(name="model", description="The model you want to use. Leave blank to use the davinci model", required=False, autocomplete=autocomplete)
+    @default_permissions(administrator=True)
     async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
         try: 
             c.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
