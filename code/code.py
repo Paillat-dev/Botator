@@ -23,7 +23,6 @@ async def on_ready():
     debug("Bot is ready")
 
 
-   
 bot.run(discord_token) # run the bot
 #set the bot's watching status to watcing your messages to answer you
 @bot.event

@@ -17,12 +17,16 @@ class Setup (discord.Cog) :
             await ctx.respond("Invalid channel id", ephemeral=True)
             return
         #check if the guild is already in the database bi checking if there is a key for the guild
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is not None:
-                #in this case, the guild is already in the database, so we update the channel id and the api key
+        try: 
+            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+            if data[3] == None: data = None
+        except:
+            data = None
+            
+        if data != None:
                 c.execute("UPDATE data SET channel_id = ?, api_key = ? WHERE guild_id = ?", (channel.id, api_key, ctx.guild.id))
-                #we will also set the advanced settings to their default values
-                c.execute("UPDATE data SET is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (False, 64, 0.9, 0.0, 0.0, 5, ctx.guild.id))
+        #        c.execute("UPDATE data SET is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (False, 64, 0.9, 0.0, 0.0, 5, ctx.guild.id))
                 conn.commit()
                 await ctx.respond("The channel id and the api key have been updated", ephemeral=True)
         else:
