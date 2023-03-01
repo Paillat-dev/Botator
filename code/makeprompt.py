@@ -89,7 +89,7 @@ async def process(self, message):
             user = await self.bot.fetch_user(uid)
             #replace the mention with the name
             content = content.replace(mention, f"{user.name}")
-        u_prompt += f"{msg.author}: {content}\n"
+        u_prompt += f"{msg.author.name}: {content}"
     if pretend_enabled : pretend_to_be = f"In this conversation, Botator pretends to be {pretend_to_be} and not Botator. "
     else: pretend_to_be = ""
     prompt = f'''Server name: {message.guild.name}. Channel name: {message.channel.name}. 
