@@ -97,18 +97,23 @@ class Settings (discord.Cog) :
         debug(f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
         #check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        try: 
+            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+        except: data = None
+        if data[2] is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        #get all the data from the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        data = c.fetchone()
-        #send the data
+        try:
+            c.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            model = c.fetchone()[1]
+        except: model = None
+        if model is None: model = "davinci"
         embed = discord.Embed(title="Info", description="Here is the info page", color=0x00ff00)
         embed.add_field(name="guild_id", value=data[0], inline=False)
-        embed.add_field(name="API Key", value=data[2], inline=False)
-        embed.add_field(name="Channel ID", value=data[1], inline=False)
+        embed.add_field(name="API Key", value="secret", inline=False)
+        embed.add_field(name="Main channel ID", value=data[1], inline=False)
+        embed.add_field(name="Model", value=model, inline=False)
         embed.add_field(name="Is Active", value=data[3], inline=False)
         embed.add_field(name="Max Tokens", value=data[4], inline=False)
         embed.add_field(name="Temperature", value=data[5], inline=False)
