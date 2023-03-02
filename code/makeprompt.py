@@ -117,9 +117,10 @@ async def chat_process(self, message):
                     max_tokens=int(max_tokens),
                     messages=msgs,
                 )
+                should_break = True
             except Exception as e:
-                response = None
-                await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10)
+                should_break = FalseS
+                await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
                 break
             
             #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
