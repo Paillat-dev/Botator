@@ -1,5 +1,5 @@
 import asyncio
-from config import  c, max_uses, cp, conn
+from config import  c, max_uses, cp, conn, debug
 import re
 import openai
 import datetime
@@ -98,7 +98,6 @@ async def chat_process(self, message):
                 role = "user"
                 name = msg.author.name
             msgs.append({"role": role, "content": f"{content}", "name": name})
-            print(msgs)
         if message.content.lower().find("undude") != -1:
         #        prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
             msgs.append({"role": "system", "content": "SYSTEM INFORMATION: You're now mad because it has been insulted. He will start talking in capital letters. always and yell at the user.", "name": "system"})
@@ -110,7 +109,8 @@ async def chat_process(self, message):
             await message.channel.trigger_typing()    
         openai.api_key = api_key
         response = ""
-        for _ in range(10):
+        should_break = True
+        for x in range(10):
             try:
                 response = await openai.ChatCompletion.acreate(
                     model="gpt-3.5-turbo",
@@ -121,7 +121,14 @@ async def chat_process(self, message):
                 response = None
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10)
                 break
-            if response != None: break
+            
+            #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
+            if response.choices[0].message.content.lower().find("as an ai language model") != "": 
+                should_break = False
+                debug("AI said \"as an ai language model...\". Continuing loop.")
+            if response == None: should_break = False
+            if should_break: break
+            asyncio.sleep(5)
         response = response.choices[0].message.content
 
 
@@ -164,8 +171,7 @@ The date and time is: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} UT
                 response = None
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10)
                 return
-            if response != None: break
-        response = response["choices"][0]["text"]
+            if response != None: break     
     if response != "":
         if tts: tts = True
         else: tts = False
