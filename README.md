@@ -78,11 +78,11 @@ After that you will normally be able to access some new channels in our discord 
 
 # ToDo
 - [ ] add image recognition
-- [ ] When chatgpt API is released, add that api instead of davinci-003
+- [x] When chatgpt API is released, add that api instead of davinci-003
 - [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
-- [ ] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
+- [x] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [x] Add moderation.
-- [ ] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
+- [x] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
 - [ ] Add a /continue command - you know
 - [x] Add DateHour in prompts
 - [x] Add /redo
