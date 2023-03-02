@@ -71,19 +71,16 @@ async def chat_process(self, message):
     if pretend_enabled : pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}"
     else: pretend_to_be = ""
     if prompt_prefix == None: prompt_prefix = ""
-    prompt = ""
+    with open(f"./prompts/{model}.txt", "r") as f:
+        prompt = f.read()
+        f.close()
+    prompt = prompt.replace("[server-name]", message.guild.name)
+    prompt = prompt.replace("[channel-name]", message.channel.name)
+    prompt = prompt.replace("[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")) # this is the gmt+1 time. If we want the gmt 0 time, we need to do: datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+    prompt = prompt.replace("[pretend-to-be]", pretend_to_be)
+    prompt = prompt.replace("[prompt-prefix]", prompt_prefix)
     if model == "chatGPT":
-        # we open the chatGPT prompt file located in the ./prompts/chatGPT.txt file
-        with open("./prompts/chatGPT.txt", "r") as f:
-            prompt = f.read()
-            f.close()
-        
-        # we replace the variables in the prompt file with the variables we have
-        prompt = prompt.replace("[server-name]", message.guild.name)
-        prompt = prompt.replace("[channel-name]", message.channel.name)
-        prompt = prompt.replace("[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")) # this is the gmt+1 time. If we want the gmt 0 time, we need to do: datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
-        prompt = prompt.replace("[pretend-to-be]", pretend_to_be)
-        prompt = prompt.replace("[prompt-prefix]", prompt_prefix)
+
         msgs = []
         msgs.append({"name":"System","role": "user", "content": prompt})
         name = ""
@@ -167,6 +164,7 @@ The date and time is: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} UT
                     presence_penalty=float(presence_penalty),
                     stop=[" Human:", " AI:", "AI:", "<|endofprompt|>",]
                 )
+                response = response.choices[0].text
             except Exception as e:
                 response = None
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10)
