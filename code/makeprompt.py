@@ -77,6 +77,7 @@ async def chat_process(self, message):
         with open("./prompts/chatGPT.txt", "r") as f:
             prompt = f.read()
             f.close()
+        
         # we replace the variables in the prompt file with the variables we have
         prompt = prompt.replace("[server-name]", message.guild.name)
         prompt = prompt.replace("[channel-name]", message.channel.name)
@@ -84,9 +85,7 @@ async def chat_process(self, message):
         prompt = prompt.replace("[pretend-to-be]", pretend_to_be)
         prompt = prompt.replace("[prompt-prefix]", prompt_prefix)
         msgs = []
-        if prompt_prefix != "": prompt = f"\n{prompt}\n{prompt_prefix}"
-        else: prompt = f"\n{prompt}"
-        msgs.append({"role": "system", "content": prompt, "name": "system"})
+        msgs.append({"name":"System","role": "user", "content": prompt})
         name = ""
         for msg in messages:
             content = msg.content
@@ -114,22 +113,22 @@ async def chat_process(self, message):
             try:
                 response = await openai.ChatCompletion.acreate(
                     model="gpt-3.5-turbo",
-                    max_tokens=int(max_tokens),
+                    temperature=2,
+                    top_p=0.9,
+                    frequency_penalty=0,
+                    presence_penalty=0,
                     messages=msgs,
                 )
                 should_break = True
             except Exception as e:
-                should_break = FalseS
-                await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
-                break
-            
-            #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
-            if response.choices[0].message.content.lower().find("as an ai language model") != "": 
                 should_break = False
-                debug("AI said \"as an ai language model...\". Continuing loop.")
+                await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
+                break            
+            #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
+            if response.choices[0].message.content.lower().find("as an ai language model") != -1: should_break = False
             if response == None: should_break = False
             if should_break: break
-            asyncio.sleep(5)
+            await asyncio.sleep(5)
         response = response.choices[0].message.content
 
 
