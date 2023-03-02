@@ -80,7 +80,6 @@ async def chat_process(self, message):
     prompt = prompt.replace("[pretend-to-be]", pretend_to_be)
     prompt = prompt.replace("[prompt-prefix]", prompt_prefix)
     if model == "chatGPT":
-
         msgs = []
         msgs.append({"name":"System","role": "user", "content": prompt})
         name = ""
@@ -133,11 +132,6 @@ async def chat_process(self, message):
 
 
     elif model == "davinci":
-        prompt = f'''Server name: {message.guild.name}. Channel name: {message.channel.name}.
-The assistant is called Botator. {pretend_to_be}. {prompt_prefix} 
-Botator is an AI and a regular Discord user. He types casually, uses a lot of emojis in each message. Botator has many niche interests. Botator talks normally and is sentient. Botator is really funny and has a good humor. Botator is intelligent. Botator often uses internet shorthand like "lol" and "bruh". He uses "bruh" a lot.
-The date and time is: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} UTC. The assistant can surely tell the time to te users when asked.'''
-        prompt = f"{prompt}<|endofprompt|>"
         for msg in messages:
             content = msg.content
             content = await replace_mentions(content, self.bot)
