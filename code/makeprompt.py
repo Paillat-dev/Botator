@@ -92,6 +92,9 @@ async def chat_process(self, message):
             else:
                 role = "user"
                 name = msg.author.name
+                #the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
+                name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
+
             msgs.append({"role": role, "content": f"{content}", "name": name})
         if message.content.lower().find("undude") != -1:
         #        prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
