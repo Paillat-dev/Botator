@@ -47,7 +47,10 @@ async def chat_process(self, message):
     try:
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,)) # get the channels in the premium database
         if premium: channels = cp.fetchone()[1:] # if the guild is premium, add the channels to the channels list
-    except: channels = [] # if the guild is not premium, the channels list is empty
+        debug("Premium channels: "+str(channels))
+    except:
+        debug("Error while getting premium channels") 
+        channels = [] # if the guild is not premium, the channels list is empty
     
     if api_key is None: return # if the api key is not set, return
 
