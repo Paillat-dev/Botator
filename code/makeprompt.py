@@ -206,5 +206,9 @@ async def chat_process(self, message):
         if tts: tts = True
         else: tts = False
         await message.channel.send(response, tts=tts)
+        #if the response matches +[emoji] at the beginning, we react with the emoji
+        if re.match(r"\+\[.*\]", response):
+            emoji = re.search(r"\[(.*)\]", response).group(1)
+            await message.add_reaction(emoji)
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
