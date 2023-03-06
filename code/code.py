@@ -2,10 +2,8 @@
 # wesh wesh ici latouff
 import discord # pip install pycord
 from discord import Intents
-import asyncio # pip install asyncio
 import cogs # import the cogs
-import datetime # pip install datetime
-from config import debug, conn, c, discord_token
+from config import debug, discord_token
 #add the message content intent to the bot, aka discord.Intents.default() and discord.Intents.message_content
 intents = discord.Intents.default()
 intents.message_content = True

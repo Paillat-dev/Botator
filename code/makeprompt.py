@@ -1,5 +1,5 @@
 import asyncio
-from config import  c, max_uses, cp, conn, debug
+from config import  c, max_uses, cp, conn, debug, moderate
 import re
 import openai
 import datetime
@@ -57,6 +57,10 @@ async def chat_process(self, message):
     if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id): return
     if original_message != None and message.guild.id == 1050769643180146749 and message.author.id != 707196665668436019: return
     await message.channel.trigger_typing()
+    if await moderate(api_key=api_key, text=message.content):
+        await message.channel.send(f"The message {message.content} has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.")
+        message.delete()
+        return
     if message.guild.id != 1021872219888033903:
         c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
         conn.commit()
@@ -85,17 +89,20 @@ async def chat_process(self, message):
         name = ""
         for msg in messages:
             content = msg.content
-            content = await replace_mentions(content, self.bot)
-            if msg.author.id == self.bot.user.id:
-                role = "assistant"
-                name = "assistant"
+            if await moderate(api_key=api_key, text=content):
+                await message.channel.send(f"The message {content} has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.")
+                message.delete()
             else:
-                role = "user"
-                name = msg.author.name
-                #the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
-                name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
-
-            msgs.append({"role": role, "content": f"{content}", "name": name})
+                content = await replace_mentions(content, self.bot)
+                if msg.author.id == self.bot.user.id:
+                    role = "assistant"
+                    name = "assistant"
+                else:
+                    role = "user"
+                    name = msg.author.name
+                    #the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
+                    name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
+                msgs.append({"role": role, "content": f"{content}", "name": name})
         if message.content.lower().find("undude") != -1:
         #        prompt += "System: Undude detected. Botator is now mad. He will start talking in capital letters.\n"
             msgs.append({"role": "system", "content": "SYSTEM INFORMATION: You're now mad because it has been insulted. He will start talking in capital letters. always and yell at the user.", "name": "system"})
