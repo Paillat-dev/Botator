@@ -79,8 +79,8 @@ async def chat_process(self, message):
 
     # if the message starts with - or // it's a comment and we return
     if message.content.startswith("-") or message.content.startswith("//"): return
-    await message.channel.trigger_typing()    
-
+    try: await message.channel.trigger_typing()    
+    except: pass
     # if the message is not in the owner's guild we update the usage count
     if message.guild.id != 1021872219888033903:
         c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
