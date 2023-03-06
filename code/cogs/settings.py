@@ -169,7 +169,7 @@ class Settings (discord.Cog) :
             if await moderate(api_key=api_key, text=pretend_to_be):
                 await ctx.respond("This has been flagged as inappropriate by OpenAI, please choose another name", ephemeral=True)
                 return
-        if pretend_to_be is None:
+        if pretend_to_be == "":
             pretend_to_be = ""
             c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()
