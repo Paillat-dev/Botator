@@ -1,8 +1,9 @@
 import asyncio
 from config import  c, max_uses, cp, conn, debug, moderate
 import re
-import openai
+import discord
 import datetime
+import openai
 
 async def replace_mentions(content, bot):
     mentions = re.findall(r"<@!?\d+>", content)
@@ -57,7 +58,8 @@ async def chat_process(self, message):
     if original_message != None and original_message.author.id != self.bot.user.id: original_message = None
     await message.channel.trigger_typing()
     if await moderate(api_key=api_key, text=message.content):
-        await message.channel.send(f"The message {message.content} has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.")
+        embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{message.content}* has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
+        await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
         message.delete()
         return
     if message.guild.id != 1021872219888033903:
@@ -89,7 +91,8 @@ async def chat_process(self, message):
         for msg in messages:
             content = msg.content
             if await moderate(api_key=api_key, text=content):
-                await message.channel.send(f"The message {content} has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.")
+                embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{content}* has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
+                await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
                 message.delete()
             else:
                 content = await replace_mentions(content, self.bot)
