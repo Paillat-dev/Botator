@@ -58,7 +58,7 @@ async def chat_process(self, message):
     if original_message != None and original_message.author.id != self.bot.user.id: original_message = None
     await message.channel.trigger_typing()
     if await moderate(api_key=api_key, text=message.content):
-        embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{message.content}* has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
+        embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{message.content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
         await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
         message.delete()
         return
@@ -91,7 +91,7 @@ async def chat_process(self, message):
         for msg in messages:
             content = msg.content
             if await moderate(api_key=api_key, text=content):
-                embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{content}* has been flagged as inappropriate by the OpenAI API. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
+                embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
                 await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
                 message.delete()
             else:
