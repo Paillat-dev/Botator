@@ -119,6 +119,7 @@ async def chat_process(self, message):
         response = ""
         should_break = True
         for x in range(10):
+            print("LOOPING")
             try:
                 response = await openai.ChatCompletion.acreate(
                     model="gpt-3.5-turbo",
@@ -137,7 +138,7 @@ async def chat_process(self, message):
             if response.choices[0].message.content.lower().find("as an ai language model") != -1: 
                 should_break = False
                 #react with a red cross
-                await message.add_reaction("❌")
+                await message.add_reaction("🔃")
                 debug("AI said 'as an ai language model...'")
             if response == None: should_break = False
             if should_break: break
