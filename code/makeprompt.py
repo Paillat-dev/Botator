@@ -211,12 +211,14 @@ async def chat_process(self, message):
     if response != "":
         if tts: tts = True
         else: tts = False
-        await message.channel.send(response, tts=tts)
         #if the response starts with +, we add the characzer after 1+as the reaction, assuming it is a valid emoji
         if response[0] == "+":
             try:
                 await message.add_reaction(response[1])
+                response = response[2:]
             except:
                 pass
+        await message.channel.send(response, tts=tts)
+
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
