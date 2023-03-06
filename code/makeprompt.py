@@ -47,11 +47,12 @@ async def chat_process(self, message):
     channels = []
     try:
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+        data = cp.fetchone()
         if premium: 
             #for 5 times, we get c.fetchone()[1] to c.fetchone()[5] and we add it to the channels list, each time with try except
-            for i in range(5):
+            for i in range(1, 6):
                 #we use the i variable to get the channel id
-                try: channels.append(str(cp.fetchone()[i+1]))
+                try: channels.append(str(data[i]))
                 except: pass
     except: channels = []
     
