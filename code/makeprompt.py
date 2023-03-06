@@ -93,7 +93,7 @@ async def chat_process(self, message):
             content = msg.content
             if await moderate(api_key=api_key, text=content):
                 embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.", color=discord.Color.brand_red())
-                await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
+                await message.channel.send(f"{msg.author.mention}", embed=embed, delete_after=10)
                 message.delete()
             else:
                 content = await replace_mentions(content, self.bot)
