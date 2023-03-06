@@ -135,6 +135,7 @@ async def chat_process(self, message):
                 should_break = False
                 #react with a red cross
                 await message.add_reaction("❌")
+                debug("AI said 'as an ai language model...'")
             if response == None: should_break = False
             if should_break: break
             await asyncio.sleep(5)
