@@ -33,7 +33,8 @@ async def chat_process(self, message):
     tts = data[11]
     pretend_to_be = data[12]
     pretend_enabled = data[13]
-    
+    try: cp.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
+    except: pass
     try: 
         c.execute("SELECT * FROM model WHERE guild_id = ?", (message.guild.id,)) # get the model in the database
         model = c.fetchone()[1]
@@ -42,15 +43,17 @@ async def chat_process(self, message):
     try: premium = cp.fetchone()[2] # get the premium status of the guild
     except: premium = 0 # if the guild is not in the database, it's not premium
     
-    channels = [] # create the channels list
     
+    channels = []
     try:
-        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,)) # get the channels in the premium database
-        if premium: channels = cp.fetchone()[1:] # if the guild is premium, add the channels to the channels list
-        debug("Premium channels: "+str(channels))
-    except:
-        debug("Error while getting premium channels") 
-        channels = [] # if the guild is not premium, the channels list is empty
+        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+        if premium: 
+            #for 5 times, we get c.fetchone()[1] to c.fetchone()[5] and we add it to the channels list, each time with try except
+            for i in range(5):
+                #we use the i variable to get the channel id
+                try: channels.append(str(cp.fetchone()[i+1]))
+                except: pass
+    except: channels = []
     
     if api_key is None: return # if the api key is not set, return
 
