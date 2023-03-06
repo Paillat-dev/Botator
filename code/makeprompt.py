@@ -48,19 +48,20 @@ async def chat_process(self, message):
     except: channels = []
     if api_key is None:
         return
+    try : original_message = await message.channel.fetch_message(message.reference.message_id)
+    except : original_message = None
+    if original_message != None and original_message.author.id != self.bot.user.id: original_message = None
+    await message.channel.trigger_typing()
     if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id): return
     if uses_count_today >= max_uses and premium == 0: return await message.channel.send(f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h.")
     elif uses_count_today >= max_uses*5 and premium == 1: return
     if is_active == 0: return
     if message.content.startswith("-") or message.content.startswith("//"): return
-    try : original_message = await message.channel.fetch_message(message.reference.message_id)
-    except : original_message = None
-    if original_message != None and original_message.author.id != self.bot.user.id: original_message = None
-    await message.channel.trigger_typing()
     if await moderate(api_key=api_key, text=message.content):
         embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{message.content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.", color=discord.Color().brand_red())
         await message.channel.send(f"{message.author.mention}", embed=embed, delete_after=10)
         message.delete()
+        message.channel.trigger_typing()
         return
     if message.guild.id != 1021872219888033903:
         c.execute("UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?", (message.guild.id,))
