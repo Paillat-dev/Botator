@@ -131,7 +131,10 @@ async def chat_process(self, message):
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
                 break            
             #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
-            if response.choices[0].message.content.lower().find("as an ai language model") != -1: should_break = False
+            if response.choices[0].message.content.lower().find("as an ai language model") != -1: 
+                should_break = False
+                #react with a red cross
+                await message.add_reaction("❌")
             if response == None: should_break = False
             if should_break: break
             await asyncio.sleep(5)
