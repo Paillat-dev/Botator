@@ -4,6 +4,7 @@ import re
 import discord
 import datetime
 import openai
+import emoji # pip install emoji
 
 async def replace_mentions(content, bot):
     mentions = re.findall(r"<@!?\d+>", content)
@@ -12,6 +13,32 @@ async def replace_mentions(content, bot):
         user = await bot.fetch_user(uid)
         content = content.replace(mention, f"@{user.name}")
     return content
+
+
+async def extract_emoji(string):
+    # Match any character that is jus after a "+"
+    pattern = r"(?<=\+)."
+    #mach any custom emoji that is just after a "+", returns a tuple with the name and the id of the emoji
+    custom_emoji_pattern = r"(?<=\+)<:(.+):(\d+)>" 
+    #now we match the pattern with the string
+    matches = re.findall(pattern, string)
+    custom_emoji_matches = re.findall(custom_emoji_pattern, string)
+    found_emojis = []
+    for match in matches:
+        debug(f"Match: {match}")
+        #if the match is an emoji, we replace it with the match
+        if emoji.emoji_count(match) > 0:
+            debug(f"Found emoji: {match}")
+            found_emojis.append(match)
+            debug(f"Sting before: {string}")
+            string = string.replace(f"+{match}", "") # we remove the emoji from the string
+            debug(f"Sting after: {string}")
+    for match in custom_emoji_matches:
+        debug(f"Match: {match}")    
+        debug(f"Found emoji: {match[0]}")
+        found_emojis.append(match[1])
+        string = string.replace(f"+<:{match[0]}:{match[1]}>", "")
+    return found_emojis, string
 
 async def chat_process(self, message):
     if message.author.bot:
@@ -72,7 +99,8 @@ async def chat_process(self, message):
 
     # if the bot has been used more than max_uses times in the last 24 hours in this guild and the guild is not premium
     # send a message and return
-    if uses_count_today >= max_uses and premium == 0: return await message.channel.send(f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h.")
+    if uses_count_today >= max_uses and premium == 0 and message.guild.id != 1050769643180146749:
+        return await message.channel.send(f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h.")
 
     # if the bot has been used more than max_uses*5 times in the last 24 hours in this guild and the guild is premium
     # send a message and return
@@ -104,7 +132,8 @@ async def chat_process(self, message):
     if pretend_enabled : pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" 
     else: pretend_to_be = "" # if the pretend to be feature is disabled, we don't add anything to the prompt
     if prompt_prefix == None: prompt_prefix = "" # if the prompt prefix is not set, we set it to an empty string
-    with open(f"./prompts/{model}.txt", "r") as f: # open the prompt file for the selected model
+    # open the prompt file for the selected model with utf-8 encoding for emojis
+    with open(f"./prompts/{model}.txt", "r", encoding="utf-8") as f:
         prompt = f.read()
         f.close()
     # replace the variables in the prompt with the actual values
@@ -212,14 +241,21 @@ async def chat_process(self, message):
     if response != "":
         if tts: tts = True
         else: tts = False
-        #if the response starts with +, we add the characzer after 1+as the reaction, assuming it is a valid emoji
-        if response[0] == "+":
+        emojis, string = await extract_emoji(response)
+        debug(f"Emojis: {emojis}")
+        await message.channel.send(string, tts=tts)
+        for emoji in emojis:
+            #if the emoji is longer than 1 character, it's a custom emoji
             try:
-                await message.add_reaction(response[1])
-                response = response[2:]
-            except:
-                pass
-        await message.channel.send(response, tts=tts)
-
+                if len(emoji) > 1:
+                    #if the emoji is a custom emoji, we need to fetch it
+                    #the emoji is in the format id
+                    debug(f"Emoji: {emoji}")
+                    emoji = await message.guild.fetch_emoji(int(emoji))
+                    await message.add_reaction(emoji)
+                else:
+                    debug(f"Emoji: {emoji}")
+                    await message.add_reaction(emoji)
+            except : pass
     else:
         await message.channel.send("The AI is not sure what to say (the response was empty)")
