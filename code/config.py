@@ -6,6 +6,7 @@ import openai
 load_dotenv()
 perspective_api_key = os.getenv("PERSPECTIVE_API_KEY")
 discord_token = os.getenv("DISCORD_TOKEN")
+webhook_url = os.getenv("WEBHOOK_URL")
 max_uses: int = 400
 logging.basicConfig(level=logging.INFO)
 
