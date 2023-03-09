@@ -20,7 +20,7 @@ class MyModal(discord.ui.Modal):
             webhook = discord.Webhook.from_url(webhook_url, session=session)
             embed = discord.Embed(title="Downvote", description=f"Downvote recieved!", color=discord.Color.og_blurple())
             embed.add_field(name="Reason", value=self.children[0].value, inline=True)
-            embed.add_field(name="Author", value=self.message.author.mention, inline=True)
+            embed.add_field(name="Author", value=interaction.user.mention, inline=True)
             embed.add_field(name="Channel", value=self.message.channel.name, inline=True)
             embed.add_field(name="Guild", value=self.message.guild.name, inline=True)
             history = await self.message.channel.history(limit=5, before=self.message).flatten()
