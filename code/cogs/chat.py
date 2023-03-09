@@ -25,7 +25,10 @@ class MyModal(discord.ui.Modal):
             embed.add_field(name="Guild", value=self.message.guild.name, inline=True)
             history = await self.message.channel.history(limit=5).flatten()
             for msg in history:
-                embed.add_field(name="Message", value=msg.content, inline=False)
+                if len(msg.content) > 1023:
+                    embed.add_field(name="Message", value=msg.content[:1023], inline=False)
+                else:
+                    embed.add_field(name="Message", value=msg.content, inline=False)
             await webhook.send(embed=embed)
         except Exception as e:
             debug(e)
