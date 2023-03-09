@@ -23,12 +23,31 @@ class MyModal(discord.ui.Modal):
             embed.add_field(name="Author", value=self.message.author.mention, inline=True)
             embed.add_field(name="Channel", value=self.message.channel.name, inline=True)
             embed.add_field(name="Guild", value=self.message.guild.name, inline=True)
-            history = await self.message.channel.history(limit=5).flatten()
+            history = await self.message.channel.history(limit=5, before=self.message).flatten()
+            history.reverse()
+            users = []
+            fake_users = []
+            for user in history:
+                if user.author not in users:
+                    #we anonimize the user, so user1, user2, user3, etc
+                    fake_users.append(f"user{len(fake_users)+1}")
+                    users.append(user.author)
+            if self.message.author not in users:
+                fake_users.append(f"user{len(fake_users)+1}")
+                users.append(self.message.author)
             for msg in history:
+                uname = fake_users[users.index(msg.author)]
+
                 if len(msg.content) > 1023:
-                    embed.add_field(name="Message", value=msg.content[:1023], inline=False)
+                    embed.add_field(name=f"{uname} said", value=msg.content[:1023], inline=False)
                 else:
-                    embed.add_field(name="Message", value=msg.content, inline=False)
+                    embed.add_field(name=f"{uname} said", value=msg.content, inline=False)
+            if len(self.message.content) > 1021:
+                uname = fake_users[users.index(self.message.author)]
+                embed.add_field(name=f"{uname} said", value="*"+self.message.content[:1021]+"*", inline=False)
+            else:
+                uname = fake_users[users.index(self.message.author)]
+                embed.add_field(name=f"{uname} said", value="*"+self.message.content+"*", inline=False)
             await webhook.send(embed=embed)
         else:
             debug("Error while sending webhook, probably no webhook is set up in the .env file")
