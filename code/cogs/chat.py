@@ -83,8 +83,11 @@ class Chat (discord.Cog) :
     @discord.message_command(name="Downvote", description="Downvote a message")
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def downvote(self, ctx: discord.ApplicationContext, message: discord.Message):
-        modal = MyModal(message)
-        await ctx.send_modal(modal)
+        if message.author.id == self.bot.user.id:    
+            modal = MyModal(message)
+            await ctx.send_modal(modal)
+        else:
+            await ctx.respond("You can't downvote a message that is not from me !", ephemeral=True)
 
     @downvote.error
     async def downvote_error(self, ctx, error):
