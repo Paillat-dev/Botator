@@ -15,7 +15,7 @@ class MyModal(discord.ui.Modal):
         embed = discord.Embed(title="Thanks for your feedback !", description="Your downvote has been sent to the developers. Thanks for your help !", color=discord.Color.og_blurple())
         embed.add_field(name="Message", value=self.children[0].value)
         await interaction.response.send_message(embed=embed, ephemeral=True)
-        try: 
+        if webhook_url != "" and webhook_url != None: 
             session = aiohttp.ClientSession()
             webhook = discord.Webhook.from_url(webhook_url, session=session)
             embed = discord.Embed(title="Downvote", description=f"Downvote recieved!", color=discord.Color.og_blurple())
@@ -30,8 +30,7 @@ class MyModal(discord.ui.Modal):
                 else:
                     embed.add_field(name="Message", value=msg.content, inline=False)
             await webhook.send(embed=embed)
-        except Exception as e:
-            debug(e)
+        else:
             debug("Error while sending webhook, probably no webhook is set up in the .env file")
 
 
