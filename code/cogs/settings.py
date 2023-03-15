@@ -1,5 +1,8 @@
 import discord
-from config import debug, conn, c
+from config import debug, conn, c, moderate
+from discord import default_permissions
+import openai
+models = ["davinci", "chatGPT"]
 
 class Settings (discord.Cog) :
     def __init__(self, bot: discord.Bot) -> None:
@@ -94,18 +97,23 @@ class Settings (discord.Cog) :
         debug(f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         #this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
         #check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        try: 
+            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+        except: data = None
+        if data[2] is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        #get all the data from the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        data = c.fetchone()
-        #send the data
+        try:
+            c.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            model = c.fetchone()[1]
+        except: model = None
+        if model is None: model = "davinci"
         embed = discord.Embed(title="Info", description="Here is the info page", color=0x00ff00)
         embed.add_field(name="guild_id", value=data[0], inline=False)
-        embed.add_field(name="API Key", value=data[2], inline=False)
-        embed.add_field(name="Channel ID", value=data[1], inline=False)
+        embed.add_field(name="API Key", value="secret", inline=False)
+        embed.add_field(name="Main channel ID", value=data[1], inline=False)
+        embed.add_field(name="Model", value=model, inline=False)
         embed.add_field(name="Is Active", value=data[3], inline=False)
         embed.add_field(name="Max Tokens", value=data[4], inline=False)
         embed.add_field(name="Temperature", value=data[5], inline=False)
@@ -119,42 +127,66 @@ class Settings (discord.Cog) :
 
     #add a slash command called "prefix" that changes the prefix of the bot
     @discord.slash_command(name="prefix", description="Change the prefix of the prompt")
-    async def prefix(self, ctx: discord.ApplicationContext, prefix: str):
+    async def prefix(self, ctx: discord.ApplicationContext, prefix: str = ""):
         debug(f"The user {ctx.author.name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
-        await ctx.respond("Prefix changed !", ephemeral=True)
+        try:
+            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+            api_key = data[2]
+        except: 
+            await ctx.respond("This server is not setup", ephemeral=True)
+            return
+        if api_key is None or api_key == "":
+            await ctx.respond("This server is not setup", ephemeral=True)
+            return
+        if prefix != "":
+            await ctx.defer()
+            if await moderate(api_key=api_key, text=prefix):
+                await ctx.respond("This has been flagged as inappropriate by OpenAI, please choose another prefix", ephemeral=True)
+                return
+        await ctx.respond("Prefix changed !", ephemeral=True, delete_after=5)
         c.execute("UPDATE data SET prompt_prefix = ? WHERE guild_id = ?", (prefix, ctx.guild.id))
         conn.commit()
 
     #when someone mentions the bot, check if the guild is in the database and if the bot is enabled. If it is, send a message answering the mention
     @discord.slash_command(name="pretend", description="Make the bot pretend to be someone else")
     @discord.option(name="pretend to be...", description="The person/thing you want the bot to pretend to be. Leave blank to disable pretend mode", required=False)
-    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = None):
+    async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = ""):
         debug(f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}")
         #check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        try: 
+            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+            api_key = data[2]
+        except:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        #check if the bot is enabled
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone()[3] == 0:
-            await ctx.respond("The bot is disabled", ephemeral=True)
+        if api_key is None or api_key == "":
+            await ctx.respond("This server is not setup", ephemeral=True)
             return
-        if pretend_to_be is None:
+        if pretend_to_be is not None or pretend_to_be != "":
+            await ctx.defer()
+            if await moderate(api_key=api_key, text=pretend_to_be):
+                await ctx.respond("This has been flagged as inappropriate by OpenAI, please choose another name", ephemeral=True)
+                return
+        if pretend_to_be == "":
             pretend_to_be = ""
             c.execute("UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()
-            await ctx.respond("Pretend mode disabled", ephemeral=True)
+            await ctx.respond("Pretend mode disabled", ephemeral=True, delete_after=5)
             await ctx.guild.me.edit(nick=None)
             return
         else:
             c.execute("UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?", (ctx.guild.id,))
             conn.commit()
-            await ctx.respond("Pretend mode enabled", ephemeral=True)
+            await ctx.respond("Pretend mode enabled", ephemeral=True, delete_after=5)
             #change the bots name on the server wit ctx.guild.me.edit(nick=pretend_to_be)
             await ctx.guild.me.edit(nick=pretend_to_be)
             c.execute("UPDATE data SET pretend_to_be = ? WHERE guild_id = ?", (pretend_to_be, ctx.guild.id))
             conn.commit()
+            #if the usename is longer than 32 characters, shorten it
+            if len(pretend_to_be) > 31: 
+                pretend_to_be = pretend_to_be[:32]
             await ctx.guild.me.edit(nick=pretend_to_be)
             return
 
@@ -179,4 +211,19 @@ class Settings (discord.Cog) :
         conn.commit()
         #send a message
         await ctx.respond("TTS has been disabled", ephemeral=True)
-
+    #autocompletition
+    async def autocomplete(ctx: discord.AutocompleteContext):
+        return [model for model in models if model.startswith(ctx.value)]
+    @discord.slash_command(name="model", description="Change the model used by the bot")
+    @discord.option(name="model", description="The model you want to use. Leave blank to use the davinci model", required=False, autocomplete=autocomplete)
+    @default_permissions(administrator=True)
+    async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
+        try: 
+            c.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()[1]
+        except:
+            data = None
+        if data is None: c.execute("INSERT INTO model VALUES (?, ?)", (ctx.guild.id, model))
+        else: c.execute("UPDATE model SET model_name = ? WHERE guild_id = ?", (model, ctx.guild.id))
+        conn.commit()
+        await ctx.respond("Model changed !", ephemeral=True)

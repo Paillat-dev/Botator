@@ -20,7 +20,11 @@ class Help (discord.Cog) :
         embed.add_field(name="/add|remove_channel", value="Add or remove a channel to the list of channels where the bot will answer. Only available on premium guilds", inline=False)
         embed.add_field(name="/delete", value="Delete all your data from our server", inline=False)
         embed.add_field(name="/cancel", value="Cancel the last message sent by the bot", inline=False)
-        embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)    
+        embed.add_field(name="/default", value="Set the advanced settings to their default values", inline=False)
+        embed.add_field(name="/say", value="Say a message", inline=False)
+        embed.add_field(name="/redo", value="Redo the last message sent by the bot", inline=False)
+        embed.add_field(name="/moderation", value="Setup the AI auto-moderation", inline=False)
+        embed.add_field(name="/get_toxicity", value="Get the toxicity that the AI would have given to a given message", inline=False)   
         embed.add_field(name="/help", value="Show this message", inline=False)
         #add a footer
         embed.set_footer(text="Made by @Paillat#7777")
