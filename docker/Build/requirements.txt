@@ -5,3 +5,4 @@ apsw
 google-api-python-client
 python-dotenv
 emoji
+google-cloud-vision
