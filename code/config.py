@@ -10,6 +10,8 @@ webhook_url = os.getenv("WEBHOOK_URL")
 max_uses: int = 400
 logging.basicConfig(level=logging.INFO)
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./../database/google-vision/botator.json"
+
 def debug(message):
     logging.info(message)
 conn = sqlite3.connect('../database/data.db')
@@ -49,5 +51,6 @@ else:
     print("Table already has the correct number of columns")
     pass
 c.execute('''CREATE TABLE IF NOT EXISTS model (guild_id text, model_name text)''')
+c.execute('''CREATE TABLE IF NOT EXISTS images (guild_id text, usage_count integer, is_enabled boolean)''')
 cp.execute('''CREATE TABLE IF NOT EXISTS data (user_id text, guild_id text, premium boolean)''')
 cp.execute('''CREATE TABLE IF NOT EXISTS channels (guild_id text, channel0 text, channel1 text, channel2 text, channel3 text, channel4 text)''')

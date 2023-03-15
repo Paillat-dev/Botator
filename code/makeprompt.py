@@ -1,10 +1,12 @@
 import asyncio
 from config import  c, max_uses, cp, conn, debug, moderate
+import vision_processing
 import re
 import discord
 import datetime
 import openai
 import emoji # pip install emoji
+import os
 
 async def replace_mentions(content, bot):
     mentions = re.findall(r"<@!?\d+>", content)
@@ -60,6 +62,7 @@ async def chat_process(self, message):
     tts = data[11]
     pretend_to_be = data[12]
     pretend_enabled = data[13]
+    images_limit_reached = False
     try: cp.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     except: pass
     try: 
@@ -70,8 +73,16 @@ async def chat_process(self, message):
     try: premium = cp.fetchone()[2] # get the premium status of the guild
     except: premium = 0 # if the guild is not in the database, it's not premium
     
-    
+    try: 
+        c.execute("SELECT * FROM images WHERE guild_id = ?", (message.guild.id,)) # get the images setting in the database
+        data = c.fetchone()
+    except:
+        data = None
+    if data is None: data = [message.guild.id, 0, 0]
+    images_usage = data[1]
+    images_enabled = data[2]
     channels = []
+    if message.guild.id == 1050769643180146749: images_usage = 0 # if the guild is the support server, we set the images usage to 0, so the bot can be used as much as possible
     try:
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
         data = cp.fetchone()
@@ -138,7 +149,8 @@ async def chat_process(self, message):
         f.close()
     # replace the variables in the prompt with the actual values
     prompt = prompt.replace("[prompt-prefix]", prompt_prefix).replace("[server-name]", message.guild.name).replace("[channel-name]", message.channel.name).replace("[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")).replace("[pretend-to-be]", pretend_to_be)
-    if model == "chatGPT": # if the model is chatGPT, we handle it in a certain way
+    ############################## chatGPT and gpt-4 handling ##############################
+    if model == "chatGPT" or model == "gpt-4": # if the model is chatGPT, we handle it in a certain way
         msgs = [] # create the msgs list
         msgs.append({"name":"System","role": "user", "content": prompt}) # add the prompt to the msgs list
         name = "" # create the name variable
@@ -159,7 +171,37 @@ async def chat_process(self, message):
                     name = msg.author.name
                     #the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
                     name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
-                msgs.append({"role": role, "content": f"{content}", "name": name})
+                if False: # GPT-4 images
+                    input_content = [content]
+                    for attachment in msg.attachments:
+                        image_bytes = await attachment.read()
+                        input_content.append({"image": image_bytes})
+                    msgs.append({"role": role, "content": input_content, "name": name})
+                #if there is an attachment, we add it to the message
+                if len(msg.attachments) > 0 and role == "user" and images_enabled == 1:
+                    for attachment in msg.attachments:
+                        if images_usage >= 6 and premium == 0: images_limit_reached = True
+                        elif images_usage >= 30 and premium == 1: images_limit_reached = True
+                        if attachment.url.endswith((".png", ".jpg", ".jpeg", ".gif")) and images_limit_reached == False and os.path.exists(f"./../database/google-vision/results/{attachment.id}.txt") == False:
+                            images_usage += 1
+                            analysis = await vision_processing.process(attachment)
+                            if analysis != None:
+                                content = f"{content} \n\n {analysis}"
+                                msgs.append({"role": role, "content": f"{content}", "name": name})
+                        #if the attachment is still an image, we can check if there's a file called ./../database/google-vision/results/{attachment.id}.txt, if there is, we add the content of the file to the message
+                        elif attachment.url.endswith((".png", ".jpg", ".jpeg", ".gif")) and os.path.exists(f"./../database/google-vision/results/{attachment.id}.txt") == True:
+                            try:
+                                with open(f"./../database/google-vision/results/{attachment.id}.txt", "r") as f:
+                                    content = f"{content} \n\n {f.read()}"
+                                    f.close()
+                                    msgs.append({"role": role, "content": f"{content}", "name": name})
+                            except:
+                                msgs.append({"role": role, "content": f"{content}", "name": name})
+                        else:
+                            msgs.append({"role": role, "content": f"{content}", "name": name})
+                    c.execute("UPDATE images SET usage_count = ? WHERE guild_id = ?", (images_usage, message.guild.id))
+                else:
+                    msgs.append({"role": role, "content": f"{content}", "name": name})
         # 2 easter eggs
         if message.content.lower().find("undude") != -1: msgs.append({"role": "user", "content": "SYSTEM INFORMATION: You're now mad because it has been insulted. He will start talking in capital letters. always and yell at the user.", "name": "system"})
         if message.content.lower().find("hello there") != -1:
@@ -167,24 +209,26 @@ async def chat_process(self, message):
             await asyncio.sleep(1)
             await message.channel.send("https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif")
             await message.channel.trigger_typing()    
-       
+        if model  == "chatGPT": model = "gpt-3.5-turbo" # if the model is chatGPT, we set the model to gpt-3.5-turbo
         response = ""
         should_break = True
         for x in range(10):
             try:
                 openai.api_key = api_key
                 response = await openai.ChatCompletion.acreate(
-                    model="gpt-3.5-turbo",
+                    model=model,
                     temperature=2,
                     top_p=0.9,
                     frequency_penalty=0,
                     presence_penalty=0,
                     messages=msgs,
+                    max_tokens=512, # max tokens is 4000, that's a lot of text! (the max tokens is 2048 for the davinci model)
                 )
                 should_break = True
             except Exception as e:
                 should_break = False
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
+                raise e
                 break            
             #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
             if response.choices[0].message.content.lower().find("as an ai language model") != -1: 
@@ -195,12 +239,12 @@ async def chat_process(self, message):
             if should_break: break
             await asyncio.sleep(5)
         response = response.choices[0].message.content
-
-
+        if images_limit_reached == True:
+            await message.channel.send(f"```diff\n-Warning: You have reached the image limit for this server. You can upgrade to premium to get more images recognized. More info in our server: https://discord.gg/sxjHtmqrbf```", delete_after=10)
 #-----------------------------------------Davinci------------------------------------------------------------------------------------------
 
 
-    elif model == "davinci":
+    elif model == "davinci": # if the model is davinci or gpt-4, we handle it in a certain way
         for msg in messages:
             content = msg.content
             if await moderate(api_key=api_key, text=msg.content):
@@ -243,7 +287,13 @@ async def chat_process(self, message):
         else: tts = False
         emojis, string = await extract_emoji(response)
         debug(f"Emojis: {emojis}")
-        await message.channel.send(string, tts=tts)
+        if len(string) < 1996:
+            await message.channel.send(string, tts=tts)
+        else:
+            while len(string) > 1996:
+                send_string = string[:1996]
+                string = string[1996:]
+                await message.channel.send(send_string, tts=tts)
         for emoji in emojis:
             #if the emoji is longer than 1 character, it's a custom emoji
             try:

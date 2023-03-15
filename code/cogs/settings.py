@@ -3,7 +3,7 @@ from config import debug, conn, c, moderate
 from discord import default_permissions
 import openai
 models = ["davinci", "chatGPT"]
-
+images_recognition = ["enable", "disable"]
 class Settings (discord.Cog) :
     def __init__(self, bot: discord.Bot) -> None:
         super().__init__()
@@ -30,7 +30,7 @@ class Settings (discord.Cog) :
             await ctx.respond("You must enter at least one argument", ephemeral=True)
             return
         #check if the user has entered valid arguments
-        if max_tokens is not None and (max_tokens < 1 or max_tokens > 2048):
+        if max_tokens is not None and (max_tokens < 1 or max_tokens > 4000):
             await ctx.respond("Invalid max tokens", ephemeral=True)
             return
         if temperature is not None and (temperature < 0.0 or temperature > 1.0):
@@ -227,3 +227,21 @@ class Settings (discord.Cog) :
         else: c.execute("UPDATE model SET model_name = ? WHERE guild_id = ?", (model, ctx.guild.id))
         conn.commit()
         await ctx.respond("Model changed !", ephemeral=True)
+    
+    async def images_recognition_autocomplete(ctx: discord.AutocompleteContext):
+        return [model for model in images_recognition if model.startswith(ctx.value)]
+    @discord.slash_command(name="images", description="Enable or disable images recognition")
+    @discord.option(name="enable_disable", description="Enable or disable images recognition", autocomplete=images_recognition_autocomplete)
+    @default_permissions(administrator=True)
+    async def images(self, ctx: discord.ApplicationContext, enable_disable: str):
+        try:
+            c.execute("SELECT * FROM images WHERE guild_id = ?", (ctx.guild.id,))
+            data = c.fetchone()
+        except:
+            data = None
+        if enable_disable == "enable": enable_disable = 1
+        elif enable_disable == "disable": enable_disable = 0
+        if data is None: c.execute("INSERT INTO images VALUES (?, ?, ?)", (ctx.guild.id, 0, enable_disable))
+        else: c.execute("UPDATE images SET is_enabled = ? WHERE guild_id = ?", (enable_disable, ctx.guild.id))
+        conn.commit()
+        await ctx.respond("Images recognition has been " + ("enabled" if enable_disable == 1 else "disabled"), ephemeral=True)
