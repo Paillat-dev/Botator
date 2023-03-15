@@ -138,7 +138,8 @@ async def chat_process(self, message):
         f.close()
     # replace the variables in the prompt with the actual values
     prompt = prompt.replace("[prompt-prefix]", prompt_prefix).replace("[server-name]", message.guild.name).replace("[channel-name]", message.channel.name).replace("[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")).replace("[pretend-to-be]", pretend_to_be)
-    if model == "chatGPT": # if the model is chatGPT, we handle it in a certain way
+    ############################## chatGPT and gpt-4 handling ##############################
+    if model == "chatGPT" or model == "gpt-4": # if the model is chatGPT, we handle it in a certain way
         msgs = [] # create the msgs list
         msgs.append({"name":"System","role": "user", "content": prompt}) # add the prompt to the msgs list
         name = "" # create the name variable
@@ -159,7 +160,14 @@ async def chat_process(self, message):
                     name = msg.author.name
                     #the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
                     name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
-                msgs.append({"role": role, "content": f"{content}", "name": name})
+                if False: # This is a placeholder for a new feature that will be added soon
+                    input_content = [content]
+                    for attachment in msg.attachments:
+                        image_bytes = await attachment.read()
+                        input_content.append({"image": image_bytes})
+                    msgs.append({"role": role, "content": input_content, "name": name})
+                else:
+                    msgs.append({"role": role, "content": f"{content}", "name": name})
         # 2 easter eggs
         if message.content.lower().find("undude") != -1: msgs.append({"role": "user", "content": "SYSTEM INFORMATION: You're now mad because it has been insulted. He will start talking in capital letters. always and yell at the user.", "name": "system"})
         if message.content.lower().find("hello there") != -1:
@@ -167,14 +175,14 @@ async def chat_process(self, message):
             await asyncio.sleep(1)
             await message.channel.send("https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif")
             await message.channel.trigger_typing()    
-       
+        if model  == "chatGPT": model = "gpt-3.5-turbo" # if the model is chatGPT, we set the model to gpt-3.5-turbo
         response = ""
         should_break = True
         for x in range(10):
             try:
                 openai.api_key = api_key
                 response = await openai.ChatCompletion.acreate(
-                    model="gpt-3.5-turbo",
+                    model=model,
                     temperature=2,
                     top_p=0.9,
                     frequency_penalty=0,
@@ -196,11 +204,10 @@ async def chat_process(self, message):
             await asyncio.sleep(5)
         response = response.choices[0].message.content
 
-
 #-----------------------------------------Davinci------------------------------------------------------------------------------------------
 
 
-    elif model == "davinci":
+    elif model == "davinci": # if the model is davinci or gpt-4, we handle it in a certain way
         for msg in messages:
             content = msg.content
             if await moderate(api_key=api_key, text=msg.content):
