@@ -13,7 +13,10 @@ logging.basicConfig(level=logging.INFO)
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./../database/google-vision/botator.json"
 
 def debug(message):
-    logging.info(message)
+    #if the os is windows, we logging.info(message), if
+    if os.name == "nt":
+        logging.info(message)
+
 conn = sqlite3.connect('../database/data.db')
 c = conn.cursor()
 connp = sqlite3.connect('../database/premium.db')

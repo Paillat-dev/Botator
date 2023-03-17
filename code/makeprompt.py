@@ -68,7 +68,7 @@ async def chat_process(self, message):
     try: 
         c.execute("SELECT * FROM model WHERE guild_id = ?", (message.guild.id,)) # get the model in the database
         model = c.fetchone()[1]
-    except: model = "davinci" # if the model is not in the database, use davinci by default
+    except: model = "chatGPT"
     
     try: premium = cp.fetchone()[2] # get the premium status of the guild
     except: premium = 0 # if the guild is not in the database, it's not premium
@@ -224,20 +224,19 @@ async def chat_process(self, message):
                     messages=msgs,
                     max_tokens=512, # max tokens is 4000, that's a lot of text! (the max tokens is 2048 for the davinci model)
                 )
-                should_break = True
+                if response.choices[0].message.content.lower().find("as an ai language model") != -1: 
+                    should_break = False
+                #react with a redone arrow
+                    await message.add_reaction("🔃")
+                else: should_break = True
             except Exception as e:
                 should_break = False
                 await message.channel.send(f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5)
-                raise e
-                break            
             #if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
-            if response.choices[0].message.content.lower().find("as an ai language model") != -1: 
-                should_break = False
-                #react with a redone arrow
-                await message.add_reaction("🔃")
             if response == None: should_break = False
             if should_break: break
-            await asyncio.sleep(5)
+            await asyncio.sleep(15)
+            await message.channel.trigger_typing()
         response = response.choices[0].message.content
         if images_limit_reached == True:
             await message.channel.send(f"```diff\n-Warning: You have reached the image limit for this server. You can upgrade to premium to get more images recognized. More info in our server: https://discord.gg/sxjHtmqrbf```", delete_after=10)
@@ -290,10 +289,9 @@ async def chat_process(self, message):
         if len(string) < 1996:
             await message.channel.send(string, tts=tts)
         else:
-            while len(string) > 1996:
-                send_string = string[:1996]
-                string = string[1996:]
-                await message.channel.send(send_string, tts=tts)
+            #we send in an embed if the message is too long
+            embed = discord.Embed(title="Botator response", description=string, color=discord.Color.brand_green())
+            await message.channel.send(embed=embed, tts=tts)
         for emoji in emojis:
             #if the emoji is longer than 1 character, it's a custom emoji
             try:

@@ -2,7 +2,7 @@ import discord
 from config import debug, conn, c, moderate
 from discord import default_permissions
 import openai
-models = ["davinci", "chatGPT"]
+models = ["davinci", "chatGPT", "gpt-4"]
 images_recognition = ["enable", "disable"]
 class Settings (discord.Cog) :
     def __init__(self, bot: discord.Bot) -> None:
@@ -229,7 +229,7 @@ class Settings (discord.Cog) :
         await ctx.respond("Model changed !", ephemeral=True)
     
     async def images_recognition_autocomplete(ctx: discord.AutocompleteContext):
-        return [model for model in images_recognition if model.startswith(ctx.value)]
+        return [state for state in images_recognition if state.startswith(ctx.value)]
     @discord.slash_command(name="images", description="Enable or disable images recognition")
     @discord.option(name="enable_disable", description="Enable or disable images recognition", autocomplete=images_recognition_autocomplete)
     @default_permissions(administrator=True)
