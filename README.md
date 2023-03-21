@@ -7,7 +7,7 @@ In order to add the bot to your discord server, you will need  an OpenAI API key
 
 When adding the bot to your server you agree to our [privacy policy](https://github.com/Paillat-dev/Botator/blob/main/privacypolicy.md) and our [terms of service](https://github.com/Paillat-dev/Botator/blob/main/tos.md)
 
-You can add the bot to your server by clicking [**here**](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=2214808576&scope=applications.commands%20bot). **PLEASE NOTE THAT WE ARE NOT RESPONSIBLE FOR ANY MISUSE YOU'LL DO WITH THE BOT..**
+You can add the bot to your server by clicking [**here**](https://discord.com/api/oauth2/authorize?client_id=1046051875755134996&permissions=414669339840&scope=bot). **PLEASE NOTE THAT WE ARE NOT RESPONSIBLE FOR ANY MISUSE YOU'LL DO WITH THE BOT..**
 
 # Setting up the bot
 Run the following commands to set your bot up:
