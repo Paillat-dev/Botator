@@ -5,7 +5,7 @@ import re
 import discord
 import datetime
 import openai
-import emoji 
+import emoji
 import os
 
 
@@ -57,7 +57,8 @@ def get_guild_data(message):
     """
     guild_data = {}
     try:
-        cp.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
+        curs_premium.execute(
+            "SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     except:
         pass
 
@@ -71,7 +72,8 @@ def get_guild_data(message):
         model = "chatGPT"
 
     try:
-        data = cp.fetchone()  # [2]  # get the premium status of the guild
+        # [2]  # get the premium status of the guild
+        data = curs_premium.fetchone()
         premium = data[2]
     except:
         premium = 0  # if the guild is not in the database, it's not premium
@@ -90,12 +92,55 @@ def get_guild_data(message):
 
     return guild_data
 
-
-async def chat_process(self, message):
+async def need_ignore_message(self, data_dict, message, guild_data, original_message, channels):
+    ## ---- Message ignore conditions ---- ##
     if message.author.bot:
-        return
+        return True
+    if data_dict["api_key"] is None:
+        return True # if the api key is not set, return
+
+    if (
+        # if the message is not in a premium channel and
+        not str(message.channel.id) in channels
+        # if the message doesn't mention the bot and
+        and message.content.find("<@" + str(self.bot.user.id) + ">") == -1
+        and original_message == None  # if the message is not a reply to the bot and
+        # if the message is not in the default channel
+        and str(message.channel.id) != str(data_dict["channel_id"])
+    ):
+        return True
+
+    # if the bot has been used more than max_uses*5 times in the last 24 hours in this guild and the guild is premium
+    # send a message and return
+    elif data_dict["uses_count_today"] >= max_uses * 5 and guild_data["premium"] == 1:
+        return True
+
+    # if the bot is not active in this guild we return
+    if data_dict["is_active"] == 0:
+        return True
+
+    # if the message starts with - or // it's a comment and we return
+    if message.content.startswith("-") or message.content.startswith("//"):
+        return True
+
+    # if the bot has been used more than max_uses times in the last 24 hours in this guild and the guild is not premium
+    # send a message and return
+    if (
+        data_dict["uses_count_today"] >= max_uses
+        and guild_data["premium"] == 0
+        and message.guild.id != 1050769643180146749
+    ):
+        await message.channel.send(
+            f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h."
+        )
+        return True
+    return False
+    
+    
+def get_data_dict(self, message):
     try:
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
+        curs_data.execute(
+            "SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
     except:
         return
     data = curs_data.fetchone()
@@ -115,8 +160,25 @@ async def chat_process(self, message):
         "pretend_to_be": data[12],
         "pretend_enabled": data[13],
     }
+    return data_dict
+    
+
+async def chat_process(self, message):
+    """This function processes the message and sends the prompt to the API
+
+    Args:
+        message (str): Data of the message that was sent
+    """
+    
+    if(await need_ignore_message(self, message, guild_data, original_message, channels)):
+        return
+    data_dict = get_data_dict(message)
+
+    ## ---- Message processing ---- ##
+
     if data is None:
         data = [message.guild.id, 0, 0]
+
     data_dict["images_usage"] = data[1]
     data_dict["images_enabled"] = data[2]
 
@@ -128,8 +190,9 @@ async def chat_process(self, message):
     if message.guild.id == 1050769643180146749:
         images_usage = 0  # if the guild is the support server, we set the images usage to 0, so the bot can be used as much as possible
     try:
-        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
-        data = cp.fetchone()
+        curs_premium.execute(
+            "SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+        data = curs_premium.fetchone()
         if guild_data["premium"]:
             # for 5 times, we get c.fetchone()[1] to c.fetchone()[5] and we add it to the channels list, each time with try except
             for i in range(1, 6):
@@ -141,9 +204,6 @@ async def chat_process(self, message):
     except:
         channels = []
 
-    if data_dict["api_key"] is None:
-        return  # if the api key is not set, return
-
     try:
         original_message = await message.channel.fetch_message(
             message.reference.message_id
@@ -152,95 +212,53 @@ async def chat_process(self, message):
         original_message = None  # if not, nobody replied to the bot
 
     if original_message != None and original_message.author.id != self.bot.user.id:
-        original_message = None  # if the message someone replied to is not from the bot, set original_message to None
+        # if the message someone replied to is not from the bot, set original_message to None
+        original_message = None
 
-    # if the message is not in a premium channel and
-    # if the message doesn't mention the bot and
-    # if the message is not a reply to the bot and
-    # if the message is not in the default channel
-    # return
-    if (
-        not str(message.channel.id) in channels
-        and message.content.find("<@" + str(self.bot.user.id) + ">") == -1
-        and original_message == None
-        and str(message.channel.id) != str(data_dict["channel_id"])
-    ):
-        return
-
-    # if the bot has been used more than max_uses times in the last 24 hours in this guild and the guild is not premium
-    # send a message and return
-    if (
-        data_dict["uses_count_today"] >= max_uses
-        and guild_data["premium"] == 0
-        and message.guild.id != 1050769643180146749
-    ):
-        return await message.channel.send(
-            f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h."
-        )
-
-    # if the bot has been used more than max_uses*5 times in the last 24 hours in this guild and the guild is premium
-    # send a message and return
-    elif data_dict["uses_count_today"] >= max_uses * 5 and guild_data["premium"] == 1:
-        return
-
-    # if the bot is not active in this guild we return
-    if data_dict["is_active"] == 0:
-        return
-
-    # if the message starts with - or // it's a comment and we return
-    if message.content.startswith("-") or message.content.startswith("//"):
-        return
     try:
         await message.channel.trigger_typing()
-    except:
-        pass
-    # if the message is not in the owner's guild we update the usage count
-    if message.guild.id != 1021872219888033903:
-        curs_data.execute(
-            "UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?",
-            (message.guild.id,),
-        )
-        con_data.commit()
-    # if the message is not a reply
-    if original_message == None:
-        messages = await message.channel.history(
-            limit=data_dict["prompt_size"]
-        ).flatten()
-        messages.reverse()
-    # if the message is a reply, we need to handle the message history differently
-    else:
-        messages = await message.channel.history(
-            limit=data_dict["prompt_size"], before=original_message
-        ).flatten()
-        messages.reverse()
-        messages.append(original_message)
-        messages.append(message)
+        # if the message is not in the owner's guild we update the usage count
+        if message.guild.id != 1021872219888033903:
+            curs_data.execute(
+                "UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?",
+                (message.guild.id,),
+            )
+            con_data.commit()
+        # if the message is not a reply
+        if original_message == None:
+            messages = await message.channel.history(
+                limit=data_dict["prompt_size"]
+            ).flatten()
+            messages.reverse()
+        # if the message is a reply, we need to handle the message history differently
+        else:
+            messages = await message.channel.history(
+                limit=data_dict["prompt_size"], before=original_message
+            ).flatten()
+            messages.reverse()
+            messages.append(original_message)
+            messages.append(message)
+    except Exception as e:
+        debug("Error while getting message history", e)
 
     # if the pretend to be feature is enabled, we add the pretend to be text to the prompt
-    if data_dict["pretend_enabled"]:
-        pretend_to_be = (
-            f"In this conversation, the assistant pretends to be {pretend_to_be}"
-        )
-    else:
-        pretend_to_be = ""  # if the pretend to be feature is disabled, we don't add anything to the prompt
-    if prompt_prefix == None:
-        prompt_prefix = (
-            ""  # if the prompt prefix is not set, we set it to an empty string
-        )
+    pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict["pretend_enabled"] else ""
+    prompt_prefix = "" if data_dict["prompt_prefix"] == None else data_dict["prompt_prefix"]
+    
     # open the prompt file for the selected model with utf-8 encoding for emojis
     with open(f"./prompts/{guild_data['model']}.txt", "r", encoding="utf-8") as f:
         prompt = f.read()
-        f.close()
-    # replace the variables in the prompt with the actual values
-    prompt = (
-        prompt.replace("[prompt-prefix]", prompt_prefix)
-        .replace("[server-name]", message.guild.name)
-        .replace("[channel-name]", message.channel.name)
-        .replace(
-            "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+        # replace the variables in the prompt with the actual values
+        prompt = (
+            prompt.replace("[prompt-prefix]", prompt_prefix)
+            .replace("[server-name]", message.guild.name)
+            .replace("[channel-name]", message.channel.name)
+            .replace(
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+            )
+            .replace("[pretend-to-be]", pretend_to_be)
         )
-        .replace("[pretend-to-be]", pretend_to_be)
-    )
+        f.close()
 
     prompt_handlers = {
         "chatGPT": self.gpt_prompt,
@@ -305,7 +323,7 @@ async def gpt_prompt(self, messages, message, data_dict, prompt, guild_data):
         )  # replace the mentions in the message
         # if the message is flagged as inappropriate by the OpenAI API, we delete it, send a message and ignore it
         if await self.check_moderate(data_dict["api_key"], message, msg):
-            continue # ignore the message
+            continue  # ignore the message
         content = await replace_mentions(content, self.bot)
         prompt += f"{msg.author.name}: {content}\n"
         if msg.author.id == self.bot.user.id:
@@ -383,10 +401,10 @@ async def gpt_prompt(self, messages, message, data_dict, prompt, guild_data):
             )
         else:
             msgs.append({"role": role, "content": f"{content}", "name": name})
-            
-    # 2 easter eggs
+
+    # We check for the eastereggs :)
     msgs = await self.check_easter_egg(message, msgs)
-    
+
     if model == "chatGPT":
         model = "gpt-3.5-turbo"  # if the model is chatGPT, we set the model to gpt-3.5-turbo
     response = ""
@@ -401,7 +419,8 @@ async def gpt_prompt(self, messages, message, data_dict, prompt, guild_data):
                 frequency_penalty=0,
                 presence_penalty=0,
                 messages=msgs,
-                max_tokens=512,  # max tokens is 4000, that's a lot of text! (the max tokens is 2048 for the davinci model)
+                # max tokens is 4000, that's a lot of text! (the max tokens is 2048 for the davinci model)
+                max_tokens=512,
             )
             if (
                 response.choices[0]
