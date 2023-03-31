@@ -7,10 +7,17 @@ from config import debug
 from google.cloud import vision
 
 # Instantiates a client
-client = vision.ImageAnnotatorClient()
+try:
+    client = vision.ImageAnnotatorClient()
+except:
+    debug("Google Vision API is not setup, please run /setup")
+
 
 
 async def process(attachment):
+    if not os.path.exists("./../database/google-vision"):
+        debug("Google Vision API is not setup, please run /setup")
+        return
     debug("Processing image...")
     image = vision.Image()
     image.source.image_uri = attachment.url
