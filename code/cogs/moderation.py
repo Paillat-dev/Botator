@@ -1,7 +1,7 @@
 import discord
 from discord import default_permissions
 import os
-from config import debug, c, conn
+from config import debug, curs_data, con_data
 import openai
 import requests
 import toxicity as tox  # this is a file called toxicity.py, which contains the toxicity function that allows you to check if a message is toxic or not (it uses the perspective api)
@@ -81,8 +81,8 @@ class Moderation(discord.Cog):
             ephemeral=True,
         )
         if enable == False:
-            c.execute("DELETE FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
-            conn.commit()
+            curs_data.execute("DELETE FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),))
+            con_data.commit()
             await ctx.respond("Moderation disabled!", ephemeral=True)
             return
 
@@ -91,12 +91,12 @@ class Moderation(discord.Cog):
         if message.author == self.bot.user:
             return
         try:
-            c.execute(
+            curs_data.execute(
                 "SELECT * FROM moderation WHERE guild_id = ?", (str(message.guild.id),)
             )
         except:
             return
-        data = c.fetchone()
+        data = curs_data.fetchone()
         if data is None:
             return
         channel = self.bot.get_channel(int(data[1]))

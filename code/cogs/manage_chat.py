@@ -1,7 +1,7 @@
 import discord
 import re
 import os
-from config import debug, c
+from config import debug, curs_data
 
 
 class ManageChat(discord.Cog):
@@ -17,8 +17,8 @@ class ManageChat(discord.Cog):
             f"The user {ctx.author} ran the cancel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond(
                 "This server is not setup, please run /setup", ephemeral=True
             )

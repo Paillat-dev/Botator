@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from config import debug, c, max_uses, cp, conn, connp, webhook_url
+from config import debug, curs_data, max_uses, curs_premium, con_data, con_premium, webhook_url
 import makeprompt as mp
 import aiohttp
 
