@@ -7,7 +7,7 @@ services:
     container_name: botator
     restart: always
     volumes:
-      - ./config:/config
+      - ./database:/Botator/database
     environment:
       - PERSPECTIVE_API_KEY=your_api_key
       - WEBHOOK_URL=https://yourdomain.com/botator
