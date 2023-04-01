@@ -1,8 +1,8 @@
+# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
 py-cord
-python-dotenv
 openai
-emoji
-# Google api
+apsw
 google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
+python-dotenv
+emoji
+google-cloud-vision
