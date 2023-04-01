@@ -85,7 +85,7 @@ def get_guild_data(message):
     except:
         images = None
 
-    guild_data["model"] = model
+    guild_data["model"] = "gpt-3.5-turbo" if model == "chatGPT" else model
     guild_data["premium"] = premium
     guild_data["images"] = images
     
