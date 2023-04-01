@@ -16,7 +16,6 @@ bot.add_cog(cogs.Chat(bot))
 bot.add_cog(cogs.ManageChat(bot))
 bot.add_cog(cogs.Moderation(bot))
 
-
 @bot.event
 async def on_ready():
     await bot.change_presence(
