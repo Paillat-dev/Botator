@@ -49,7 +49,6 @@ c.execute(
 c.execute("PRAGMA table_info(moderation)")
 result = c.fetchall()
 actual_columns = len(result)
-
 if actual_columns != expected_columns:
     # we add the new columns
     c.execute("ALTER TABLE moderation ADD COLUMN toxicity real")
