@@ -21,10 +21,6 @@ RUN chown -R appuser /Botator/database
 
 RUN mkdir /Botator/database/google
 
-# Copy google APIs credentials
-RUN mkdir /Botator/database/google-vision
-COPY ./database/google/botator.json /Botator/database/google/ 
-
 
 USER appuser
 CMD ["python", "code.py"]
