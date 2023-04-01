@@ -3,7 +3,7 @@ from config import debug, con_data, curs_data, moderate
 from discord import default_permissions
 import openai
 
-models = ["davinci", "chatGPT", "gpt-4"]
+models = ["davinci", "gpt-3.5-turbo", "gpt-4"]
 images_recognition = ["enable", "disable"]
 
 
