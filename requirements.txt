@@ -1,4 +1,4 @@
-py-cord
+discord.py
 python-dotenv
 openai
 emoji
@@ -6,3 +6,4 @@ emoji
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+
