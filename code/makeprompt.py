@@ -167,6 +167,29 @@ async def get_data_dict(message):
             + "```", delete_after=60
         )
 
+def get_prompt(guild_data, data_dict, message, pretend_to_be):
+    # support for custom prompts
+    custom_prompt_path = f"../database/prompts/{guild_data['model']}.txt"
+    if(os.path.exists(custom_prompt_path)):
+        prompt_path = custom_prompt_path
+    else:
+        prompt_path = f"./prompts/{guild_data['model']}.txt"
+    
+    # open the prompt file for the selected model with utf-8 encoding for emojis
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        prompt = f.read()
+        # replace the variables in the prompt with the actual values
+        prompt = (
+            prompt.replace("[prompt-prefix]", data_dict['prompt_prefix'])
+            .replace("[server-name]", message.guild.name)
+            .replace("[channel-name]", message.channel.name)
+            .replace(
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+            )
+            .replace("[pretend-to-be]", pretend_to_be)
+        )
+        f.close()
+    return prompt
 
 async def chat_process(self, message):
     """This function processes the message and sends the prompt to the API
@@ -228,7 +251,6 @@ async def chat_process(self, message):
 
     if (await need_ignore_message(self.bot, data_dict, message, guild_data, original_message, channels)):
         return
-    print("prompt handler")
 
     try:
         await message.channel.trigger_typing()
@@ -262,20 +284,7 @@ async def chat_process(self, message):
         "pretend_enabled"] else ""
     prompt_prefix = "" if data_dict["prompt_prefix"] == None else data_dict["prompt_prefix"]
 
-    # open the prompt file for the selected model with utf-8 encoding for emojis
-    with open(f"./prompts/{guild_data['model']}.txt", "r", encoding="utf-8") as f:
-        prompt = f.read()
-        # replace the variables in the prompt with the actual values
-        prompt = (
-            prompt.replace("[prompt-prefix]", prompt_prefix)
-            .replace("[server-name]", message.guild.name)
-            .replace("[channel-name]", message.channel.name)
-            .replace(
-                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
-            )
-            .replace("[pretend-to-be]", pretend_to_be)
-        )
-        f.close()
+    prompt = get_prompt(guild_data, data_dict, message, pretend_to_be)
 
     prompt_handlers = {
         "gpt-3.5-turbo": gpt_prompt,
@@ -398,16 +407,16 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
         ):
             for attachment in msg.attachments:
                 path = f"./../database/google-vision/results/{attachment.id}.txt"
-                if images_usage >= 6 and guild_data["premium"] == 0:
+                if data_dict['images_usage'] >= 6 and guild_data["premium"] == 0:
                     guild_data["images_limit_reached"] = True
-                elif images_usage >= 30 and guild_data["premium"] == 1:
+                elif data_dict['images_usage'] >= 30 and guild_data["premium"] == 1:
                     guild_data["images_limit_reached"] = True
                 if (
                     attachment.url.endswith((".png", ".jpg", ".jpeg", ".gif"))
                     and not guild_data["images_limit_reached"]
                     and not os.path.exists(path)
                 ):
-                    images_usage += 1
+                    data_dict['images_usage'] += 1
                     analysis = await vision_processing.process(attachment)
                     if analysis != None:
                         content = f"{content} \n\n {analysis}"
@@ -446,7 +455,7 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                     )
             curs_data.execute(
                 "UPDATE images SET usage_count = ? WHERE guild_id = ?",
-                (images_usage, message.guild.id),
+                (data_dict['images_usage'], message.guild.id),
             )
         else:
             msgs.append({"role": role, "content": f"{content}", "name": name})
