@@ -1,7 +1,7 @@
 import discord
 import re
 import os
-from config import debug, c
+from config import debug, curs_data
 
 
 class ManageChat(discord.Cog):
@@ -17,8 +17,9 @@ class ManageChat(discord.Cog):
             f"The user {ctx.author} ran the cancel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute(
+            "SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond(
                 "This server is not setup, please run /setup", ephemeral=True
             )
@@ -87,32 +88,34 @@ class ManageChat(discord.Cog):
         last_message: discord.Message = await ctx.channel.fetch_message(
             ctx.channel.last_message_id
         )
+        new_file_name = f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"
         # rename the file with the name of the channel and the date in this format: transcript_servername_channelname_dd-month-yyyy.txt ex : transcript_Botator_Testing_12-may-2021.txt
         os.rename(
             "transcript.txt",
-            f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt",
+            new_file_name,
         )
         # send the file in a private message to the user who ran the command
+        # TODO: rework so as to give the choice of a private send or a public send
         if channel_send is None:
             await ctx.respond(
                 file=discord.File(
-                    f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"
+                    new_file_name
                 ),
                 ephemeral=True,
             )
         else:
             await channel_send.send(
                 file=discord.File(
-                    f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"
+                    new_file_name
                 )
             )
             await ctx.respond("Transcript sent!", ephemeral=True, delete_after=5)
         await ctx.author.send(
             file=discord.File(
-                f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"
+                new_file_name
             )
         )
         # delete the file
         os.remove(
-            f"transcript_{ctx.guild.name}_{ctx.channel.name}_{last_message.created_at.strftime('%d-%B-%Y')}.txt"
+            new_file_name
         )

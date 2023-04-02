@@ -1,5 +1,5 @@
 import discord
-from config import debug, conn, c, connp, cp
+from config import debug, con_data, curs_data, con_premium, curs_premium
 
 
 class Setup(discord.Cog):
@@ -26,26 +26,26 @@ class Setup(discord.Cog):
             return
         # check if the guild is already in the database bi checking if there is a key for the guild
         try:
-            c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-            data = c.fetchone()
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            data = curs_data.fetchone()
             if data[3] == None:
                 data = None
         except:
             data = None
 
         if data != None:
-            c.execute(
+            curs_data.execute(
                 "UPDATE data SET channel_id = ?, api_key = ? WHERE guild_id = ?",
                 (channel.id, api_key, ctx.guild.id),
             )
             #        c.execute("UPDATE data SET is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?", (False, 64, 0.9, 0.0, 0.0, 5, ctx.guild.id))
-            conn.commit()
+            con_data.commit()
             await ctx.respond(
                 "The channel id and the api key have been updated", ephemeral=True
             )
         else:
             # in this case, the guild is not in the database, so we add it
-            c.execute(
+            curs_data.execute(
                 "INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     ctx.guild.id,
@@ -64,7 +64,7 @@ class Setup(discord.Cog):
                     False,
                 ),
             )
-            conn.commit()
+            con_data.commit()
             await ctx.respond(
                 "The channel id and the api key have been added", ephemeral=True
             )
@@ -78,16 +78,16 @@ class Setup(discord.Cog):
             f"The user {ctx.author} ran the delete command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # delete the guild from the database, except the guild id and the uses_count_today
-        c.execute(
+        curs_data.execute(
             "UPDATE data SET api_key = ?, channel_id = ?, is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?",
             (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx.guild.id),
         )
-        conn.commit()
+        con_data.commit()
         await ctx.respond("Deleted", ephemeral=True)
 
     # create a command called "enable" that only admins can use
@@ -104,15 +104,15 @@ class Setup(discord.Cog):
         debug(
             f"The user {ctx.author} ran the enable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # enable the guild
-        c.execute(
+        curs_data.execute(
             "UPDATE data SET is_active = ? WHERE guild_id = ?", (True, ctx.guild.id)
         )
-        conn.commit()
+        con_data.commit()
         await ctx.respond("Enabled", ephemeral=True)
 
     # create a command called "disable" that only admins can use
@@ -123,15 +123,15 @@ class Setup(discord.Cog):
             f"The user {ctx.author} ran the disable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # disable the guild
-        c.execute(
+        curs_data.execute(
             "UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx.guild.id)
         )
-        conn.commit()
+        con_data.commit()
         await ctx.respond("Disabled", ephemeral=True)
 
     # create a command calles "add channel" that can only be used in premium servers
@@ -152,8 +152,8 @@ class Setup(discord.Cog):
             f"The user {ctx.author} ran the add_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # check if the guild is premium
@@ -168,8 +168,8 @@ class Setup(discord.Cog):
         if channel is None:
             channel = ctx.channel
         # check if the channel is already in the list
-        c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if str(channel.id) == c.fetchone()[0]:
+        curs_data.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if str(channel.id) == curs_data.fetchone()[0]:
             await ctx.respond(
                 "This channel is already set as the main channel", ephemeral=True
             )
@@ -182,7 +182,7 @@ class Setup(discord.Cog):
                 "INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)",
                 (ctx.guild.id, channel.id, None, None, None, None),
             )
-            connp.commit()
+            con_premium.commit()
             await ctx.respond(f"Added channel **{channel.name}**", ephemeral=True)
             return
         channels = guild_channels[1:]
@@ -195,7 +195,7 @@ class Setup(discord.Cog):
                     f"UPDATE channels SET channel{i} = ? WHERE guild_id = ?",
                     (channel.id, ctx.guild.id),
                 )
-                connp.commit()
+                con_premium.commit()
                 await ctx.respond(f"Added channel **{channel.name}**", ephemeral=True)
                 return
         await ctx.respond("You can only add 5 channels", ephemeral=True)
@@ -218,8 +218,8 @@ class Setup(discord.Cog):
             f"The user {ctx.author} ran the remove_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        c.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if c.fetchone() is None:
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # check if the guild is premium
@@ -236,8 +236,8 @@ class Setup(discord.Cog):
         # check if the channel is in the list
         cp.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
         guild_channels = cp.fetchone()
-        c.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if str(channel.id) == c.fetchone()[0]:
+        curs_data.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        if str(channel.id) == curs_data.fetchone()[0]:
             await ctx.respond(
                 "This channel is set as the main channel and therefore cannot be removed. Type /setup to change the main channel.",
                 ephemeral=True,
@@ -261,6 +261,6 @@ class Setup(discord.Cog):
                     f"UPDATE channels SET channel{i} = ? WHERE guild_id = ?",
                     (None, ctx.guild.id),
                 )
-                connp.commit()
+                con_premium.commit()
                 await ctx.respond(f"Removed channel **{channel.name}**", ephemeral=True)
                 return

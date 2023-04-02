@@ -125,32 +125,3 @@ def get_toxicity(message: str):
             float(response["attributeScores"]["PROFANITY"]["summaryScore"]["value"]),
             float(response["attributeScores"]["THREAT"]["summaryScore"]["value"]),
         ]
-
-
-# test part
-def test():
-    print("Testing toxicity.py...")
-    print("Hello world:")
-    result = get_toxicity("Hello world")
-    try:
-        print(
-            f"TOXICITY: {result[0]}; SEVERE_TOXICITY: {result[1]}; IDENTITY ATTACK: {result[2]}; INSULT: {result[3]}; PROFANITY: {result[4]}; THREAT: {result[5]}; SEXUALLY EXPLICIT: {result[6]}; FLIRTATION: {result[7]}; OBSCENE: {result[8]}; SPAM: {result[9]}"
-        )
-    except:
-        print(
-            f"TOXICITY: {result[0]}; SEVERE_TOXICITY: {result[1]}; IDENTITY ATTACK: {result[2]}; INSULT: {result[3]}; PROFANITY: {result[4]}; THREAT: {result[5]}"
-        )
-    print("HELLO WORLD GET ABSOLUTELY BUY MY NEW MERCH OMGGGGGGG:")
-    result = get_toxicity("HELLO WORLD GET ABSOLUTELY BUY MY NEW MERCH OMGGGGGGG")
-    try:
-        print(
-            f"TOXICITY: {result[0]}; SEVERE_TOXICITY: {result[1]}; IDENTITY ATTACK: {result[2]}; INSULT: {result[3]}; PROFANITY: {result[4]}; THREAT: {result[5]}; SEXUALLY EXPLICIT: {result[6]}; FLIRTATION: {result[7]}; OBSCENE: {result[8]}; SPAM: {result[9]}"
-        )
-    except:
-        print(
-            f"TOXICITY: {result[0]}; SEVERE_TOXICITY: {result[1]}; IDENTITY ATTACK: {result[2]}; INSULT: {result[3]}; PROFANITY: {result[4]}; THREAT: {result[5]}"
-        )
-
-
-# uncomment the following line to test the code
-# test()
