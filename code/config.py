@@ -21,7 +21,7 @@ def debug(message):
     if os.name == "nt":
         logging.info(message)
     else:
-        printf(message)
+        print(message)
 
 
 # connect to the database
