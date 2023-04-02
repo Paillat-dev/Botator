@@ -20,6 +20,8 @@ def debug(message):
     # if the os is windows, we logging.info(message), if
     if os.name == "nt":
         logging.info(message)
+    else:
+        printf(message)
 
 
 # connect to the database
