@@ -10,7 +10,7 @@ from google.cloud import vision
 try:
     client = vision.ImageAnnotatorClient()
 except:
-    debug("Google Vision API is not setup, please run /setup")
+    print("Google Vision API is not setup, please run /setup")
 
 
 
@@ -64,4 +64,4 @@ async def process(attachment):
         return final
 
     except Exception as e:
-        debug("Error while processing image: " + str(e))
+        print("Error while processing image: " + str(e))
