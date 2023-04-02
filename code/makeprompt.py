@@ -398,16 +398,16 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
         ):
             for attachment in msg.attachments:
                 path = f"./../database/google-vision/results/{attachment.id}.txt"
-                if images_usage >= 6 and guild_data["premium"] == 0:
+                if data_dict['images_usage'] >= 6 and guild_data["premium"] == 0:
                     guild_data["images_limit_reached"] = True
-                elif images_usage >= 30 and guild_data["premium"] == 1:
+                elif data_dict['images_usage'] >= 30 and guild_data["premium"] == 1:
                     guild_data["images_limit_reached"] = True
                 if (
                     attachment.url.endswith((".png", ".jpg", ".jpeg", ".gif"))
                     and not guild_data["images_limit_reached"]
                     and not os.path.exists(path)
                 ):
-                    images_usage += 1
+                    data_dict['images_usage'] += 1
                     analysis = await vision_processing.process(attachment)
                     if analysis != None:
                         content = f"{content} \n\n {analysis}"
@@ -446,7 +446,7 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                     )
             curs_data.execute(
                 "UPDATE images SET usage_count = ? WHERE guild_id = ?",
-                (images_usage, message.guild.id),
+                (data_dict['images_usage'], message.guild.id),
             )
         else:
             msgs.append({"role": role, "content": f"{content}", "name": name})
