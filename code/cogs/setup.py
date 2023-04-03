@@ -158,8 +158,8 @@ class Setup(discord.Cog):
             return
         # check if the guild is premium
         try:
-            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
-            premium = cp.fetchone()[0]
+            con_premium.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            premium = con_premium.fetchone()[0]
         except:
             premium = 0
         if not premium:
@@ -174,11 +174,11 @@ class Setup(discord.Cog):
                 "This channel is already set as the main channel", ephemeral=True
             )
             return
-        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
-        guild_channels = cp.fetchone()
+        con_premium.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
+        guild_channels = con_premium.fetchone()
         if guild_channels is None:
             # if the channel is not in the list, add it
-            cp.execute(
+            con_premium.execute(
                 "INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)",
                 (ctx.guild.id, channel.id, None, None, None, None),
             )
@@ -191,7 +191,7 @@ class Setup(discord.Cog):
             return
         for i in range(5):
             if channels[i] == None:
-                cp.execute(
+                con_premium.execute(
                     f"UPDATE channels SET channel{i} = ? WHERE guild_id = ?",
                     (channel.id, ctx.guild.id),
                 )
@@ -224,8 +224,8 @@ class Setup(discord.Cog):
             return
         # check if the guild is premium
         try:
-            cp.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
-            premium = cp.fetchone()[0]
+            con_premium.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            premium = con_premium.fetchone()[0]
         except:
             premium = 0
         if not premium:
@@ -234,8 +234,8 @@ class Setup(discord.Cog):
         if channel is None:
             channel = ctx.channel
         # check if the channel is in the list
-        cp.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
-        guild_channels = cp.fetchone()
+        con_premium.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
+        guild_channels = con_premium.fetchone()
         curs_data.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if str(channel.id) == curs_data.fetchone()[0]:
             await ctx.respond(
@@ -257,7 +257,7 @@ class Setup(discord.Cog):
         # remove the channel from the list
         for i in range(5):
             if channels[i] == str(channel.id):
-                cp.execute(
+                con_premium.execute(
                     f"UPDATE channels SET channel{i} = ? WHERE guild_id = ?",
                     (None, ctx.guild.id),
                 )
