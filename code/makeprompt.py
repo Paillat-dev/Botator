@@ -27,19 +27,13 @@ async def extract_emoji(string):
     custom_emoji_matches = re.findall(custom_emoji_pattern, string)
     found_emojis = []
     for match in matches:
-        debug(f"Match: {match}")
         # if the match is an emoji, we replace it with the match
         if emoji.emoji_count(match) > 0:
-            debug(f"Found emoji: {match}")
             found_emojis.append(match)
-            debug(f"Sting before: {string}")
             string = string.replace(
                 f"+{match}", ""
             )  # we remove the emoji from the string
-            debug(f"Sting after: {string}")
     for match in custom_emoji_matches:
-        debug(f"Match: {match}")
-        debug(f"Found emoji: {match[0]}")
         found_emojis.append(match[1])
         string = string.replace(f"+<:{match[0]}:{match[1]}>", "")
     return found_emojis, string
@@ -66,7 +60,7 @@ def get_guild_data(message):
             "SELECT * FROM model WHERE guild_id = ?", (message.guild.id,)
         )  # get the model in the database
         data = curs_data.fetchone()
-        model = model[1]
+        model = data[1]
     except:
         model = "gpt-3.5-turbo"
 
@@ -86,6 +80,8 @@ def get_guild_data(message):
         images = None
 
     guild_data["model"] = "gpt-3.5-turbo" if model == "chatGPT" else model
+    debug(f"Model: {guild_data['model']}")
+    debug(f"Model from database: {model}")
     guild_data["premium"] = premium
     guild_data["images"] = images
     
@@ -224,8 +220,6 @@ async def chat_process(self, message):
 
     ## ---- Message processing ---- ##
 
-    print(message)
-
     if not images_data:
         images_data = [message.guild.id, 0, 0]
 
@@ -277,12 +271,11 @@ async def chat_process(self, message):
             messages.append(message)
     except Exception as e:
         debug("Error while getting message history", e)
-        print(e)
 
     # if the pretend to be feature is enabled, we add the pretend to be text to the prompt
     pretend_to_be = data_dict["pretend_to_be"]
     pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[ "pretend_enabled"] else ""
-
+    debug(f"Pretend to be: {pretend_to_be}")
     prompt = get_prompt(guild_data, data_dict, message, pretend_to_be)
 
     prompt_handlers = {
@@ -290,6 +283,7 @@ async def chat_process(self, message):
         "gpt-4": gpt_prompt,
         "davinci": davinci_prompt,
     }
+    debug(guild_data["model"])
     response = await prompt_handlers[guild_data["model"]](
         self.bot, messages, message, data_dict, prompt, guild_data
     )
@@ -368,6 +362,7 @@ async def check_easter_egg(message, msgs):
 
 
 async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
+    debug("Using GPT-3.5 Turbo prompt")
     msgs = []  # create the msgs list
     msgs.append(
         {"name": "System", "role": "user", "content": prompt}
@@ -511,6 +506,7 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
 
 
 async def davinci_prompt(self, messages, message, data_dict, prompt, guild_data):
+    debug("davinci_prompt")
     for msg in messages:
         if not await self.check_moderate(data_dict["api_key"], message, msg):
             content = await replace_mentions(content, self.bot)
