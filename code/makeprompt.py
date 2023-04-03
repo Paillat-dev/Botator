@@ -280,9 +280,8 @@ async def chat_process(self, message):
         print(e)
 
     # if the pretend to be feature is enabled, we add the pretend to be text to the prompt
-    pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[
-        "pretend_enabled"] else ""
-    prompt_prefix = "" if data_dict["prompt_prefix"] == None else data_dict["prompt_prefix"]
+    pretend_to_be = data_dict["pretend_to_be"]
+    pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[ "pretend_enabled"] else ""
 
     prompt = get_prompt(guild_data, data_dict, message, pretend_to_be)
 
