@@ -23,6 +23,7 @@ async def extract_emoji(string):
     # mach any custom emoji that is just after a "+", returns a tuple with the name and the id of the emoji
     custom_emoji_pattern = r"(?<=\+)<:(.+):(\d+)>"
     # now we match the pattern with the string
+    debug("Extracting emojis from string" + string)
     matches = re.findall(pattern, string)
     custom_emoji_matches = re.findall(custom_emoji_pattern, string)
     found_emojis = []
@@ -276,7 +277,7 @@ async def chat_process(self, message):
     pretend_to_be = data_dict["pretend_to_be"]
     pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[ "pretend_enabled"] else ""
     debug(f"Pretend to be: {pretend_to_be}")
-    prompt = get_prompt(guild_data, data_dict, message, pretend_to_be)
+    prompt = get_prompt(guild_data, data_dict, message, pretend_to_be) + "\n"
 
     prompt_handlers = {
         "gpt-3.5-turbo": gpt_prompt,
@@ -508,11 +509,14 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
 async def davinci_prompt(self, messages, message, data_dict, prompt, guild_data):
     debug("davinci_prompt")
     for msg in messages:
-        if not await self.check_moderate(data_dict["api_key"], message, msg):
-            content = await replace_mentions(content, self.bot)
+        if not await check_moderate(data_dict["api_key"], message, msg):
+            content = msg.content
+            content = await replace_mentions(content, self)
             prompt += f"{msg.author.name}: {content}\n"
-        prompt.append(await check_easter_egg(message, prompt))
-    prompt = prompt + f"\n{self.bot.user.name}:"
+    # Disabled eastereggs because of compatibility issues with the gpt-3.5 format
+#    prompt.append(await check_easter_egg(message, prompt))
+    debug("prompt: " + prompt)
+    prompt = prompt + f"\n{self.user.name}:"
     response = ""
     for _ in range(10):
         try:
@@ -540,5 +544,4 @@ async def davinci_prompt(self, messages, message, data_dict, prompt, guild_data)
             )
             return
         if response != None:
-            break
-        return response
+            return response
