@@ -17,8 +17,7 @@ class ManageChat(discord.Cog):
             f"The user {ctx.author} ran the cancel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
         # check if the guild is in the database
-        curs_data.execute(
-            "SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if curs_data.fetchone() is None:
             await ctx.respond(
                 "This server is not setup, please run /setup", ephemeral=True
@@ -98,24 +97,12 @@ class ManageChat(discord.Cog):
         # TODO: rework so as to give the choice of a private send or a public send
         if channel_send is None:
             await ctx.respond(
-                file=discord.File(
-                    new_file_name
-                ),
+                file=discord.File(new_file_name),
                 ephemeral=True,
             )
         else:
-            await channel_send.send(
-                file=discord.File(
-                    new_file_name
-                )
-            )
+            await channel_send.send(file=discord.File(new_file_name))
             await ctx.respond("Transcript sent!", ephemeral=True, delete_after=5)
-        await ctx.author.send(
-            file=discord.File(
-                new_file_name
-            )
-        )
+        await ctx.author.send(file=discord.File(new_file_name))
         # delete the file
-        os.remove(
-            new_file_name
-        )
+        os.remove(new_file_name)

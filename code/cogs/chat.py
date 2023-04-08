@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
-from config import debug, curs_data, max_uses, curs_premium, con_data, con_premium, webhook_url
+from config import (
+    debug,
+    webhook_url,
+)
 import makeprompt as mp
 import aiohttp
 
@@ -9,8 +12,7 @@ class MyModal(discord.ui.Modal):
     def __init__(self, message):
         super().__init__(title="Downvote")
         self.add_item(
-            discord.ui.InputText(
-                label="Reason", style=discord.InputTextStyle.long)
+            discord.ui.InputText(label="Reason", style=discord.InputTextStyle.long)
         )
         self.message = message
 
@@ -32,15 +34,12 @@ class MyModal(discord.ui.Modal):
                 color=discord.Color.og_blurple(),
             )
 
-            embed.add_field(
-                name="Reason", value=self.children[0].value, inline=True)
-            embed.add_field(
-                name="Author", value=interaction.user.mention, inline=True)
+            embed.add_field(name="Reason", value=self.children[0].value, inline=True)
+            embed.add_field(name="Author", value=interaction.user.mention, inline=True)
             embed.add_field(
                 name="Channel", value=self.message.channel.name, inline=True
             )
-            embed.add_field(
-                name="Guild", value=self.message.guild.name, inline=True)
+            embed.add_field(name="Guild", value=self.message.guild.name, inline=True)
 
             history = await self.message.channel.history(
                 limit=5, before=self.message
@@ -75,9 +74,11 @@ class MyModal(discord.ui.Modal):
             uname = fake_users[users.index(self.message.author)]
             embed.add_field(
                 name=f"{uname} said",
-                value="*" + self.message.content[:1021] + "*" if len(
-                    self.message.content) > 1021 else "*" + self.message.content + "*", # [:1021] if len(self.message.content) > 1021,
-                # means that if the message is longer than 1021 characters, it will be cut at 1021 characters
+                value="*" + self.message.content[:1021] + "*"
+                if len(self.message.content) > 1021
+                else "*"
+                + self.message.content
+                + "*",  # [:1021] if len(self.message.content) > 1021,
                 inline=False,
             )
             await webhook.send(embed=embed)
