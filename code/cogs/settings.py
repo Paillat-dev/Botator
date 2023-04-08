@@ -1,7 +1,6 @@
 import discord
 from config import debug, con_data, curs_data, moderate
 from discord import default_permissions
-import openai
 
 models = ["davinci", "gpt-3.5-turbo", "gpt-4"]
 images_recognition = ["enable", "disable"]
@@ -12,10 +11,8 @@ class Settings(discord.Cog):
         super().__init__()
         self.bot = bot
 
-    # create a command called "advanced" that only admins can use, wich sets the advanced settings up: max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size
     @discord.slash_command(name="advanced", description="Advanced settings")
-    ##@discord.commands.permissions(administrator=True)
-    # add the options
+    @default_permissions(administrator=True)
     @discord.option(name="max_tokens", description="The max tokens", required=False)
     @discord.option(name="temperature", description="The temperature", required=False)
     @discord.option(
@@ -37,12 +34,10 @@ class Settings(discord.Cog):
         debug(
             f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
-        # check if the guild is in the database
         curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        # check if the user has entered at least one argument
         if (
             max_tokens is None
             and temperature is None
@@ -52,7 +47,6 @@ class Settings(discord.Cog):
         ):
             await ctx.respond("You must enter at least one argument", ephemeral=True)
             return
-        # check if the user has entered valid arguments
         if max_tokens is not None and (max_tokens < 1 or max_tokens > 4000):
             await ctx.respond("Invalid max tokens", ephemeral=True)
             return
@@ -158,7 +152,7 @@ class Settings(discord.Cog):
         # create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
 
     @discord.slash_command(name="default", description="Default settings")
-    ##@discord.commands.permissions(administrator=True)
+    @default_permissions(administrator=True)
     async def default(self, ctx: discord.ApplicationContext):
         debug(
             f"The user {ctx.author} ran the default command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -187,6 +181,7 @@ class Settings(discord.Cog):
     @discord.slash_command(
         name="info", description="Show the information stored about this server"
     )
+    @default_permissions(administrator=True)
     async def info(self, ctx: discord.ApplicationContext):
         debug(
             f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -226,8 +221,8 @@ class Settings(discord.Cog):
             embed.add_field(name="Prompt prefix", value=data[10], inline=False)
         await ctx.respond(embed=embed, ephemeral=True)
 
-    # add a slash command called "prefix" that changes the prefix of the bot
     @discord.slash_command(name="prefix", description="Change the prefix of the prompt")
+    @default_permissions(administrator=True)
     async def prefix(self, ctx: discord.ApplicationContext, prefix: str = ""):
         debug(
             f"The user {ctx.author.name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -266,6 +261,7 @@ class Settings(discord.Cog):
         description="The person/thing you want the bot to pretend to be. Leave blank to disable pretend mode",
         required=False,
     )
+    @default_permissions(administrator=True)
     async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = ""):
         debug(
             f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -320,6 +316,7 @@ class Settings(discord.Cog):
             return
 
     @discord.slash_command(name="enable_tts", description="Enable TTS when chatting")
+    @default_permissions(administrator=True)
     async def enable_tts(self, ctx: discord.ApplicationContext):
         # get the guild id
         guild_id = ctx.guild.id
@@ -331,6 +328,7 @@ class Settings(discord.Cog):
         await ctx.respond("TTS has been enabled", ephemeral=True)
 
     @discord.slash_command(name="disable_tts", description="Disable TTS when chatting")
+    @default_permissions(administrator=True)
     async def disable_tts(self, ctx: discord.ApplicationContext):
         # get the guild id
         guild_id = ctx.guild.id
@@ -383,7 +381,9 @@ class Settings(discord.Cog):
     @default_permissions(administrator=True)
     async def images(self, ctx: discord.ApplicationContext, enable_disable: str):
         try:
-            curs_data.execute("SELECT * FROM images WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute(
+                "SELECT * FROM images WHERE guild_id = ?", (ctx.guild.id,)
+            )
             data = curs_data.fetchone()
         except:
             data = None
