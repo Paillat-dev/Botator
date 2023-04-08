@@ -1,4 +1,5 @@
 import discord
+from discord import default_permissions
 from config import debug, con_data, curs_data, con_premium, curs_premium
 
 
@@ -10,21 +11,19 @@ class Setup(discord.Cog):
     @discord.slash_command(name="setup", description="Setup the bot")
     @discord.option(name="channel_id", description="The channel id", required=True)
     @discord.option(name="api_key", description="The api key", required=True)
+    @default_permissions(administrator=True)
     async def setup(
         self,
         ctx: discord.ApplicationContext,
         channel: discord.TextChannel,
         api_key: str,
     ):
-        # check if the api key is valid
         debug(
             f"The user {ctx.author} ran the setup command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
         )
-        # check if the channel is valid
         if channel is None:
             await ctx.respond("Invalid channel id", ephemeral=True)
             return
-        # check if the guild is already in the database bi checking if there is a key for the guild
         try:
             curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
             data = curs_data.fetchone()
@@ -44,7 +43,6 @@ class Setup(discord.Cog):
                 "The channel id and the api key have been updated", ephemeral=True
             )
         else:
-            # in this case, the guild is not in the database, so we add it
             curs_data.execute(
                 "INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
@@ -72,7 +70,7 @@ class Setup(discord.Cog):
     @discord.slash_command(
         name="delete", description="Delete the information about this server"
     )
-    ##@discord.commands.permissions(administrator=True)
+    @default_permissions(administrator=True)
     async def delete(self, ctx: discord.ApplicationContext):
         debug(
             f"The user {ctx.author} ran the delete command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -92,7 +90,7 @@ class Setup(discord.Cog):
 
     # create a command called "enable" that only admins can use
     @discord.slash_command(name="enable", description="Enable the bot")
-    ##@discord.commands.permissions(administrator=True)
+    @default_permissions(administrator=True)
     async def enable(self, ctx: discord.ApplicationContext):
         # if the guild is eqal to 1014156298226515970, the guild is banned
         if ctx.guild.id == 1014156298226515970:
@@ -117,7 +115,7 @@ class Setup(discord.Cog):
 
     # create a command called "disable" that only admins can use
     @discord.slash_command(name="disable", description="Disable the bot")
-    ##@discord.commands.permissions(administrator=True)
+    @default_permissions(administrator=True)
     async def disable(self, ctx: discord.ApplicationContext):
         debug(
             f"The user {ctx.author} ran the disable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
@@ -145,6 +143,7 @@ class Setup(discord.Cog):
         type=discord.TextChannel,
         required=False,
     )
+    @default_permissions(administrator=True)
     async def add_channel(
         self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None
     ):
@@ -158,7 +157,9 @@ class Setup(discord.Cog):
             return
         # check if the guild is premium
         try:
-            con_premium.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            con_premium.execute(
+                "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
+            )
             premium = con_premium.fetchone()[0]
         except:
             premium = 0
@@ -168,13 +169,17 @@ class Setup(discord.Cog):
         if channel is None:
             channel = ctx.channel
         # check if the channel is already in the list
-        curs_data.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute(
+            "SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,)
+        )
         if str(channel.id) == curs_data.fetchone()[0]:
             await ctx.respond(
                 "This channel is already set as the main channel", ephemeral=True
             )
             return
-        con_premium.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
+        con_premium.execute(
+            "SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,)
+        )
         guild_channels = con_premium.fetchone()
         if guild_channels is None:
             # if the channel is not in the list, add it
@@ -211,6 +216,7 @@ class Setup(discord.Cog):
         type=discord.TextChannel,
         required=False,
     )
+    @default_permissions(administrator=True)
     async def remove_channel(
         self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None
     ):
@@ -224,7 +230,9 @@ class Setup(discord.Cog):
             return
         # check if the guild is premium
         try:
-            con_premium.execute("SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            con_premium.execute(
+                "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
+            )
             premium = con_premium.fetchone()[0]
         except:
             premium = 0
@@ -234,9 +242,13 @@ class Setup(discord.Cog):
         if channel is None:
             channel = ctx.channel
         # check if the channel is in the list
-        con_premium.execute("SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,))
+        con_premium.execute(
+            "SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,)
+        )
         guild_channels = con_premium.fetchone()
-        curs_data.execute("SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute(
+            "SELECT channel_id FROM data WHERE guild_id = ?", (ctx.guild.id,)
+        )
         if str(channel.id) == curs_data.fetchone()[0]:
             await ctx.respond(
                 "This channel is set as the main channel and therefore cannot be removed. Type /setup to change the main channel.",
