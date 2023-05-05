@@ -73,22 +73,10 @@ def get_guild_data(message):
         premium = curs_premium.fetchone()[2]
     except Exception as e:
         premium = 0
-    try:
-        curs_data.execute(
-            "SELECT * FROM images WHERE guild_id = ?", (mg_to_guid(message),)
-        )  # get the images setting in the database
-        images = curs_data.fetchone()
-    except:
-        images = None
-
     guild_data["model"] = "gpt-3.5-turbo" if model == "chatGPT" else model
     debug(f"Model: {guild_data['model']}")
     debug(f"Model from database: {model}")
     guild_data["premium"] = premium
-    guild_data["images"] = images
-    
-    guild_data["images_limit_reached"] = False
-
     return guild_data
 
 
@@ -407,6 +395,7 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                 image_bytes = await attachment.read()
                 input_content.append({"image": image_bytes})
             msgs.append({"role": role, "content": input_content, "name": name})
+        print(f"Image status for guild is {guild_data['images_enabled']}")
         if (
             len(msg.attachments) > 0
             and role == "user"
