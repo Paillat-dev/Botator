@@ -1,7 +1,17 @@
 import discord
-from discord import default_permissions
-from config import debug, con_data, curs_data, con_premium, curs_premium
+from discord import default_permissions, guild_only
+from discord.ext import commands
+from config import debug, con_data, curs_data, con_premium, curs_premium, ctx_to_guid
 
+class NoPrivateMessages(commands.CheckFailure):
+    pass
+
+def dms_only():
+    async def predicate(ctx):
+        if ctx.guild is not None:
+            raise NoPrivateMessages('Hey no private messages!')
+        return True
+    return commands.check(predicate)
 
 class Setup(discord.Cog):
     def __init__(self, bot: discord.Bot):
@@ -12,15 +22,13 @@ class Setup(discord.Cog):
     @discord.option(name="channel_id", description="The channel id", required=True)
     @discord.option(name="api_key", description="The api key", required=True)
     @default_permissions(administrator=True)
+    @guild_only()
     async def setup(
         self,
         ctx: discord.ApplicationContext,
         channel: discord.TextChannel,
         api_key: str,
     ):
-        debug(
-            f"The user {ctx.author} ran the setup command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         if channel is None:
             await ctx.respond("Invalid channel id", ephemeral=True)
             return
@@ -66,24 +74,75 @@ class Setup(discord.Cog):
             await ctx.respond(
                 "The channel id and the api key have been added", ephemeral=True
             )
+    @discord.slash_command(name="setup_dms", description="Setup the bot in dms")
+    @discord.option(name="api_key", description="The api key", required=True)
+    @default_permissions(administrator=True)
+    @dms_only()
+    async def setup_dms(
+        self,
+        ctx: discord.ApplicationContext,
+        api_key: str,
+    ):
+        channel = ctx.channel
+        if channel is None:
+            await ctx.respond("Invalid channel id", ephemeral=True)
+            return
+        try:
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.user.id,))
+            data = curs_data.fetchone()
+            if data[3] == None:
+                data = None
+        except:
+            data = None
+
+        if data != None:
+            curs_data.execute(
+                "UPDATE data SET channel_id = ?, api_key = ? WHERE guild_id = ?",
+                (channel.id, api_key, ctx.user.id),
+            )
+            con_data.commit()
+            await ctx.respond(
+                "The channel id and the api key have been updated", ephemeral=True
+            )
+        else:
+            curs_data.execute(
+                "INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    ctx.user.id,
+                    channel.id,
+                    api_key,
+                    False,
+                    64,
+                    0.9,
+                    0.0,
+                    0.0,
+                    0,
+                    5,
+                    "",
+                    False,
+                    "",
+                    False,
+                ),
+            )
+            con_data.commit()
+            await ctx.respond(
+                "The api key has been added", ephemeral=True
+            )
 
     @discord.slash_command(
         name="delete", description="Delete the information about this server"
     )
     @default_permissions(administrator=True)
     async def delete(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the delete command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # delete the guild from the database, except the guild id and the uses_count_today
         curs_data.execute(
             "UPDATE data SET api_key = ?, channel_id = ?, is_active = ?, max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?",
-            (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx.guild.id),
+            (None, None, False, 50, 0.9, 0.0, 0.0, 0, ctx_to_guid(ctx)),
         )
         con_data.commit()
         await ctx.respond("Deleted", ephemeral=True)
@@ -92,23 +151,13 @@ class Setup(discord.Cog):
     @discord.slash_command(name="enable", description="Enable the bot")
     @default_permissions(administrator=True)
     async def enable(self, ctx: discord.ApplicationContext):
-        # if the guild is eqal to 1014156298226515970, the guild is banned
-        if ctx.guild.id == 1014156298226515970:
-            await ctx.respond(
-                "This server is banned for bad and nsfw use.", ephemeral=True
-            )
-            return
-        # check if the guild is in the database
-        debug(
-            f"The user {ctx.author} ran the enable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # enable the guild
         curs_data.execute(
-            "UPDATE data SET is_active = ? WHERE guild_id = ?", (True, ctx.guild.id)
+            "UPDATE data SET is_active = ? WHERE guild_id = ?", (True, ctx_to_guid(ctx))
         )
         con_data.commit()
         await ctx.respond("Enabled", ephemeral=True)
@@ -117,17 +166,14 @@ class Setup(discord.Cog):
     @discord.slash_command(name="disable", description="Disable the bot")
     @default_permissions(administrator=True)
     async def disable(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the disable command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         # disable the guild
         curs_data.execute(
-            "UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx.guild.id)
+            "UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx_to_guid(ctx))
         )
         con_data.commit()
         await ctx.respond("Disabled", ephemeral=True)
@@ -144,12 +190,10 @@ class Setup(discord.Cog):
         required=False,
     )
     @default_permissions(administrator=True)
+    @guild_only()
     async def add_channel(
         self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None
     ):
-        debug(
-            f"The user {ctx.author} ran the add_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
         curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if curs_data.fetchone() is None:
@@ -217,12 +261,10 @@ class Setup(discord.Cog):
         required=False,
     )
     @default_permissions(administrator=True)
+    @guild_only()
     async def remove_channel(
         self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None
     ):
-        debug(
-            f"The user {ctx.author} ran the remove_channel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
         curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if curs_data.fetchone() is None:

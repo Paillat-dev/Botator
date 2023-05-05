@@ -1,5 +1,5 @@
 import asyncio
-from config import curs_data, max_uses, curs_premium, con_data, debug, moderate
+from config import curs_data, max_uses, curs_premium, con_data, debug, moderate, mg_to_guid
 import vision_processing
 import re
 import discord
@@ -7,6 +7,12 @@ import datetime
 import openai
 import emoji
 import os
+
+async def historicator(message):
+    if message.guild != None:
+        return message.channel
+    else:
+        return message.author
 
 async def replace_mentions(content, bot):
     mentions = re.findall(r"<@!?\d+>", content)
@@ -50,15 +56,17 @@ def get_guild_data(message):
         dict: A dictionary with the data of the guild
     """
     guild_data = {}
+    guid = mg_to_guid(message)
     try:
         curs_premium.execute(
-            "SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
+            "SELECT * FROM data WHERE guild_id = ?", (guid,)
+        )  # get the data of the guild
     except:
         pass
 
     try:
         curs_data.execute(
-            "SELECT * FROM model WHERE guild_id = ?", (message.guild.id,)
+            "SELECT * FROM model WHERE guild_id = ?", (guid,)
         )  # get the model in the database
         data = curs_data.fetchone()
         model = data[1]
@@ -74,7 +82,7 @@ def get_guild_data(message):
 
     try:
         curs_data.execute(
-            "SELECT * FROM images WHERE guild_id = ?", (message.guild.id,)
+            "SELECT * FROM images WHERE guild_id = ?", (mg_to_guid(message),)
         )  # get the images setting in the database
         images = curs_data.fetchone()
     except:
@@ -125,9 +133,10 @@ async def need_ignore_message(bot, data_dict, message, guild_data, original_mess
     if (
         data_dict["uses_count_today"] >= max_uses
         and guild_data["premium"] == 0
-        and message.guild.id != 1050769643180146749
+        and mg_to_guid(message) != 1050769643180146749
     ):
-        await message.channel.send(
+        hist = await historicator(message)
+        await hist.send(
             f"The bot has been used more than {str(max_uses)} times in the last 24 hours in this guild. Please try again in 24h."
         )
         return True
@@ -136,8 +145,14 @@ async def need_ignore_message(bot, data_dict, message, guild_data, original_mess
 
 async def get_data_dict(message):
     try:
-        curs_data.execute(
-            "SELECT * FROM data WHERE guild_id = ?", (message.guild.id,))
+        if isinstance(message.channel, discord.DMChannel):
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (mg_to_guid(message),)
+            )
+        else:
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (mg_to_guid(message),)
+            )
         data = curs_data.fetchone()
         # Create a dict with the data
         data_dict = {
@@ -154,15 +169,18 @@ async def get_data_dict(message):
             "tts": bool(data[11]),
             "pretend_to_be": data[12],
             "pretend_enabled": data[13],
+            "images_enabled": 0,
+            "images_usage": 0,
         }
         return data_dict
     except Exception as e:
-        # Send an error message
-        await message.channel.send(
+        hist = await historicator(message)
+        await hist.send(
             "The bot is not configured yet. Please use `//setup` to configure it. \n" +
             "If it still doesn't work, it might be a database error. \n ```" + e.__str__()
             + "```", delete_after=60
         )
+        raise e
 
 def get_prompt(guild_data, data_dict, message, pretend_to_be):
     # support for custom prompts
@@ -178,8 +196,8 @@ def get_prompt(guild_data, data_dict, message, pretend_to_be):
         # replace the variables in the prompt with the actual values
         prompt = (
             prompt.replace("[prompt-prefix]", data_dict['prompt_prefix'])
-            .replace("[server-name]", message.guild.name)
-            .replace("[channel-name]", message.channel.name)
+            .replace("[server-name]", message.guild.name if message.guild else "DMs conversation")
+            .replace("[channel-name]", message.channel.name if message.guild else "DMs conversation")
             .replace(
                 "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
             )
@@ -212,26 +230,26 @@ async def chat_process(self, message):
         original_message = None
 
     try:
-        # get the images setting in the database
         curs_data.execute(
-            "SELECT * FROM images WHERE guild_id = ?", (message.guild.id,))
+            "SELECT * FROM images WHERE user_id = ?", (mg_to_guid(message)))
         images_data = curs_data.fetchone()
     except:
         images_data = None
-
-    ## ---- Message processing ---- ##
-
     if not images_data:
-        images_data = [message.guild.id, 0, 0]
-
-    data_dict["images_usage"] = 0 if message.guild.id == 1050769643180146749 else images_data[1]
+        images_data = [0, 0, 0]
+        images_data = [mg_to_guid(message), 0, 0]
+        data_dict["images_usage"] = 0 if mg_to_guid(message) == 1050769643180146749 else images_data[1]
+        print(type(images_data))
+        print(type(data_dict))
+        print(type(images_data[2]))
     data_dict["images_enabled"] = images_data[2]
+    data_dict["images_usage"] = images_data[1]
 
 
     channels = []
     try:
         curs_premium.execute(
-            "SELECT * FROM channels WHERE guild_id = ?", (message.guild.id,))
+            "SELECT * FROM channels WHERE guild_id = ?", (mg_to_guid(message),) )
         images_data = curs_premium.fetchone()
         if guild_data["premium"]:
             # for 5 times, we get c.fetchone()[1] to c.fetchone()[5] and we add it to the channels list, each time with try except
@@ -248,32 +266,30 @@ async def chat_process(self, message):
         return
 
     try:
-        await message.channel.trigger_typing()
-        # if the message is not in the owner's guild we update the usage count
-        if message.guild.id != 1021872219888033903:
+        try: await message.channel.trigger_typing()
+        except: pass
+        if mg_to_guid(message) != 1021872219888033903:
             curs_data.execute(
                 "UPDATE data SET uses_count_today = uses_count_today + 1 WHERE guild_id = ?",
-                (message.guild.id,),
+                (mg_to_guid(message),),
             )
             con_data.commit()
-        # if the message is not a reply
+        hist = await historicator(message)
         if original_message == None:
-            messages = await message.channel.history(
+            messages = await hist.history(
                 limit=data_dict["prompt_size"]
             ).flatten()
-            messages.reverse()
-        # if the message is a reply, we need to handle the message history differently
         else:
-            messages = await message.channel.history(
+            messages = await hist.history(
                 limit=data_dict["prompt_size"], before=original_message
             ).flatten()
             messages.reverse()
             messages.append(original_message)
             messages.append(message)
     except Exception as e:
-        debug("Error while getting message history", e)
+        debug("Error while getting message history")
+        raise e
 
-    # if the pretend to be feature is enabled, we add the pretend to be text to the prompt
     pretend_to_be = data_dict["pretend_to_be"]
     pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[ "pretend_enabled"] else ""
     debug(f"Pretend to be: {pretend_to_be}")
@@ -293,7 +309,8 @@ async def chat_process(self, message):
         emojis, string = await extract_emoji(response)
         debug(f"Emojis: {emojis}")
         if len(string) < 1996:
-            await message.channel.send(string, tts=data_dict["tts"])
+              hist = await historicator(message) 
+              await hist.send(string, tts=data_dict["tts"])
         else:
             # we send in an embed if the message is too long
             embed = discord.Embed(
@@ -301,7 +318,8 @@ async def chat_process(self, message):
                 description=string,
                 color=discord.Color.brand_green(),
             )
-            await message.channel.send(embed=embed, tts=data_dict["tts"])
+            hist = await historicator(message)
+            await hist.send(embed=embed, tts=data_dict["tts"])
         for emoji in emojis:
             # if the emoji is longer than 1 character, it's a custom emoji
             try:
@@ -317,7 +335,8 @@ async def chat_process(self, message):
             except:
                 pass
     else:
-        await message.channel.send(
+          hist = await historicator(message)
+          await hist.send(
             "The AI is not sure what to say (the response was empty)"
         )
 
@@ -329,7 +348,8 @@ async def check_moderate(api_key, message, msg):
             description=f"The message *{msg.content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.",
             color=discord.Color.brand_red(),
         )
-        await message.channel.send(
+        hist = await historicator(message)
+        await hist.send(
             f"{msg.author.mention}", embed=embed, delete_after=10
         )
         message.delete()
@@ -355,7 +375,8 @@ async def check_easter_egg(message, msgs):
             }
         )
         await asyncio.sleep(1)
-        await message.channel.send(
+        hist = await historicator(message)
+        await hist.send(
             "https://media.tenor.com/FxIRfdV3unEAAAAd/star-wars-general-grievous.gif"
         )
         await message.channel.trigger_typing()
@@ -363,7 +384,6 @@ async def check_easter_egg(message, msgs):
 
 
 async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
-    debug("Using GPT-3.5 Turbo prompt")
     msgs = []  # create the msgs list
     msgs.append(
         {"name": "System", "role": "user", "content": prompt}
@@ -374,33 +394,29 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
         content = await replace_mentions(
             content, bot
         )  # replace the mentions in the message
-        # if the message is flagged as inappropriate by the OpenAI API, we delete it, send a message and ignore it
         if await check_moderate(data_dict["api_key"], message, msg):
-            continue  # ignore the message
+            continue
         content = await replace_mentions(content, bot)
-        prompt += f"{msg.author.name}: {content}\n"
         if msg.author.id == bot.user.id:
             role = "assistant"
             name = "assistant"
         else:
             role = "user"
             name = msg.author.name
-            # the name should match '^[a-zA-Z0-9_-]{1,64}$', so we need to remove any special characters
             name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
-        if False:  # GPT-4 images
+        if False:  # GPT-4 images, not implemented yet
             input_content = [content]
             for attachment in msg.attachments:
                 image_bytes = await attachment.read()
                 input_content.append({"image": image_bytes})
             msgs.append({"role": role, "content": input_content, "name": name})
-
-        # if there is an attachment, we add it to the message
         if (
             len(msg.attachments) > 0
             and role == "user"
             and data_dict["images_enabled"] == 1
         ):
             for attachment in msg.attachments:
+                print("attachment found")
                 path = f"./../database/google-vision/results/{attachment.id}.txt"
                 if data_dict['images_usage'] >= 6 and guild_data["premium"] == 0:
                     guild_data["images_limit_reached"] = True
@@ -450,12 +466,10 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                     )
             curs_data.execute(
                 "UPDATE images SET usage_count = ? WHERE guild_id = ?",
-                (data_dict['images_usage'], message.guild.id),
+                (data_dict['images_usage'], mg_to_guid(message)),
             )
         else:
             msgs.append({"role": role, "content": f"{content}", "name": name})
-
-    # We check for the eastereggs :)
     msgs = await check_easter_egg(message, msgs)
 
     response = ""
@@ -486,7 +500,8 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                 should_break = True
         except Exception as e:
             should_break = False
-            await message.channel.send(
+            hist = await historicator(message)
+            await hist.send(
                 f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=5
             )
         # if the ai said "as an ai language model..." we continue the loop" (this is a bug in the chatgpt model)
@@ -499,7 +514,8 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
     response = response.choices[0].message.content
     
     if guild_data["images_limit_reached"]:
-        await message.channel.send(
+        hist = await historicator(message)
+        await hist.send(
             f"```diff\n-Warning: You have reached the image limit for this server. You can upgrade to premium to get more images recognized. More info in our server: https://discord.gg/sxjHtmqrbf```",
             delete_after=10,
         )
@@ -539,7 +555,8 @@ async def davinci_prompt(self, messages, message, data_dict, prompt, guild_data)
             response = response.choices[0].text
         except Exception as e:
             response = None
-            await message.channel.send(
+            hist = await historicator(message)
+            await hist.send(
                 f"```diff\n-Error: OpenAI API ERROR.\n\n{e}```", delete_after=10
             )
             return

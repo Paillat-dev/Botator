@@ -1,6 +1,4 @@
 import discord
-from config import debug
-
 
 class Help(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
@@ -9,9 +7,6 @@ class Help(discord.Cog):
 
     @discord.slash_command(name="help", description="Show all the commands")
     async def help(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the help command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         embed = discord.Embed(
             title="Help", description="Here is the help page", color=0x00FF00
         )
@@ -71,9 +66,6 @@ class Help(discord.Cog):
         name="advanced_help", description="Show the advanced settings meanings"
     )
     async def advanced_help(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the advanced_help command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         embed = discord.Embed(
             title="Advanced Help",
             description="Here is the advanced help page",

@@ -1,5 +1,5 @@
 import discord
-from config import debug, con_data, curs_data, moderate
+from config import debug, con_data, curs_data, moderate, ctx_to_guid
 from discord import default_permissions
 
 models = ["davinci", "gpt-3.5-turbo", "gpt-4"]
@@ -31,10 +31,7 @@ class Settings(discord.Cog):
         presence_penalty: float = None,
         prompt_size: int = None,
     ):
-        debug(
-            f"The user {ctx.author} ran the advanced command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
@@ -69,26 +66,26 @@ class Settings(discord.Cog):
         if max_tokens is None:
             if (
                 curs_data.execute(
-                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
                 is not None
                 and max_tokens is None
             ):
                 max_tokens = curs_data.execute(
-                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
             else:
                 max_tokens = 64
         if temperature is None:
             if (
                 curs_data.execute(
-                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
                 is not None
                 and temperature is None
             ):
                 temperature = curs_data.execute(
-                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
             else:
                 temperature = 0.9
@@ -96,14 +93,14 @@ class Settings(discord.Cog):
             if (
                 curs_data.execute(
                     "SELECT frequency_penalty FROM data WHERE guild_id = ?",
-                    (ctx.guild.id,),
+                    (ctx_to_guid(ctx),),
                 ).fetchone()[0]
                 is not None
                 and frequency_penalty is None
             ):
                 frequency_penalty = curs_data.execute(
                     "SELECT frequency_penalty FROM data WHERE guild_id = ?",
-                    (ctx.guild.id,),
+                    (ctx_to_guid(ctx),),
                 ).fetchone()[0]
             else:
                 frequency_penalty = 0.0
@@ -111,27 +108,27 @@ class Settings(discord.Cog):
             if (
                 curs_data.execute(
                     "SELECT presence_penalty FROM data WHERE guild_id = ?",
-                    (ctx.guild.id,),
+                    (ctx_to_guid(ctx),),
                 ).fetchone()[0]
                 is not None
                 and presence_penalty is None
             ):
                 presence_penalty = curs_data.execute(
                     "SELECT presence_penalty FROM data WHERE guild_id = ?",
-                    (ctx.guild.id,),
+                    (ctx_to_guid(ctx),),
                 ).fetchone()[0]
             else:
                 presence_penalty = 0.0
         if prompt_size is None:
             if (
                 curs_data.execute(
-                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
                 is not None
                 and prompt_size is None
             ):
                 prompt_size = curs_data.execute(
-                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx.guild.id,)
+                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
                 ).fetchone()[0]
             else:
                 prompt_size = 1
@@ -144,7 +141,7 @@ class Settings(discord.Cog):
                 frequency_penalty,
                 presence_penalty,
                 prompt_size,
-                ctx.guild.id,
+                ctx_to_guid(ctx),
             ),
         )
         con_data.commit()
@@ -154,11 +151,8 @@ class Settings(discord.Cog):
     @discord.slash_command(name="default", description="Default settings")
     @default_permissions(administrator=True)
     async def default(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the default command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
         if curs_data.fetchone() is None:
             await ctx.respond(
                 "This server is not setup, please run /setup", ephemeral=True
@@ -167,7 +161,7 @@ class Settings(discord.Cog):
         # set the advanced settings (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size) and also prompt_prefix to their default values
         curs_data.execute(
             "UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?",
-            (64, 0.9, 0.0, 0.0, 5, ctx.guild.id),
+            (64, 0.9, 0.0, 0.0, 5, ctx_to_guid(ctx)),
         )
         con_data.commit()
         await ctx.respond(
@@ -183,13 +177,10 @@ class Settings(discord.Cog):
     )
     @default_permissions(administrator=True)
     async def info(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the info command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
         # check if the guild is in the database
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
             data = curs_data.fetchone()
         except:
             data = None
@@ -197,7 +188,7 @@ class Settings(discord.Cog):
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         try:
-            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx_to_guid(ctx),))
             model = curs_data.fetchone()[1]
         except:
             model = None
@@ -224,11 +215,8 @@ class Settings(discord.Cog):
     @discord.slash_command(name="prefix", description="Change the prefix of the prompt")
     @default_permissions(administrator=True)
     async def prefix(self, ctx: discord.ApplicationContext, prefix: str = ""):
-        debug(
-            f"The user {ctx.author.name} ran the prefix command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
             data = curs_data.fetchone()
             api_key = data[2]
         except:
@@ -248,7 +236,7 @@ class Settings(discord.Cog):
         await ctx.respond("Prefix changed !", ephemeral=True, delete_after=5)
         curs_data.execute(
             "UPDATE data SET prompt_prefix = ? WHERE guild_id = ?",
-            (prefix, ctx.guild.id),
+            (prefix, ctx_to_guid(ctx)),
         )
         con_data.commit()
 
@@ -263,12 +251,9 @@ class Settings(discord.Cog):
     )
     @default_permissions(administrator=True)
     async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = ""):
-        debug(
-            f"The user {ctx.author} ran the pretend command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # check if the guild is in the database
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
             data = curs_data.fetchone()
             api_key = data[2]
         except:
@@ -289,7 +274,7 @@ class Settings(discord.Cog):
             pretend_to_be = ""
             curs_data.execute(
                 "UPDATE data SET pretend_enabled = 0 WHERE guild_id = ?",
-                (ctx.guild.id,),
+                (ctx_to_guid(ctx),),
             )
             con_data.commit()
             await ctx.respond("Pretend mode disabled", ephemeral=True, delete_after=5)
@@ -298,7 +283,7 @@ class Settings(discord.Cog):
         else:
             curs_data.execute(
                 "UPDATE data SET pretend_enabled = 1 WHERE guild_id = ?",
-                (ctx.guild.id,),
+                (ctx_to_guid(ctx),),
             )
             con_data.commit()
             await ctx.respond("Pretend mode enabled", ephemeral=True, delete_after=5)
@@ -306,7 +291,7 @@ class Settings(discord.Cog):
             await ctx.guild.me.edit(nick=pretend_to_be)
             curs_data.execute(
                 "UPDATE data SET pretend_to_be = ? WHERE guild_id = ?",
-                (pretend_to_be, ctx.guild.id),
+                (pretend_to_be, ctx_to_guid(ctx)),
             )
             con_data.commit()
             # if the usename is longer than 32 characters, shorten it
@@ -319,7 +304,7 @@ class Settings(discord.Cog):
     @default_permissions(administrator=True)
     async def enable_tts(self, ctx: discord.ApplicationContext):
         # get the guild id
-        guild_id = ctx.guild.id
+        guild_id = ctx_to_guid(ctx)
         # connect to the database
         # update the tts value in the database
         curs_data.execute("UPDATE data SET tts = 1 WHERE guild_id = ?", (guild_id,))
@@ -331,7 +316,7 @@ class Settings(discord.Cog):
     @default_permissions(administrator=True)
     async def disable_tts(self, ctx: discord.ApplicationContext):
         # get the guild id
-        guild_id = ctx.guild.id
+        guild_id = ctx_to_guid(ctx)
         # connect to the database
         # update the tts value in the database
         curs_data.execute("UPDATE data SET tts = 0 WHERE guild_id = ?", (guild_id,))
@@ -353,16 +338,16 @@ class Settings(discord.Cog):
     @default_permissions(administrator=True)
     async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
         try:
-            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx.guild.id,))
+            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx_to_guid(ctx),))
             data = curs_data.fetchone()[1]
         except:
             data = None
         if data is None:
-            curs_data.execute("INSERT INTO model VALUES (?, ?)", (ctx.guild.id, model))
+            curs_data.execute("INSERT INTO model VALUES (?, ?)", (ctx_to_guid(ctx), model))
         else:
             curs_data.execute(
                 "UPDATE model SET model_name = ? WHERE guild_id = ?",
-                (model, ctx.guild.id),
+                (model, ctx_to_guid(ctx)),
             )
         con_data.commit()
         await ctx.respond("Model changed !", ephemeral=True)
@@ -382,7 +367,7 @@ class Settings(discord.Cog):
     async def images(self, ctx: discord.ApplicationContext, enable_disable: str):
         try:
             curs_data.execute(
-                "SELECT * FROM images WHERE guild_id = ?", (ctx.guild.id,)
+                "SELECT * FROM images WHERE guild_id = ?", (ctx_to_guid(ctx),)
             )
             data = curs_data.fetchone()
         except:
@@ -393,12 +378,12 @@ class Settings(discord.Cog):
             enable_disable = 0
         if data is None:
             curs_data.execute(
-                "INSERT INTO images VALUES (?, ?, ?)", (ctx.guild.id, 0, enable_disable)
+                "INSERT INTO images VALUES (?, ?, ?)", (ctx_to_guid(ctx), 0, enable_disable)
             )
         else:
             curs_data.execute(
                 "UPDATE images SET is_enabled = ? WHERE guild_id = ?",
-                (enable_disable, ctx.guild.id),
+                (enable_disable, ctx_to_guid(ctx)),
             )
         con_data.commit()
         await ctx.respond(

@@ -23,8 +23,18 @@ def debug(message):
     else:
         print(message)
 
+def ctx_to_guid(ctx):
+    if ctx.guild is None:
+        return ctx.author.id
+    else:
+        return ctx.guild.id
 
-# connect to the database
+def mg_to_guid(mg):
+    if mg.guild is None:
+        return mg.author.id
+    else:
+        return mg.guild.id
+
 con_data = sqlite3.connect("../database/data.db")
 curs_data = con_data.cursor()
 con_premium = sqlite3.connect("../database/premium.db")
