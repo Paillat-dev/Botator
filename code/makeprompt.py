@@ -74,7 +74,6 @@ def get_guild_data(message):
     except Exception as e:
         premium = 0
         raise e
-        pass
     try:
         curs_data.execute(
             "SELECT * FROM images WHERE guild_id = ?", (mg_to_guid(message),)
@@ -243,15 +242,15 @@ async def chat_process(self, message):
 
     channels = []
     try:
-        con_premium.execute(
+        curs_premium.execute(
             "SELECT * FROM channels WHERE guild_id = ?", (mg_to_guid(message),) )
-        images_data = curs_premium.fetchone()
+        channels_data = curs_premium.fetchone()
         if guild_data["premium"]:
             # for 5 times, we get c.fetchone()[1] to c.fetchone()[5] and we add it to the channels list, each time with try except
             for i in range(1, 6):
                 # we use the i variable to get the channel id
                 try:
-                    channels.append(str(images_data[i]))
+                    channels.append(str(channels_data[i]))
                 except:
                     pass
     except:
