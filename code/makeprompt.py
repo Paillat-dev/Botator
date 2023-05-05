@@ -73,7 +73,6 @@ def get_guild_data(message):
         premium = curs_premium.fetchone()[2]
     except Exception as e:
         premium = 0
-        raise e
     try:
         curs_data.execute(
             "SELECT * FROM images WHERE guild_id = ?", (mg_to_guid(message),)
@@ -172,6 +171,21 @@ async def get_data_dict(message):
             "images_enabled": 0,
             "images_usage": 0,
         }
+        try:
+            curs_data.execute(
+                "SELECT * FROM images WHERE user_id = ?", (mg_to_guid(message)))
+            images_data = curs_data.fetchone()
+        except:
+            images_data = None
+        if not images_data:
+            images_data = [0, 0, 0]
+            images_data = [mg_to_guid(message), 0, 0]
+            data_dict["images_usage"] = 0 if mg_to_guid(message) == 1050769643180146749 else images_data[1]
+            print(type(images_data))
+            print(type(data_dict))
+            print(type(images_data[2]))
+        data_dict["images_enabled"] = images_data[2]
+        data_dict["images_usage"] = images_data[1]
         return data_dict
     except Exception as e:
         hist = await historicator(message)
@@ -180,7 +194,6 @@ async def get_data_dict(message):
             "If it still doesn't work, it might be a database error. \n ```" + e.__str__()
             + "```", delete_after=60
         )
-        raise e
 
 def get_prompt(guild_data, data_dict, message, pretend_to_be):
     # support for custom prompts
@@ -229,23 +242,6 @@ async def chat_process(self, message):
         # if the message someone replied to is not from the bot, set original_message to None
         original_message = None
 
-    try:
-        curs_data.execute(
-            "SELECT * FROM images WHERE user_id = ?", (mg_to_guid(message)))
-        images_data = curs_data.fetchone()
-    except:
-        images_data = None
-    if not images_data:
-        images_data = [0, 0, 0]
-        images_data = [mg_to_guid(message), 0, 0]
-        data_dict["images_usage"] = 0 if mg_to_guid(message) == 1050769643180146749 else images_data[1]
-        print(type(images_data))
-        print(type(data_dict))
-        print(type(images_data[2]))
-    data_dict["images_enabled"] = images_data[2]
-    data_dict["images_usage"] = images_data[1]
-
-
     channels = []
     try:
         curs_premium.execute(
@@ -258,10 +254,9 @@ async def chat_process(self, message):
                 try:
                     channels.append(str(channels_data[i]))
                 except Exception as e:
-                    raise e
                     pass
     except Exception as e:
-        raise e
+        pass
     print(channels)
 
     if (await need_ignore_message(self.bot, data_dict, message, guild_data, original_message, channels)):
@@ -291,7 +286,6 @@ async def chat_process(self, message):
             messages.append(message)
     except Exception as e:
         debug("Error while getting message history")
-        raise e
 
     pretend_to_be = data_dict["pretend_to_be"]
     pretend_to_be = f"In this conversation, the assistant pretends to be {pretend_to_be}" if data_dict[ "pretend_enabled"] else ""
@@ -419,7 +413,6 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
             and data_dict["images_enabled"] == 1
         ):
             for attachment in msg.attachments:
-                print("attachment found")
                 path = f"./../database/google-vision/results/{attachment.id}.txt"
                 if data_dict['images_usage'] >= 6 and guild_data["premium"] == 0:
                     guild_data["images_limit_reached"] = True
