@@ -251,9 +251,11 @@ async def chat_process(self, message):
                 # we use the i variable to get the channel id
                 try:
                     channels.append(str(channels_data[i]))
-                except:
+                except Exception as e:
+                    raise e
                     pass
-    except:
+    except Exception as e:
+        raise e
         debug("No premium channels found for this guild")
 
     if (await need_ignore_message(self.bot, data_dict, message, guild_data, original_message, channels)):
