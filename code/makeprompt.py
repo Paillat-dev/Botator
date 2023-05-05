@@ -496,12 +496,15 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
         await message.channel.trigger_typing()
     response = response.choices[0].message.content
     
-    if guild_data["images_limit_reached"]:
-        hist = await historicator(message)
-        await hist.send(
-            f"```diff\n-Warning: You have reached the image limit for this server. You can upgrade to premium to get more images recognized. More info in our server: https://discord.gg/sxjHtmqrbf```",
-            delete_after=10,
-        )
+    try: 
+        if guild_data["images_limit_reached"]:
+            hist = await historicator(message)
+            await hist.send(
+                f"```diff\n-Warning: You have reached the image limit for this server. You can upgrade to premium to get more images recognized. More info in our server: https://discord.gg/sxjHtmqrbf```",
+                delete_after=10,
+            )
+    except:
+        pass
     return response
 
 
