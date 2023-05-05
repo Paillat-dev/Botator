@@ -256,7 +256,7 @@ async def chat_process(self, message):
                     pass
     except Exception as e:
         raise e
-        debug("No premium channels found for this guild")
+    print(channels)
 
     if (await need_ignore_message(self.bot, data_dict, message, guild_data, original_message, channels)):
         return
