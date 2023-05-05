@@ -58,14 +58,6 @@ def get_guild_data(message):
     guild_data = {}
     guid = mg_to_guid(message)
     try:
-        curs_premium.execute(
-            "SELECT * FROM data WHERE guild_id = ?", (guid,)
-        )  # get the data of the guild
-    except Exception as e:
-        raise e
-        pass
-
-    try:
         curs_data.execute(
             "SELECT * FROM model WHERE guild_id = ?", (guid,)
         )  # get the model in the database
@@ -73,15 +65,15 @@ def get_guild_data(message):
         model = data[1]
     except:
         model = "gpt-3.5-turbo"
-
     try:
-        # [2]  # get the premium status of the guild
-        data = curs_premium.fetchone()
-        premium = data[2]
+        curs_premium.execute(
+            "SELECT * FROM data WHERE guild_id = ?", (guid,)
+        )  # get the data of the guild
+        premium = curs_premium.fetchone()[2]
     except Exception as e:
+        premium = 0
         raise e
-        premium = 0  # if the guild is not in the database, it's not premium
-
+        pass
     try:
         curs_data.execute(
             "SELECT * FROM images WHERE guild_id = ?", (mg_to_guid(message),)
