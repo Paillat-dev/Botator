@@ -1,0 +1,8 @@
+py-cord
+python-dotenv
+openai
+emoji
+# Google api
+google-api-python-client
+google-cloud-vision
+

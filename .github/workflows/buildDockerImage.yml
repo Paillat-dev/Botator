@@ -1,0 +1,63 @@
+# Building Docker image and pushing it to Docker Hub
+
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image with sha
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/botator:${{ github.sha }} .
+
+      - name: Build Docker image with latest
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/botator:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/botator:${{ github.sha }}
+
+      - name: Push Docker image latest to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/botator:latest
+
+  build_arm64:
+    # This is the job for arm64 architecture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # We are using qemu to emulate arm64 architecture
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/botator_arm64:${{ github.sha }}
+      - name: Build and push latest
+        id: docker_build_latest
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/botator_arm64:latest
