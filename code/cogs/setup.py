@@ -199,14 +199,10 @@ class Setup(discord.Cog):
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        # check if the guild is premium
-        try:
-            con_premium.execute(
-                "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
-            )
-            premium = con_premium.fetchone()[0]
-        except:
-            premium = 0
+        con_premium.execute(
+            "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
+        )
+        premium = con_premium.fetchone()[0]
         if not premium:
             await ctx.respond("This server is not premium", ephemeral=True)
             return
