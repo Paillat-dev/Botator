@@ -279,6 +279,7 @@ async def chat_process(self, message):
             messages = await hist.history(
                 limit=data_dict["prompt_size"]
             ).flatten()
+            messages.reverse()
         else:
             messages = await hist.history(
                 limit=data_dict["prompt_size"], before=original_message
