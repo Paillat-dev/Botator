@@ -61,7 +61,8 @@ def get_guild_data(message):
         curs_premium.execute(
             "SELECT * FROM data WHERE guild_id = ?", (guid,)
         )  # get the data of the guild
-    except:
+    except Exception as e:
+        raise e
         pass
 
     try:
@@ -77,7 +78,8 @@ def get_guild_data(message):
         # [2]  # get the premium status of the guild
         data = curs_premium.fetchone()
         premium = data[2]
-    except:
+    except Exception as e:
+        raise e
         premium = 0  # if the guild is not in the database, it's not premium
 
     try:
