@@ -100,13 +100,14 @@ async def need_ignore_message(bot, data_dict, message, guild_data, original_mess
 
     if (
         # if the message is not in a premium channel and
-        not (str(message.channel.id) in channels
+        not (str(message.channel.id) in [str(channel) for channel in channels]
              # if the message doesn't mention the bot and
              and (message.content.find("<@" + str(bot.user.id) + ">") != -1
                   or original_message))  # if the message is not a reply to the bot and
         # if the message is not in the default channel
         and str(message.channel.id) != str(data_dict["channel_id"])
     ):
+        print("Message ignored in guild " + str(message.guild.id))
         return True
 
     # if the bot has been used more than max_uses*5 times in the last 24 hours in this guild and the guild is premium
