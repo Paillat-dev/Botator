@@ -68,7 +68,8 @@ def get_guild_data(message):
     try:
         curs_premium.execute(
             "SELECT * FROM data WHERE guild_id = ?", (guid,)
-        )  # get the data of the guild
+        )  
+        print("GUID: " + str(guid))
         premium = curs_premium.fetchone()[2]
     except Exception as e:
         premium = 0
