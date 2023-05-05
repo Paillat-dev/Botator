@@ -58,7 +58,7 @@ def get_guild_data(message):
     guild_data = {}
     guid = mg_to_guid(message)
     try:
-        con_premium.execute(
+        curs_premium.execute(
             "SELECT * FROM data WHERE guild_id = ?", (guid,)
         )  # get the data of the guild
     except:

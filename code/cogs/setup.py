@@ -194,15 +194,17 @@ class Setup(discord.Cog):
     async def add_channel(
         self, ctx: discord.ApplicationContext, channel: discord.TextChannel = None
     ):
-        # check if the guild is in the database
         curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
         if curs_data.fetchone() is None:
             await ctx.respond("This server is not setup", ephemeral=True)
             return
-        con_premium.execute(
-            "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
-        )
-        premium = curs_premium.fetchone()[0]
+        try:
+            curs_premium.execute(
+                "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
+            )
+            premium = curs_premium.fetchone()[0]
+        except:
+            premium = False
         if not premium:
             await ctx.respond("This server is not premium", ephemeral=True)
             return
@@ -217,10 +219,10 @@ class Setup(discord.Cog):
                 "This channel is already set as the main channel", ephemeral=True
             )
             return
-        con_premium.execute(
+        curs_premium.execute(
             "SELECT * FROM channels WHERE guild_id = ?", (ctx.guild.id,)
         )
-        guild_channels = con_premium.fetchone()
+        guild_channels = curs_premium.fetchone()
         if guild_channels is None:
             # if the channel is not in the list, add it
             con_premium.execute(
@@ -236,7 +238,7 @@ class Setup(discord.Cog):
             return
         for i in range(5):
             if channels[i] == None:
-                con_premium.execute(
+                curs_premium.execute(
                     f"UPDATE channels SET channel{i} = ? WHERE guild_id = ?",
                     (channel.id, ctx.guild.id),
                 )
