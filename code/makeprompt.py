@@ -69,7 +69,6 @@ def get_guild_data(message):
         curs_premium.execute(
             "SELECT * FROM data WHERE guild_id = ?", (guid,)
         )  
-        print("GUID: " + str(guid))
         premium = curs_premium.fetchone()[2]
     except Exception as e:
         premium = 0
@@ -395,7 +394,6 @@ async def gpt_prompt(bot, messages, message, data_dict, prompt, guild_data):
                 image_bytes = await attachment.read()
                 input_content.append({"image": image_bytes})
             msgs.append({"role": role, "content": input_content, "name": name})
-        print(f"Image status for guild is {guild_data['images_enabled']}")
         if (
             len(msg.attachments) > 0
             and role == "user"
