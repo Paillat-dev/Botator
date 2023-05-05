@@ -202,7 +202,7 @@ class Setup(discord.Cog):
         con_premium.execute(
             "SELECT premium FROM data WHERE guild_id = ?", (ctx.guild.id,)
         )
-        premium = con_premium.fetchone()[0]
+        premium = curs_premium.fetchone()[0]
         if not premium:
             await ctx.respond("This server is not premium", ephemeral=True)
             return

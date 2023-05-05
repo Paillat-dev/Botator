@@ -1,5 +1,5 @@
 import asyncio
-from config import curs_data, max_uses, curs_premium, con_data, debug, moderate, mg_to_guid
+from config import curs_data, max_uses, curs_premium, con_data, debug, moderate, mg_to_guid, con_premium
 import vision_processing
 import re
 import discord
@@ -58,7 +58,7 @@ def get_guild_data(message):
     guild_data = {}
     guid = mg_to_guid(message)
     try:
-        curs_premium.execute(
+        con_premium.execute(
             "SELECT * FROM data WHERE guild_id = ?", (guid,)
         )  # get the data of the guild
     except:
@@ -248,7 +248,7 @@ async def chat_process(self, message):
 
     channels = []
     try:
-        curs_premium.execute(
+        con_premium.execute(
             "SELECT * FROM channels WHERE guild_id = ?", (mg_to_guid(message),) )
         images_data = curs_premium.fetchone()
         if guild_data["premium"]:
