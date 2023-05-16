@@ -168,3 +168,5 @@ database
 premium-key.txt
 premium.db
 guildscount.py
+
+*.ovpn
