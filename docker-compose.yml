@@ -9,9 +9,5 @@ services:
     restart: always
     volumes:
       - ./database:/Botator/database
-    environment:
-      - PERSPECTIVE_API_KEY=your_api_key
-      - WEBHOOK_URL=https://yourdomain.com/botator
-      - DISCORD_TOKEN=your_token
     env_file:
       - .env
