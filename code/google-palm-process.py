@@ -2,7 +2,7 @@ import requests
 
 proxy_url = 'http://64.225.4.12:9991'  # Replace with your actual proxy URL and port
 
-api_key = 'AIzaSyCqIBAf0STUTVq7pizT3XtMcQQ_zgy9UGU'
+api_key = 'S'
 model_name = 'chat-bison-001'
 api_url = f'https://autopush-generativelanguage.sandbox.googleapis.com/v1beta2/models/{model_name}:generateMessage?key={api_key}'
 

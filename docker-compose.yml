@@ -3,8 +3,9 @@
 version: '3'
 services:
   botator:
-    image: botator/botator:latest
-    container_name: botator
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - ./database:/Botator/database
@@ -12,3 +13,5 @@ services:
       - PERSPECTIVE_API_KEY=your_api_key
       - WEBHOOK_URL=https://yourdomain.com/botator
       - DISCORD_TOKEN=your_token
+    env_file:
+      - .env
