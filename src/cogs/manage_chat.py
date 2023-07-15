@@ -1,7 +1,7 @@
 import discord
 import re
 import os
-from config import debug, curs_data
+from src.config import debug, curs_data
 
 
 class ManageChat(discord.Cog):

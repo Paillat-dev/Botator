@@ -5,4 +5,4 @@ emoji
 # Google api
 google-api-python-client
 google-cloud-vision
-
+tiktoken

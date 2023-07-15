@@ -1,7 +1,7 @@
 import discord  # discord.py
 from discord import Intents
-import cogs  # import the cogs
-from config import debug, discord_token
+import src.cogs as cogs
+from src.config import debug, discord_token
 
 # add the message content intent to the bot, aka discord.Intents.default() and discord.Intents.message_content
 intents = discord.Intents.default()

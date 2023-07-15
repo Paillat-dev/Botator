@@ -1,5 +1,5 @@
 import discord
-from config import debug, con_data, curs_data, moderate, ctx_to_guid
+from src.config import debug, con_data, curs_data, moderate, ctx_to_guid
 from discord import default_permissions
 
 models = ["davinci", "gpt-3.5-turbo", "gpt-4"]

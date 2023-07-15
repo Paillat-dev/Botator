@@ -1,7 +1,7 @@
 import discord
 from discord import default_permissions
 import os
-from config import debug, curs_data, con_data
+from src.config import debug, curs_data, con_data
 import openai
 import requests
 
