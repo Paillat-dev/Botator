@@ -1,5 +1,6 @@
 import discord
-from src.config import debug, con_data, curs_data, moderate, ctx_to_guid
+from src.config import debug, con_data, curs_data, ctx_to_guid
+from src.utils.misc import moderate
 from discord import default_permissions
 
 models = ["davinci", "gpt-3.5-turbo", "gpt-4"]
@@ -31,145 +32,42 @@ class Settings(discord.Cog):
         presence_penalty: float = None,
         prompt_size: int = None,
     ):
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
-        if curs_data.fetchone() is None:
-            await ctx.respond("This server is not setup", ephemeral=True)
-            return
-        if (
-            max_tokens is None
-            and temperature is None
-            and frequency_penalty is None
-            and presence_penalty is None
-            and prompt_size is None
-        ):
-            await ctx.respond("You must enter at least one argument", ephemeral=True)
-            return
-        if max_tokens is not None and (max_tokens < 1 or max_tokens > 4000):
-            await ctx.respond("Invalid max tokens", ephemeral=True)
-            return
-        if temperature is not None and (temperature < 0.0 or temperature > 1.0):
-            await ctx.respond("Invalid temperature", ephemeral=True)
-            return
-        if frequency_penalty is not None and (
-            frequency_penalty < 0.0 or frequency_penalty > 2.0
-        ):
-            await ctx.respond("Invalid frequency penalty", ephemeral=True)
-            return
-        if presence_penalty is not None and (
-            presence_penalty < 0.0 or presence_penalty > 2.0
-        ):
-            await ctx.respond("Invalid presence penalty", ephemeral=True)
-            return
-        if prompt_size is not None and (prompt_size < 1 or prompt_size > 10):
-            await ctx.respond("Invalid prompt size", ephemeral=True)
-            return
-        if max_tokens is None:
-            if (
-                curs_data.execute(
-                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-                is not None
-                and max_tokens is None
-            ):
-                max_tokens = curs_data.execute(
-                    "SELECT max_tokens FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-            else:
-                max_tokens = 64
-        if temperature is None:
-            if (
-                curs_data.execute(
-                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-                is not None
-                and temperature is None
-            ):
-                temperature = curs_data.execute(
-                    "SELECT temperature FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-            else:
-                temperature = 0.9
-        if frequency_penalty is None:
-            if (
-                curs_data.execute(
-                    "SELECT frequency_penalty FROM data WHERE guild_id = ?",
-                    (ctx_to_guid(ctx),),
-                ).fetchone()[0]
-                is not None
-                and frequency_penalty is None
-            ):
-                frequency_penalty = curs_data.execute(
-                    "SELECT frequency_penalty FROM data WHERE guild_id = ?",
-                    (ctx_to_guid(ctx),),
-                ).fetchone()[0]
-            else:
-                frequency_penalty = 0.0
-        if presence_penalty is None:
-            if (
-                curs_data.execute(
-                    "SELECT presence_penalty FROM data WHERE guild_id = ?",
-                    (ctx_to_guid(ctx),),
-                ).fetchone()[0]
-                is not None
-                and presence_penalty is None
-            ):
-                presence_penalty = curs_data.execute(
-                    "SELECT presence_penalty FROM data WHERE guild_id = ?",
-                    (ctx_to_guid(ctx),),
-                ).fetchone()[0]
-            else:
-                presence_penalty = 0.0
-        if prompt_size is None:
-            if (
-                curs_data.execute(
-                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-                is not None
-                and prompt_size is None
-            ):
-                prompt_size = curs_data.execute(
-                    "SELECT prompt_size FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
-                ).fetchone()[0]
-            else:
-                prompt_size = 1
-        # update the database
-        curs_data.execute(
-            "UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?",
-            (
-                max_tokens,
-                temperature,
-                frequency_penalty,
-                presence_penalty,
-                prompt_size,
-                ctx_to_guid(ctx),
-            ),
-        )
-        con_data.commit()
-        await ctx.respond("Advanced settings updated", ephemeral=True)
-        # create a command called "delete" that only admins can use wich deletes the guild id, the api key, the channel id and the advanced settings from the database
+        await ctx.respond("This command has been deprecated since the new model does not need theese settungs to work well", ephemeral=True)
 
     @discord.slash_command(name="default", description="Default settings")
     @default_permissions(administrator=True)
     async def default(self, ctx: discord.ApplicationContext):
+        await ctx.respond("This command has been deprecated since the new model does not need theese settungs to work well", ephemeral=True)
+
+    @discord.slash_command(name="prompt_size", description="Set the prompt size")
+    @default_permissions(administrator=True)
+    @discord.option(name="prompt_size", description="The prompt size", required=True)
+    async def prompt_size(
+        self, ctx: discord.ApplicationContext, prompt_size: int = None
+    ):
+        #only command that is not deprecated
         # check if the guild is in the database
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
-        if curs_data.fetchone() is None:
-            await ctx.respond(
-                "This server is not setup, please run /setup", ephemeral=True
-            )
+        try:
+            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            data = curs_data.fetchone()
+        except:
+            data = None
+        if data[2] is None:
+            await ctx.respond("This server is not setup", ephemeral=True)
             return
-        # set the advanced settings (max_tokens, temperature, frequency_penalty, presence_penalty, prompt_size) and also prompt_prefix to their default values
+        # check if the prompt size is valid
+        if prompt_size is None:
+            await ctx.respond("You must specify a prompt size", ephemeral=True)
+            return
+        if prompt_size < 1 or prompt_size > 15:
+            await ctx.respond("The prompt size must be between 1 and 15", ephemeral=True)
+            return
+        # update the prompt size
         curs_data.execute(
-            "UPDATE data SET max_tokens = ?, temperature = ?, frequency_penalty = ?, presence_penalty = ?, prompt_size = ? WHERE guild_id = ?",
-            (64, 0.9, 0.0, 0.0, 5, ctx_to_guid(ctx)),
+            "UPDATE data SET prompt_size = ? WHERE guild_id = ?", (prompt_size, ctx_to_guid(ctx))
         )
         con_data.commit()
-        await ctx.respond(
-            "The advanced settings have been set to their default values",
-            ephemeral=True,
-        )
-
-    # create a command called "cancel" that deletes the last message sent by the bot in the response channel
+        await ctx.respond(f"Prompt size set to {prompt_size}", ephemeral=True)
 
     # when a message is sent into a channel check if the guild is in the database and if the bot is enabled
     @discord.slash_command(
@@ -200,14 +98,8 @@ class Settings(discord.Cog):
         embed.add_field(name="guild_id", value=data[0], inline=False)
         embed.add_field(name="API Key", value="secret", inline=False)
         embed.add_field(name="Main channel ID", value=data[1], inline=False)
-        embed.add_field(name="Model", value=model, inline=False)
         embed.add_field(name="Is Active", value=data[3], inline=False)
-        embed.add_field(name="Max Tokens", value=data[4], inline=False)
-        embed.add_field(name="Temperature", value=data[5], inline=False)
-        embed.add_field(name="Frequency Penalty", value=data[6], inline=False)
-        embed.add_field(name="Presence Penalty", value=data[7], inline=False)
         embed.add_field(name="Prompt Size", value=data[9], inline=False)
-        embed.add_field(name="Uses Count Today", value=data[8], inline=False)
         if data[10]:
             embed.add_field(name="Prompt prefix", value=data[10], inline=False)
         await ctx.respond(embed=embed, ephemeral=True)
@@ -337,20 +229,7 @@ class Settings(discord.Cog):
     )
     @default_permissions(administrator=True)
     async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
-        try:
-            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx_to_guid(ctx),))
-            data = curs_data.fetchone()[1]
-        except:
-            data = None
-        if data is None:
-            curs_data.execute("INSERT INTO model VALUES (?, ?)", (ctx_to_guid(ctx), model))
-        else:
-            curs_data.execute(
-                "UPDATE model SET model_name = ? WHERE guild_id = ?",
-                (model, ctx_to_guid(ctx)),
-            )
-        con_data.commit()
-        await ctx.respond("Model changed !", ephemeral=True)
+        await ctx.respond("This command has been deprecated. Model gpt-3.5-turbo is always used by default", ephemeral=True)
 
     async def images_recognition_autocomplete(ctx: discord.AutocompleteContext):
         return [state for state in images_recognition if state.startswith(ctx.value)]

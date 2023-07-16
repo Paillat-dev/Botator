@@ -1,10 +1,11 @@
 import asyncio
 import os
-from src.config import  curs_data, max_uses, curs_premium, moderate
+from src.config import  curs_data, max_uses, curs_premium
 import re
 import discord
 import datetime
 import json
+from src.utils.misc import moderate
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import add_reaction_to_last_message, reply_to_last_message, send_a_stock_image, create_a_thread, functions, server_normal_channel_functions
 async def replace_mentions(content, bot):
@@ -16,14 +17,22 @@ async def replace_mentions(content, bot):
     return content
 
 async def chatgpt_process(self, messages, message: discord.Message, api_key, prompt, model):
+        async def error_call(error=""):
+            try:
+                if error != "":
+                    await message.channel.send(f"An error occured: {error}", delete_after=10)
+                await message.channel.trigger_typing()
+            except:
+                pass
+        
         msgs = [] # create the msgs list
         msgs.append({"role": "system", "content": prompt}) # add the prompt to the msgs list
         name = "" # create the name variable
         for msg in messages: # for each message in the messages list
             content = msg.content # get the content of the message
             content = await replace_mentions(content, self.bot) # replace the mentions in the message
-            # if the message is flagged as inappropriate by the OpenAI API, we delete it, send a message and ignore it
-            if await moderate(api_key=api_key, text=content): 
+            # if the message is flagged as inappropriate by the OpenAI API, we delete it, send a message and ignore it 
+            if await moderate(api_key, content, error_call): 
                 embed = discord.Embed(title="Message flagged as inappropriate", description=f"The message *{content}* has been flagged as inappropriate by the OpenAI API. This means that if it hadn't been deleted, your openai account would have been banned. Please contact OpenAI support if you think this is a mistake.", color=discord.Color.brand_red())
                 await message.channel.send(f"{msg.author.mention}", embed=embed, delete_after=10)
                 await message.delete()
@@ -53,23 +62,12 @@ async def chatgpt_process(self, messages, message: discord.Message, api_key, pro
 
         response = str()
         caller = openai_caller(api_key=api_key)
-        async def error_call(error=""):
-            try:
-                if error != "":
-                    await message.channel.send(f"An error occured: {error}", delete_after=10)
-                await message.channel.trigger_typing()
-            except:
-                pass
-        funcs = functions
-        if isinstance(message.channel, discord.TextChannel):
-            for func in server_normal_channel_functions:
-                funcs.append(func)
-
+        called_functions = functions if not isinstance(message.channel, discord.TextChannel) else server_normal_channel_functions + functions
         response = await caller.generate_response(
             error_call,
             model=model,
             messages=msgs,
-            functions=functions,
+            functions=called_functions,
             #function_call="auto",
         )
         response = response["choices"][0]["message"] #type: ignore
@@ -99,7 +97,7 @@ async def chatgpt_process(self, messages, message: discord.Message, api_key, pro
                     if isinstance(message.channel, discord.TextChannel):
                         await create_a_thread(message.channel, name, reply)
                     else:
-                        await message.channel.send("`A server normal text channel only function has been called in a DM channel. Please retry.`", delete_after=10)
+                        await message.channel.send("`A server normal text channel only function has been called in a non standard channel. Please retry`", delete_after=10)
             if name == "":
                 await message.channel.send("The function call is empty. Please retry.", delete_after=10)
         else:
