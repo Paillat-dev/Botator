@@ -126,7 +126,7 @@ class openai_caller:
 ##testing
 if __name__ == "__main__":
     async def main():
-        openai = openai_caller(api_key="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")
+        openai = openai_caller(api_key="sk-")
         response = await openai.generate_response(
             model="gpt-3.5-turbo",
             messages=[{"role":"user", "content":"ping"}],
