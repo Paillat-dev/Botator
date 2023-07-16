@@ -43,15 +43,6 @@ curs_data = con_data.cursor()
 con_premium = sqlite3.connect("./database/premium.db")
 curs_premium = con_premium.cursor()
 
-
-async def moderate(api_key, text):
-    openai.api_key = api_key
-    response = await openai.Moderation.acreate(
-        input=text,
-    )
-    return response["results"][0]["flagged"] # type: ignore
-
-
 curs_data.execute(
     """CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)"""
 )

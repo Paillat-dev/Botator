@@ -72,15 +72,25 @@ class openai_caller:
             kwargs['messages'] = kwargs['messages'][1:]
             print(f"{bcolors.BOLD}{bcolors.WARNING}Warning: Too many tokens. Removing first message.{bcolors.ENDC}")
             tokens = await num_tokens_from_messages(kwargs['messages'], kwargs['model'])
+        kwargs['api_key'] = self.api_key
+        callable = lambda: openai_module.ChatCompletion.acreate(**kwargs)
+        response = await self.retryal_call(recall_func, callable)
+        return response
+
+    async def moderation(self, recall_func=None, **kwargs):
+        if recall_func is None:
+            recall_func = lambda x: 2
+        callable = lambda: openai_module.Moderation.acreate(**kwargs)
+        response = await self.retryal_call(recall_func, callable)
+        return response
+
+    async def retryal_call(self, recall_func, callable):
         i = 0
         response = None
-        kwargs['api_key'] = self.api_key
         while i < 10:
             try:
-                response = await openai_module.ChatCompletion.acreate(
-                    **kwargs
-                    )
-                break
+                response = await callable()
+                return response
             except APIError as e:
                 print(f"\n\n{bcolors.BOLD}{bcolors.WARNING}APIError. This is not your fault. Retrying...{bcolors.ENDC}")
                 await recall_func("`An APIError occurred. This is not your fault. Retrying...`")
@@ -121,7 +131,7 @@ class openai_caller:
                 if i == 10:
                     print(f"\n\n{bcolors.BOLD}{bcolors.FAIL}OpenAI API is not responding. Please try again later.{bcolors.ENDC}")
                     raise TimeoutError("OpenAI API is not responding. Please try again later.")
-        return response # type: ignore
+        return response
     
 ##testing
 if __name__ == "__main__":
