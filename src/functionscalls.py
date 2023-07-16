@@ -73,7 +73,9 @@ server_normal_channel_functions = [
         }
     },
 ]
+
 unsplash_random_image_url = "https://source.unsplash.com/random/1920x1080"
+
 async def add_reaction_to_last_message(message_to_react_to: discord.Message, emoji, message=""):
     if message == "":
         await message_to_react_to.add_reaction(emoji)

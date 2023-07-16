@@ -14,8 +14,6 @@ bot.add_cog(cogs.Chat(bot))
 bot.add_cog(cogs.ManageChat(bot))
 bot.add_cog(cogs.Moderation(bot))
 
-bot.run(discord_token)  # run the bot
-
 
 # set the bot's watching status to watcing your messages to answer you
 @bot.event
@@ -32,3 +30,6 @@ async def on_ready():
 async def on_application_command_error(ctx, error):
     debug(error)
     await ctx.respond(error, ephemeral=True)
+
+
+bot.run(discord_token)  # run the bot
