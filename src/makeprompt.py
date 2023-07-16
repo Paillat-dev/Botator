@@ -1,11 +1,12 @@
 import asyncio
 import os
-from src.config import  curs_data, max_uses, curs_premium, functions, moderate
+from src.config import  curs_data, max_uses, curs_premium, moderate
 import re
 import discord
 import datetime
+import json
 from src.utils.openaicaller import openai_caller
-from src.functionscalls import add_reaction_to_last_message, reply_to_last_message, send_a_stock_image
+from src.functionscalls import add_reaction_to_last_message, reply_to_last_message, send_a_stock_image, create_a_thread, functions, server_normal_channel_functions
 async def replace_mentions(content, bot):
     mentions = re.findall(r"<@!?\d+>", content)
     for mention in mentions:
@@ -52,36 +53,57 @@ async def chatgpt_process(self, messages, message: discord.Message, api_key, pro
 
         response = str()
         caller = openai_caller(api_key=api_key)
+        async def error_call(error=""):
+            try:
+                if error != "":
+                    await message.channel.send(f"An error occured: {error}", delete_after=10)
+                await message.channel.trigger_typing()
+            except:
+                pass
+        funcs = functions
+        if isinstance(message.channel, discord.TextChannel):
+            for func in server_normal_channel_functions:
+                funcs.append(func)
 
         response = await caller.generate_response(
+            error_call,
             model=model,
             messages=msgs,
             functions=functions,
-            function_call="auto",
+            #function_call="auto",
         )
         response = response["choices"][0]["message"] #type: ignore
         if response.get("function_call"):
-            function_calls = response.get("function_call")
-            if function_calls.get("add_reaction_to_last_message"):
-                func = function_calls.get("add_reaction_to_last_message")
-                if func.get("emoji"):
-                    emoji = func.get("emoji")
-                    reply = func.get("message", "")
+            function_call = response.get("function_call")
+            name = function_call.get("name", "")
+            arguments = function_call.get("arguments", {})
+            arguments = json.loads(arguments)
+            if name == "add_reaction_to_last_message":
+                if arguments.get("emoji"):
+                    emoji = arguments.get("emoji")
+                    reply = arguments.get("message", "")
                     await add_reaction_to_last_message(message, emoji, reply)
-            if function_calls.get("reply_to_last_message"):
-                func = function_calls.get("reply_to_last_message")
-                if func.get("message"):
-                    reply = func.get("message")
+            if name == "reply_to_last_message":
+                if arguments.get("message"):
+                    reply = arguments.get("message")
                     await reply_to_last_message(message, reply)
-            if function_calls.get("send_a_stock_image"):
-                func = function_calls.get("send_a_stock_image")
-                if func.get("query"):
-                    query = func.get("query")
-                    reply = func.get("message", "")
+            if name == "send_a_stock_image":
+                if arguments.get("query"):
+                    query = arguments.get("query")
+                    reply = arguments.get("message", "")
                     await send_a_stock_image(message, query, reply)
+            if name == "create_a_thread":
+                if arguments.get("name") and arguments.get("message"):
+                    name = arguments.get("name")
+                    reply = arguments.get("message", "")
+                    if isinstance(message.channel, discord.TextChannel):
+                        await create_a_thread(message.channel, name, reply)
+                    else:
+                        await message.channel.send("`A server normal text channel only function has been called in a DM channel. Please retry.`", delete_after=10)
+            if name == "":
+                await message.channel.send("The function call is empty. Please retry.", delete_after=10)
         else:
             await message.channel.send(response["content"]) #type: ignore
-            print(response["content"]) #type: ignore
 async def chat_process(self, message):
     
     #if the message is from a bot, we ignore it
@@ -136,8 +158,11 @@ async def chat_process(self, message):
 
     if original_message != None and original_message.author.id != self.bot.user.id:
         original_message = None
-    
-    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id):
+    is_bots_thread = False
+    if isinstance(message.channel, discord.Thread):
+        if message.channel.owner_id == self.bot.user.id:
+            is_bots_thread = True
+    if not str(message.channel.id) in channels and message.content.find("<@"+str(self.bot.user.id)+">") == -1 and original_message == None and str(message.channel.id) != str(channel_id) and not is_bots_thread:
         return
 
     # if the bot is not active in this guild we return
