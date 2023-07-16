@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-from config import (
+from src.config import (
     debug,
     webhook_url,
 )
-import makeprompt as mp
+import src.makeprompt as mp
 import aiohttp
 
 

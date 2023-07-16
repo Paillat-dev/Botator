@@ -1,7 +1,7 @@
 import discord
 from discord import default_permissions, guild_only
 from discord.ext import commands
-from config import debug, con_data, curs_data, con_premium, curs_premium, ctx_to_guid
+from src.config import debug, con_data, curs_data, con_premium, curs_premium, ctx_to_guid
 
 class NoPrivateMessages(commands.CheckFailure):
     pass

@@ -1,0 +1,53 @@
+[
+    {
+        "name": "add_reaction_to_last_message",
+        "description": "React to the last message sent by the user with an emoji.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "emoji": {
+                    "type": "string",
+                    "description": "an emoji to react with, only one emoji is supported"
+
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Your message"
+                }
+            },
+            "required": ["emoji"]
+        }
+    },
+    {
+        "name": "reply_to_last_message",
+        "description": "Reply to the last message sent by the user.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "description": "Your message"
+                }
+            },
+            "required": ["message"]
+        }
+    },
+    {
+        "name": "send_a_stock_image",
+        "description": "Send a stock image in the channel.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "The query to search for, words separated by spaces"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Your message to send with the image"
+                }
+            },
+            "required": ["query"]
+        }
+    }
+]

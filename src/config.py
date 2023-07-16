@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+import json
 from dotenv import load_dotenv
 import os
 import openai
@@ -15,6 +16,8 @@ os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"
 ] = "./../database/google-vision/botator.json"
 
+with open(os.path.abspath(os.path.join("src", "prompts", "functions.json"))) as f:
+    functions = json.load(f)
 
 def debug(message):
     # if the os is windows, we logging.info(message), if
@@ -35,9 +38,9 @@ def mg_to_guid(mg):
     else:
         return mg.guild.id
 
-con_data = sqlite3.connect("../database/data.db")
+con_data = sqlite3.connect("./database/data.db")
 curs_data = con_data.cursor()
-con_premium = sqlite3.connect("../database/premium.db")
+con_premium = sqlite3.connect("./database/premium.db")
 curs_premium = con_premium.cursor()
 
 
@@ -46,7 +49,7 @@ async def moderate(api_key, text):
     response = await openai.Moderation.acreate(
         input=text,
     )
-    return response["results"][0]["flagged"]
+    return response["results"][0]["flagged"] # type: ignore
 
 
 curs_data.execute(
