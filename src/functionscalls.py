@@ -1,4 +1,6 @@
 import discord
+import aiohttp
+
 functions = [
     {
         "name": "add_reaction_to_last_message",
@@ -74,7 +76,13 @@ server_normal_channel_functions = [
     },
 ]
 
-unsplash_random_image_url = "https://source.unsplash.com/random/1920x1080"
+unsplash_random_image_url = "https://source.unsplash.com/random"
+
+async def get_final_url(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.head(url, allow_redirects=True) as response:
+            final_url = str(response.url)
+            return final_url
 
 async def add_reaction_to_last_message(message_to_react_to: discord.Message, emoji, message=""):
     if message == "":
@@ -88,11 +96,10 @@ async def reply_to_last_message(message_to_reply_to: discord.Message, message):
 
 async def send_a_stock_image(message_in_channel_in_wich_to_send: discord.Message, query: str, message:str = ""):
     query = query.replace(" ", "+")
-    if message == "":
-        await message_in_channel_in_wich_to_send.channel.send(f"https://source.unsplash.com/random/1920x1080?{query}")
-    else:
-        await message_in_channel_in_wich_to_send.channel.send(message)
-        await message_in_channel_in_wich_to_send.channel.send(f"https://source.unsplash.com/random/1920x1080?{query}")
+    image_url = f"{unsplash_random_image_url}?{query}"
+    final_url = await get_final_url(image_url)
+    message = message + "\n" + final_url
+    await message_in_channel_in_wich_to_send.channel.send(message)
 
 async def create_a_thread(channel_in_which_to_create_the_thread: discord.TextChannel, name: str, message: str):
     msg = await channel_in_which_to_create_the_thread.send(message)
