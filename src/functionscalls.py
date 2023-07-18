@@ -1,5 +1,10 @@
 import discord
 import aiohttp
+import random
+
+from src.config import tenor_api_key
+
+tenor_api_url = f"https://tenor.googleapis.com/v2/search?key={tenor_api_key}&q="
 
 functions = [
     {
@@ -46,6 +51,28 @@ functions = [
             "required": ["query"],
         },
     },
+    {
+        "name": "send_a_gif",
+        "description": "Send a gif in the channel.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "The query to search for, words separated by spaces",
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Your message to send with the gif",
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "The number of gifs to search for, a random one will be chosen. If the gif is a really specific one, you might want to have a lower limit, to avoid sending a gif that doesn't match your query.",
+                },
+            },
+            "required": ["query"],
+        },
+    },
 ]
 
 server_normal_channel_functions = [
@@ -75,6 +102,11 @@ async def get_final_url(url):
             final_url = str(response.url)
             return final_url
 
+async def do_async_request(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            response = await response.json()
+            return response
 
 async def add_reaction_to_last_message(
     message_to_react_to: discord.Message, emoji, message=""
@@ -105,3 +137,14 @@ async def create_a_thread(
 ):
     msg = await channel_in_which_to_create_the_thread.send(message)
     await msg.create_thread(name=name)
+
+async def send_a_gif(message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = "", limit: int = 15):
+    query = query.replace(" ", "+")
+    image_url = f"{tenor_api_url}{query}&limit={limit}"
+    print(image_url)
+    response = await do_async_request(image_url)
+    json = response
+    print(json)
+    gif_url = random.choice(json["results"])["itemurl"]
+    message = message + "\n" + gif_url
+    await message_in_channel_in_wich_to_send.channel.send(message)

@@ -3,25 +3,27 @@ import sqlite3
 import json
 from dotenv import load_dotenv
 import os
-import openai
 
+# Loading environement variables
 load_dotenv()
+
 perspective_api_key = os.getenv("PERSPECTIVE_API_KEY")
 discord_token = os.getenv("DISCORD_TOKEN")
 webhook_url = os.getenv("WEBHOOK_URL")
 max_uses: int = 400
+tenor_api_key = os.getenv("TENOR_API_KEY")
+
+# Logging
 logging.basicConfig(level=logging.INFO)
 
+# Setting up the google vision api
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"
 ] = "./../database/google-vision/botator.json"
 
-with open(os.path.abspath(os.path.join("src", "prompts", "functions.json"))) as f:
-    functions = json.load(f)
-
+# Defining a debug function
 
 def debug(message):
-    # if the os is windows, we logging.info(message), if
     if os.name == "nt":
         logging.info(message)
     else:

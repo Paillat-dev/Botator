@@ -12,6 +12,7 @@ from src.functionscalls import (
     reply_to_last_message,
     send_a_stock_image,
     create_a_thread,
+    send_a_gif,
     functions,
     server_normal_channel_functions,
 )
@@ -144,6 +145,12 @@ async def chatgpt_process(
                         "`A server normal text channel only function has been called in a non standard channel. Please retry`",
                         delete_after=10,
                     )
+        if name == "send_a_gif":
+            if arguments.get("query"):
+                query = arguments.get("query")
+                reply = arguments.get("message", "")
+                limit = arguments.get("limit", 15)
+                await send_a_gif(message, query, reply, limit)
         if name == "":
             await message.channel.send(
                 "The function call is empty. Please retry.", delete_after=10
