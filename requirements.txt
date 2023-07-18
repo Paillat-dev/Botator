@@ -6,3 +6,4 @@ emoji
 google-api-python-client
 google-cloud-vision
 tiktoken
+bs4

@@ -13,6 +13,8 @@ from src.functionscalls import (
     send_a_stock_image,
     create_a_thread,
     send_a_gif,
+    send_ascii_art_text,
+    send_ascii_art_image,
     functions,
     server_normal_channel_functions,
 )
@@ -151,6 +153,17 @@ async def chatgpt_process(
                 reply = arguments.get("message", "")
                 limit = arguments.get("limit", 15)
                 await send_a_gif(message, query, reply, limit)
+        if name == "send_ascii_art_text":
+            if arguments.get("text"):
+                text = arguments.get("text")
+                font = arguments.get("font", "standard")
+                reply = arguments.get("message", "")
+                await send_ascii_art_text(message, text, font, reply)
+        if name == "send_ascii_art_image":
+            if arguments.get("query"):
+                query = arguments.get("query")
+                reply = arguments.get("message", "")
+                await send_ascii_art_image(message, query, reply)
         if name == "":
             await message.channel.send(
                 "The function call is empty. Please retry.", delete_after=10
