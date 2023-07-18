@@ -25,6 +25,10 @@ Please note that we can possibly log the messages that are sent for **no more th
 You can now enable your bot by doing **/enable**.
 
 You can always disable the bot by doing **/disable** and delete your api key from our server by doing **/delete**.
+# Docker
+You can run this bot with docker. First clone this repository. Now add your secret avlues, like the discord token in a file called .env. Finally, run the following: 
+
+`docker compose up -d`
 
 # Commands reference
 
@@ -88,24 +92,13 @@ After that you will normally be able to access some new channels in our discord 
 # ToDo
 - [x] add image recognition
 - [x] When chatgpt API is released, add that api instead of davinci-003
-- [ ] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
+- [x] Publish a GOOD docker image on dockerhub and add some more instructions about how to selfhost
 - [x] Add a log and updates channel option and a way for devs to send messages to that channel on all servers.
 - [x] Add moderation.
 - [x] Add TOKENS warnings (when setting the bot up, people dosen't understand tha ot uses their tokens)
-- [ ] Add a /continue command - you know
+- [x] Add a /continue command - you know
 - [x] Add DateHour in prompts
 - [x] Add /redo
 - [x] Add uses count reset after 24h
 - [x] Organize code in COGs
-- [x] add way to consider the answers to the bot's messages.
-<!-- 
-
-# Docker
-You can run this bot with docker. First clone this repository. Now replace the text into the key.txt file that you will find i#nto the ./Botator/docker/Build directory with your **DISCORD** API key. After that,run the following command in the /Botator/docker/Build directory.
-
-`docker build . -t botator:latest --no-cache`
-
-Now create a directory called `botator` where you want the database files to be stored, and run the following command into that directory to run the container.
-
-`docker run -d --name botatordef -v `**`your botator folder directory`**`:/Botator/database botator:latest`
- -->
+- [x] add way to consider the answers to the bot's messages. 
