@@ -4,6 +4,7 @@ import random
 import time
 from bs4 import BeautifulSoup
 from src.config import tenor_api_key
+
 randomseed = time.time()
 random.seed(randomseed)
 tenor_api_url = f"https://tenor.googleapis.com/v2/search?key={tenor_api_key}&q="
@@ -92,7 +93,7 @@ functions = [
                 "message": {
                     "type": "string",
                     "description": "Your message to send with the ascii art. It will not be converted to ascii art, just sent as a normal message.",
-                }
+                },
             },
             "required": ["text"],
         },
@@ -110,7 +111,7 @@ functions = [
                 "message": {
                     "type": "string",
                     "description": "Your message to send with the image",
-                }
+                },
             },
             "required": ["query"],
         },
@@ -138,7 +139,9 @@ server_normal_channel_functions = [
 font_matches = {
     "standard": "ANSI Regular",
     "shadow": "ANSI Shadow",
-    "money": random.choice(["Big Money-ne", "Big Money-nw", "Big Money-se", "Big Money-sw"]),
+    "money": random.choice(
+        ["Big Money-ne", "Big Money-nw", "Big Money-se", "Big Money-sw"]
+    ),
     "bloody": "Bloody",
     "dos-rebel": "DOS Rebel",
 }
@@ -152,15 +155,16 @@ async def get_final_url(url):
             final_url = str(response.url)
             return final_url
 
+
 async def do_async_request(url, json=True):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            
             if json:
                 response = await response.json()
             else:
                 response = await response.text()
             return response
+
 
 async def add_reaction_to_last_message(
     message_to_react_to: discord.Message, emoji, message=""
@@ -192,18 +196,30 @@ async def create_a_thread(
     msg = await channel_in_which_to_create_the_thread.send(message)
     await msg.create_thread(name=name)
 
-async def send_a_gif(message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = "", limit: int = 15):
+
+async def send_a_gif(
+    message_in_channel_in_wich_to_send: discord.Message,
+    query: str,
+    message: str = "",
+    limit: int = 15,
+):
     query = query.replace(" ", "+")
     image_url = f"{tenor_api_url}{query}&limit={limit}"
     print(image_url)
     response = await do_async_request(image_url)
     json = response
     print(json)
-    gif_url = random.choice(json["results"])["itemurl"] # type: ignore
+    gif_url = random.choice(json["results"])["itemurl"]  # type: ignore
     message = message + "\n" + gif_url
     await message_in_channel_in_wich_to_send.channel.send(message)
 
-async def send_ascii_art_text(message_in_channel_in_wich_to_send: discord.Message, text: str, font: str = "standard", message: str = ""):
+
+async def send_ascii_art_text(
+    message_in_channel_in_wich_to_send: discord.Message,
+    text: str,
+    font: str = "standard",
+    message: str = "",
+):
     font = font_matches[font]
     text = text.replace(" ", "+")
     asciiiar_url = f"https://asciified.thelicato.io/api?text={text}&font={font}"
@@ -211,13 +227,18 @@ async def send_ascii_art_text(message_in_channel_in_wich_to_send: discord.Messag
     message = f"```\n{response}```\n{message}"
     await message_in_channel_in_wich_to_send.channel.send(message)
 
-async def send_ascii_art_image(message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""):
+
+async def send_ascii_art_image(
+    message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""
+):
     query = query.replace(" ", "-")
     asciiiar_url = f"https://emojicombos.com/{query}"
     response = await do_async_request(asciiiar_url, json=False)
     soup = BeautifulSoup(response, "html.parser")
-    combos = soup.find_all("div", class_=lambda x: x and "combo-ctn" in x and "hidden" not in x)[:5] # type: ignore
-    combos = [combo["data-combo"] for combo in combos if len(combo["data-combo"]) <= 2000]
+    combos = soup.find_all("div", class_=lambda x: x and "combo-ctn" in x and "hidden" not in x)[:5]  # type: ignore
+    combos = [
+        combo["data-combo"] for combo in combos if len(combo["data-combo"]) <= 2000
+    ]
     combo = random.choice(combos)
     message = f"```\n{combo}```\n{message}"
     await message_in_channel_in_wich_to_send.channel.send(message)

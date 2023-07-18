@@ -23,6 +23,7 @@ os.environ[
 
 # Defining a debug function
 
+
 def debug(message):
     if os.name == "nt":
         logging.info(message)
