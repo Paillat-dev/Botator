@@ -1,17 +1,28 @@
 import discord
 from discord import default_permissions, guild_only
 from discord.ext import commands
-from src.config import debug, con_data, curs_data, con_premium, curs_premium, ctx_to_guid
+from src.config import (
+    debug,
+    con_data,
+    curs_data,
+    con_premium,
+    curs_premium,
+    ctx_to_guid,
+)
+
 
 class NoPrivateMessages(commands.CheckFailure):
     pass
 
+
 def dms_only():
     async def predicate(ctx):
         if ctx.guild is not None:
-            raise NoPrivateMessages('Hey no private messages!')
+            raise NoPrivateMessages("Hey no private messages!")
         return True
+
     return commands.check(predicate)
+
 
 class Setup(discord.Cog):
     def __init__(self, bot: discord.Bot):
@@ -74,6 +85,7 @@ class Setup(discord.Cog):
             await ctx.respond(
                 "The channel id and the api key have been added", ephemeral=True
             )
+
     @discord.slash_command(name="setup_dms", description="Setup the bot in dms")
     @discord.option(name="api_key", description="The api key", required=True)
     @default_permissions(administrator=True)
@@ -125,9 +137,7 @@ class Setup(discord.Cog):
                 ),
             )
             con_data.commit()
-            await ctx.respond(
-                "The api key has been added", ephemeral=True
-            )
+            await ctx.respond("The api key has been added", ephemeral=True)
 
     @discord.slash_command(
         name="delete", description="Delete the information about this server"
@@ -173,7 +183,8 @@ class Setup(discord.Cog):
             return
         # disable the guild
         curs_data.execute(
-            "UPDATE data SET is_active = ? WHERE guild_id = ?", (False, ctx_to_guid(ctx))
+            "UPDATE data SET is_active = ? WHERE guild_id = ?",
+            (False, ctx_to_guid(ctx)),
         )
         con_data.commit()
         await ctx.respond("Disabled", ephemeral=True)

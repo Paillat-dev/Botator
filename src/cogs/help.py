@@ -1,5 +1,6 @@
 import discord
 
+
 class Help(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         super().__init__()

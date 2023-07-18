@@ -19,6 +19,7 @@ os.environ[
 with open(os.path.abspath(os.path.join("src", "prompts", "functions.json"))) as f:
     functions = json.load(f)
 
+
 def debug(message):
     # if the os is windows, we logging.info(message), if
     if os.name == "nt":
@@ -26,17 +27,20 @@ def debug(message):
     else:
         print(message)
 
+
 def ctx_to_guid(ctx):
     if ctx.guild is None:
         return ctx.author.id
     else:
         return ctx.guild.id
 
+
 def mg_to_guid(mg):
     if mg.guild is None:
         return mg.author.id
     else:
         return mg.guild.id
+
 
 con_data = sqlite3.connect("./database/data.db")
 curs_data = con_data.cursor()

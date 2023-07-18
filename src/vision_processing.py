@@ -13,7 +13,6 @@ except:
     print("Google Vision API is not setup, please run /setup")
 
 
-
 async def process(attachment):
     try:
         debug("Processing image...")

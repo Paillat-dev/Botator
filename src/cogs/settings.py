@@ -32,12 +32,18 @@ class Settings(discord.Cog):
         presence_penalty: float = None,
         prompt_size: int = None,
     ):
-        await ctx.respond("This command has been deprecated since the new model does not need theese settungs to work well", ephemeral=True)
+        await ctx.respond(
+            "This command has been deprecated since the new model does not need theese settungs to work well",
+            ephemeral=True,
+        )
 
     @discord.slash_command(name="default", description="Default settings")
     @default_permissions(administrator=True)
     async def default(self, ctx: discord.ApplicationContext):
-        await ctx.respond("This command has been deprecated since the new model does not need theese settungs to work well", ephemeral=True)
+        await ctx.respond(
+            "This command has been deprecated since the new model does not need theese settungs to work well",
+            ephemeral=True,
+        )
 
     @discord.slash_command(name="prompt_size", description="Set the prompt size")
     @default_permissions(administrator=True)
@@ -45,10 +51,12 @@ class Settings(discord.Cog):
     async def prompt_size(
         self, ctx: discord.ApplicationContext, prompt_size: int = None
     ):
-        #only command that is not deprecated
+        # only command that is not deprecated
         # check if the guild is in the database
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
+            )
             data = curs_data.fetchone()
         except:
             data = None
@@ -60,11 +68,14 @@ class Settings(discord.Cog):
             await ctx.respond("You must specify a prompt size", ephemeral=True)
             return
         if prompt_size < 1 or prompt_size > 15:
-            await ctx.respond("The prompt size must be between 1 and 15", ephemeral=True)
+            await ctx.respond(
+                "The prompt size must be between 1 and 15", ephemeral=True
+            )
             return
         # update the prompt size
         curs_data.execute(
-            "UPDATE data SET prompt_size = ? WHERE guild_id = ?", (prompt_size, ctx_to_guid(ctx))
+            "UPDATE data SET prompt_size = ? WHERE guild_id = ?",
+            (prompt_size, ctx_to_guid(ctx)),
         )
         con_data.commit()
         await ctx.respond(f"Prompt size set to {prompt_size}", ephemeral=True)
@@ -78,7 +89,9 @@ class Settings(discord.Cog):
         # this command sends all the data about the guild, including the api key, the channel id, the advanced settings and the uses_count_today
         # check if the guild is in the database
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
+            )
             data = curs_data.fetchone()
         except:
             data = None
@@ -86,7 +99,9 @@ class Settings(discord.Cog):
             await ctx.respond("This server is not setup", ephemeral=True)
             return
         try:
-            curs_data.execute("SELECT * FROM model WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            curs_data.execute(
+                "SELECT * FROM model WHERE guild_id = ?", (ctx_to_guid(ctx),)
+            )
             model = curs_data.fetchone()[1]
         except:
             model = None
@@ -108,7 +123,9 @@ class Settings(discord.Cog):
     @default_permissions(administrator=True)
     async def prefix(self, ctx: discord.ApplicationContext, prefix: str = ""):
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
+            )
             data = curs_data.fetchone()
             api_key = data[2]
         except:
@@ -145,7 +162,9 @@ class Settings(discord.Cog):
     async def pretend(self, ctx: discord.ApplicationContext, pretend_to_be: str = ""):
         # check if the guild is in the database
         try:
-            curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),))
+            curs_data.execute(
+                "SELECT * FROM data WHERE guild_id = ?", (ctx_to_guid(ctx),)
+            )
             data = curs_data.fetchone()
             api_key = data[2]
         except:
@@ -229,7 +248,10 @@ class Settings(discord.Cog):
     )
     @default_permissions(administrator=True)
     async def model(self, ctx: discord.ApplicationContext, model: str = "davinci"):
-        await ctx.respond("This command has been deprecated. Model gpt-3.5-turbo is always used by default", ephemeral=True)
+        await ctx.respond(
+            "This command has been deprecated. Model gpt-3.5-turbo is always used by default",
+            ephemeral=True,
+        )
 
     async def images_recognition_autocomplete(ctx: discord.AutocompleteContext):
         return [state for state in images_recognition if state.startswith(ctx.value)]
@@ -257,7 +279,8 @@ class Settings(discord.Cog):
             enable_disable = 0
         if data is None:
             curs_data.execute(
-                "INSERT INTO images VALUES (?, ?, ?)", (ctx_to_guid(ctx), 0, enable_disable)
+                "INSERT INTO images VALUES (?, ?, ?)",
+                (ctx_to_guid(ctx), 0, enable_disable),
             )
         else:
             curs_data.execute(
