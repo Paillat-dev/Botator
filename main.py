@@ -20,10 +20,19 @@ bot.add_cog(cogs.Moderation(bot))
 async def on_ready():
     await bot.change_presence(
         activity=discord.Activity(
-            type=discord.ActivityType.watching, name="your messages to answer you"
+            type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"
         )
     )
     debug("Bot is ready")
+
+
+@bot.event
+async def on_guild_join(guild):
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"
+        )
+    )
 
 
 @bot.event
