@@ -89,6 +89,7 @@ class openai_caller:
 
             async def nothing(x):
                 return x
+
             error_call = nothing
         if kwargs.get("model", "") in chat_models:
             return await self.chat_generate(error_call, **kwargs)
