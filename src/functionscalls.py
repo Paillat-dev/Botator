@@ -205,10 +205,8 @@ async def send_a_gif(
 ):
     query = query.replace(" ", "+")
     image_url = f"{tenor_api_url}{query}&limit={limit}"
-    print(image_url)
     response = await do_async_request(image_url)
     json = response
-    print(json)
     gif_url = random.choice(json["results"])["itemurl"]  # type: ignore
     message = message + "\n" + gif_url
     await message_in_channel_in_wich_to_send.channel.send(message)

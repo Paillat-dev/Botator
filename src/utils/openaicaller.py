@@ -123,7 +123,7 @@ class openai_caller:
                     f"\n\n{bcolors.BOLD}{bcolors.WARNING}APIError. This is not your fault. Retrying...{bcolors.ENDC}"
                 )
                 await recall_func(
-                    "`An APIError occurred. This is not your fault. Retrying...`"
+                    "`An APIError occurred. This is not your fault, it is OpenAI's fault. We apologize for the inconvenience. Retrying...`"
                 )
                 await asyncio.sleep(10)
                 await recall_func()
