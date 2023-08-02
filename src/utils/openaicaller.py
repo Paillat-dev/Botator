@@ -32,7 +32,7 @@ from openai.error import (
     AuthenticationError,
     ServiceUnavailableError,
 )
-from utils.tokens import num_tokens_from_messages
+from src.utils.tokens import num_tokens_from_messages
 
 
 class bcolors:
