@@ -111,6 +111,7 @@ async def chatgpt_process(
     )
     response = await caller.generate_response(
         error_call,
+        api_key=api_key,
         model=model,
         messages=msgs,
         functions=called_functions,
