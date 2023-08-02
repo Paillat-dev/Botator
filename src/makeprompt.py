@@ -103,7 +103,7 @@ async def chatgpt_process(
         await message.channel.trigger_typing()
 
     response = str()
-    caller = openai_caller(api_key=api_key)
+    caller = openai_caller()
     called_functions = (
         functions
         if not isinstance(message.channel, discord.TextChannel)
