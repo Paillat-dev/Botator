@@ -178,7 +178,6 @@ async def chatgpt_process(
             else:
                 await message.channel.send(content)
                 content = ""
-        await message.channel.send(response["content"])  # type: ignore
 
 
 async def chat_process(self, message):
