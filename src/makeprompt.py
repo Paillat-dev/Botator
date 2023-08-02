@@ -169,6 +169,14 @@ async def chatgpt_process(
                 "The function call is empty. Please retry.", delete_after=10
             )
     else:
+        content = response.get("content", "")
+        while len(content) != 0:
+            if len(content) > 2000:
+                await message.channel.send(content[:2000])
+                content = content[2000:]
+            else:
+                await message.channel.send(content)
+                content = ""
         await message.channel.send(response["content"])  # type: ignore
 
 
