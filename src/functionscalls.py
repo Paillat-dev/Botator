@@ -235,15 +235,15 @@ async def send_ascii_art_text(
         elif len(ascii_art) < 8000:
             embed = discord.Embed(
                 title="Ascii art",
-                description=ascii_art,)
+                description=ascii_art,
+            )
             await message_in_channel_in_wich_to_send.channel.send(embed=embed)
         else:
             await message_in_channel_in_wich_to_send.channel.send(
                 "Sorry, the ascii art is too big to be sent"
             )
         if len(message) < 2000:
-            await message_in_channel_in_wich_to_send.channel.send(message
-            )
+            await message_in_channel_in_wich_to_send.channel.send(message)
         else:
             while len(message) > 0:
                 await message_in_channel_in_wich_to_send.channel.send(message[:2000])
