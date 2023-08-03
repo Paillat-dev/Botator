@@ -221,7 +221,9 @@ async def send_ascii_art_text(
 ):
     font = font_matches[font]
     text = text.replace(" ", "+")
-    asciiiar_url = f"https://asciified.thelicato.io/api/v2/ascii?text={text}&font={font}"
+    asciiiar_url = (
+        f"https://asciified.thelicato.io/api/v2/ascii?text={text}&font={font}"
+    )
     print(asciiiar_url)
     ascii_art = await do_async_request(asciiiar_url, json=False)
     final_message = f"```\n{ascii_art}```\n{message}"
@@ -240,12 +242,13 @@ async def send_ascii_art_text(
             await message_in_channel_in_wich_to_send.channel.send(
                 "Sorry, the ascii art is too big to be sent"
             )
-        if len (message) < 2000:
+        if len(message) < 2000:
             await message_in_channel_in_wich_to_send.channel.send(message)
         else:
             while len(message) > 0:
                 await message_in_channel_in_wich_to_send.channel.send(message[:2000])
                 message = message[2000:]
+
 
 async def send_ascii_art_image(
     message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""
