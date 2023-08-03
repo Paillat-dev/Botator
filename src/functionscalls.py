@@ -4,7 +4,7 @@ import aiohttp
 import random
 import time
 from bs4 import BeautifulSoup
-from config import tenor_api_key
+from src.config import tenor_api_key
 
 randomseed = time.time()
 random.seed(randomseed)
