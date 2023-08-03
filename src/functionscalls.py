@@ -1,9 +1,10 @@
 import discord
+import asyncio
 import aiohttp
 import random
 import time
 from bs4 import BeautifulSoup
-from src.config import tenor_api_key
+from config import tenor_api_key
 
 randomseed = time.time()
 random.seed(randomseed)
@@ -220,11 +221,31 @@ async def send_ascii_art_text(
 ):
     font = font_matches[font]
     text = text.replace(" ", "+")
-    asciiiar_url = f"https://asciified.thelicato.io/api?text={text}&font={font}"
-    response = await do_async_request(asciiiar_url, json=False)
-    message = f"```\n{response}```\n{message}"
-    await message_in_channel_in_wich_to_send.channel.send(message)
-
+    asciiiar_url = f"https://asciified.thelicato.io/api/v2/ascii?text={text}&font={font}"
+    print(asciiiar_url)
+    ascii_art = await do_async_request(asciiiar_url, json=False)
+    final_message = f"```\n{ascii_art}```\n{message}"
+    if len(final_message) < 2000:
+        await message_in_channel_in_wich_to_send.channel.send(final_message)
+    else:
+        if len(ascii_art) < 2000:
+            await message_in_channel_in_wich_to_send.channel.send(ascii_art)
+        elif len(ascii_art) < 8000:
+            embed = discord.Embed(
+                title="Ascii art",
+                description=ascii_art,
+            )
+            await message_in_channel_in_wich_to_send.channel.send(embed=embed)
+        else:
+            await message_in_channel_in_wich_to_send.channel.send(
+                "Sorry, the ascii art is too big to be sent"
+            )
+        if len (message) < 2000:
+            await message_in_channel_in_wich_to_send.channel.send(message)
+        else:
+            while len(message) > 0:
+                await message_in_channel_in_wich_to_send.channel.send(message[:2000])
+                message = message[2000:]
 
 async def send_ascii_art_image(
     message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""
