@@ -170,3 +170,5 @@ premium.db
 guildscount.py
 
 *.ovpn
+
+tests/
