@@ -7,5 +7,5 @@ google-api-python-client
 google-cloud-vision
 tiktoken
 bs4
-disco.oauth2
+discord-oauth2.py
 black
