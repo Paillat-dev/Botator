@@ -1,5 +1,6 @@
 import discord
 from discord import default_permissions
+from discord.ext import commands
 import os
 from src.config import debug, curs_data, con_data
 import openai
@@ -10,6 +11,14 @@ class Moderation(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         super().__init__()
         self.bot = bot
+    """
+    @discord.slash_command(
+        name="ban", description="Ban a user from using the bot"
+    )
+    @commands.is_owner()
+    async def ban(self, ctx: discord.ApplicationContext, user: discord.User):
+        pass
+    """
 
     @discord.slash_command(
         name="moderation", description="Enable or disable AI moderation & set the rules"
