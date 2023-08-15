@@ -49,17 +49,9 @@ async def fetch_messages_history(channel: discord.TextChannel, limit, original_m
     return messages
 
 
-async def prepare_messages(self, messages, message: discord.Message, api_key, prompt):
-    async def error_call(error=""):
-        try:
-            if error != "":
-                await message.channel.send(
-                    f"An error occured: {error}", delete_after=10
-                )
-            await message.channel.trigger_typing()
-        except:
-            pass
-
+async def prepare_messages(
+    self, messages, message: discord.Message, api_key, prompt, error_call
+):
     msgs = []  # create the msgs list
     msgs.append(
         {"role": "system", "content": prompt}
@@ -123,18 +115,8 @@ async def prepare_messages(self, messages, message: discord.Message, api_key, pr
 
 
 async def chatgpt_process(
-    self, msgs, message: discord.Message, api_key, prompt, model, depth=0
+    self, msgs, message: discord.Message, api_key, prompt, model, error_call, depth=0
 ):
-    async def error_call(error=""):
-        try:
-            if error != "":
-                await message.channel.send(
-                    f"An error occured: {error}", delete_after=10
-                )
-            await message.channel.trigger_typing()
-        except:
-            pass
-
     response = str()
     caller = openai_caller()
     called_functions = (
@@ -317,5 +299,16 @@ async def chat_process(self, message):
             )
             .replace("[pretend-to-be]", pretend_to_be)
         )
-    emesgs = await prepare_messages(self, messages, message, api_key, prompt)
-    await chatgpt_process(self, emesgs, message, api_key, prompt, model)
+
+    async def error_call(error=""):
+        try:
+            if error != "":
+                await message.channel.send(f"An error occured: {error}", delete_after=4)
+            await message.channel.trigger_typing()
+        except:
+            pass
+
+    emesgs = await prepare_messages(
+        self, messages, message, api_key, prompt, error_call
+    )
+    await chatgpt_process(self, emesgs, message, api_key, prompt, model, error_call)
