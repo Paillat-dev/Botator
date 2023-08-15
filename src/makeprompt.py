@@ -305,19 +305,30 @@ async def chat_process(self, message):
         os.path.join(os.path.dirname(__file__), f"./prompts/{model}.txt")
     )
     prompt = gpt_3_5_turbo_prompt[:] # copy the prompt but to dnot reference it
-
-    prompt = (
-        prompt.replace("[prompt-prefix]", prompt_prefix)
-        .replace("[server-name]", message.guild.name)
-        .replace(
-            "[channel-name]",
-            message.channel.name
-            if isinstance(message.channel, discord.TextChannel)
-            else "DM-channel",
+    if not isinstance(message.channel, discord.DMChannel):        
+        prompt = (
+            prompt.replace("[prompt-prefix]", prompt_prefix)
+            .replace("[server-name]", message.guild.name)
+            .replace(
+                "[channel-name]",
+                message.channel.name
+            )
+            .replace(
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+            )
+            .replace("[pretend-to-be]", pretend_to_be)
         )
-        .replace(
-            "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+    else:
+        prompt = (
+            prompt.replace("[prompt-prefix]", prompt_prefix)
+            .replace("[server-name]", "DM-channel")
+            .replace(
+                "[channel-name]",
+                "DM-channel"
+            )
+            .replace(
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+            )
+            .replace("[pretend-to-be]", pretend_to_be)
         )
-        .replace("[pretend-to-be]", pretend_to_be)
-    )
     await chatgpt_process(self, messages, message, api_key, prompt, model)
