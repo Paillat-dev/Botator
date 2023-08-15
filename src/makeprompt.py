@@ -29,6 +29,26 @@ async def replace_mentions(content, bot):
         content = content.replace(mention, f"@{user.name}")
     return content
 
+def is_ignorable(content):
+    if content.startswith("-") or content.startswith("//"):
+        return True
+    return False
+
+async def fetch_messages_history(channel:discord.TextChannel, limit, original_message):
+    messages = []
+    if original_message == None:
+        async for msg in channel.history(limit=100, oldest_first=True):
+            if not is_ignorable(msg.content):
+                messages.append(msg)
+            if len(messages) == limit:
+                break
+    else:
+        async for msg in channel.history(limit=100, before=original_message, oldest_first=True):
+            if not is_ignorable(msg.content):
+                messages.append(msg)
+            if len(messages) == limit:
+                break
+    return messages
 
 async def chatgpt_process(
     self, messages, message: discord.Message, api_key, prompt, model
@@ -274,18 +294,7 @@ async def chat_process(self, message):
     except:
         pass
 
-    # if the message is not a reply
-    if original_message == None:
-        messages = await message.channel.history(limit=prompt_size).flatten()
-        messages.reverse()
-    # if the message is a reply, we need to handle the message history differently
-    else:
-        messages = await message.channel.history(
-            limit=prompt_size, before=original_message
-        ).flatten()
-        messages.reverse()
-        messages.append(original_message)
-        messages.append(message)
+    messages = await fetch_messages_history(message.channel, prompt_size, original_message)
 
     # if the pretend to be feature is enabled, we add the pretend to be text to the prompt
     if pretend_enabled:
