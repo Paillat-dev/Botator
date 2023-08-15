@@ -161,7 +161,7 @@ async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt,
                     "Oh uh, it seems like i am calling functions recursively. I will stop now."
                 )
                 raise FuntionCallError("Too many recursive function calls")
-            await chatgpt_process(self, msgs, message, api_key, prompt, model)
+            await chatgpt_process(self, msgs, message, api_key, prompt, model, depth)
     else:
         content = response.get("content", "")
         while len(content) != 0:
