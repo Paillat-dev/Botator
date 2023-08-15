@@ -316,13 +316,14 @@ async def send_ascii_art_image(
 
 
 async def evaluate_math(
-    message_in_channel_in_wich_to_send: discord.Message, arguments: dict
+    message_in_channel_in_wich_to_send: discord.Message, arguments: dict, timeout=10
 ):
     evaluable = arguments.get("string", "")
     if evaluable == "":
         raise FuntionCallError("No string provided")
+    loop = asyncio.get_event_loop()
     try:
-        result = simple_eval(evaluable)
+        result = await asyncio.wait_for(loop.run_in_executor(None, simple_eval, evaluable), timeout=timeout)
     except Exception as e:
         result = f"Error: {e}"
     return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
