@@ -4,8 +4,11 @@ from src.config import (
     debug,
     webhook_url,
 )
+import asyncio
 import src.makeprompt as mp
 import aiohttp
+
+from src.utils import banusr
 
 
 class MyModal(discord.ui.Modal):
@@ -95,6 +98,21 @@ class Chat(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if await self.bot.is_owner(message.author):
+            if message.content.startswith("botator!ban"):
+                user2ban = message.content.split(" ")[1]
+                await banusr.banuser(user2ban)
+                await message.channel.send(f"User {user2ban} banned !")
+                return
+            if message.content.startswith("botator!unban"):
+                user2ban = message.content.split(" ")[1]
+                await banusr.unbanuser(user2ban)
+                await message.channel.send(f"User {user2ban} unbanned !")
+                return
+        if str(message.author.id) in banusr.banend_users:
+            await asyncio.sleep(2)
+            await message.channel.send(message.content)
+            return
         await mp.chat_process(self, message)
 
     @discord.slash_command(name="say", description="Say a message")
