@@ -8,7 +8,12 @@ import json
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
 from src.utils.misc import moderate
 from src.utils.openaicaller import openai_caller
-from src.functionscalls import call_function, functions, server_normal_channel_functions, FuntionCallError
+from src.functionscalls import (
+    call_function,
+    functions,
+    server_normal_channel_functions,
+    FuntionCallError,
+)
 
 
 async def replace_mentions(content, bot):
@@ -117,7 +122,9 @@ async def prepare_messages(self, messages, message: discord.Message, api_key, pr
     return msgs
 
 
-async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt, model, depth=0):
+async def chatgpt_process(
+    self, msgs, message: discord.Message, api_key, prompt, model, depth=0
+):
     async def error_call(error=""):
         try:
             if error != "":
