@@ -323,7 +323,9 @@ async def evaluate_math(
         raise FuntionCallError("No string provided")
     loop = asyncio.get_event_loop()
     try:
-        result = await asyncio.wait_for(loop.run_in_executor(None, simple_eval, evaluable), timeout=timeout)
+        result = await asyncio.wait_for(
+            loop.run_in_executor(None, simple_eval, evaluable), timeout=timeout
+        )
     except Exception as e:
         result = f"Error: {e}"
     return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
