@@ -149,6 +149,8 @@ font_matches = {
 
 unsplash_random_image_url = "https://source.unsplash.com/random"
 
+class FuntionCallError(Exception):
+    pass
 
 async def get_final_url(url):
     async with aiohttp.ClientSession() as session:
@@ -168,8 +170,12 @@ async def do_async_request(url, json=True):
 
 
 async def add_reaction_to_last_message(
-    message_to_react_to: discord.Message, emoji, message=""
-):
+    message_to_react_to: discord.Message, arguments: dict
+):  
+    emoji = arguments.get("emoji", "")
+    if emoji == "":
+        raise FuntionCallError("No emoji provided")
+    message = arguments.get("message", "")
     if message == "":
         await message_to_react_to.add_reaction(emoji)
     else:
@@ -177,13 +183,20 @@ async def add_reaction_to_last_message(
         await message_to_react_to.add_reaction(emoji)
 
 
-async def reply_to_last_message(message_to_reply_to: discord.Message, message):
+async def reply_to_last_message(message_to_reply_to: discord.Message, arguments: dict):
+    message = arguments.get("message", "")
+    if message == "":
+        raise FuntionCallError("No message provided")
     await message_to_reply_to.reply(message)
 
 
 async def send_a_stock_image(
-    message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""
+    message_in_channel_in_wich_to_send: discord.Message, arguments: dict
 ):
+    query = arguments.get("query", "")
+    if query == "":
+        raise FuntionCallError("No query provided")
+    message = arguments.get("message", "")
     query = query.replace(" ", "+")
     image_url = f"{unsplash_random_image_url}?{query}"
     final_url = await get_final_url(image_url)
@@ -192,18 +205,28 @@ async def send_a_stock_image(
 
 
 async def create_a_thread(
-    channel_in_which_to_create_the_thread: discord.TextChannel, name: str, message: str
+    called_by: discord.Message, arguments: dict
 ):
+    name = arguments.get("name", "")
+    if name == "":
+        raise FuntionCallError("No name provided")
+    message = arguments.get("message", "")
+    if message == "":
+        raise FuntionCallError("No message provided")
+    channel_in_which_to_create_the_thread = called_by.channel
     msg = await channel_in_which_to_create_the_thread.send(message)
     await msg.create_thread(name=name)
 
 
 async def send_a_gif(
     message_in_channel_in_wich_to_send: discord.Message,
-    query: str,
-    message: str = "",
-    limit: int = 15,
+    arguments: dict,
 ):
+    query = arguments.get("query", "")
+    if query == "":
+        raise FuntionCallError("No query provided")
+    message = arguments.get("message", "")
+    limit = arguments.get("limit", 15)
     query = query.replace(" ", "+")
     image_url = f"{tenor_api_url}{query}&limit={limit}"
     response = await do_async_request(image_url)
@@ -215,10 +238,16 @@ async def send_a_gif(
 
 async def send_ascii_art_text(
     message_in_channel_in_wich_to_send: discord.Message,
-    text: str,
-    font: str = "standard",
-    message: str = "",
+    arguments: dict,
 ):
+    text = arguments.get("text", "")
+    if text == "":
+        raise FuntionCallError("No text provided")
+    font = arguments.get("font", "standard")
+    message = arguments.get("message", "")
+    if font not in font_matches:
+        raise FuntionCallError("Invalid font")
+    
     font = font_matches[font]
     text = text.replace(" ", "+")
     asciiiar_url = (
@@ -251,8 +280,12 @@ async def send_ascii_art_text(
 
 
 async def send_ascii_art_image(
-    message_in_channel_in_wich_to_send: discord.Message, query: str, message: str = ""
+    message_in_channel_in_wich_to_send: discord.Message, arguments: dict
 ):
+    query = arguments.get("query", "")
+    if query == "":
+        raise FuntionCallError("No query provided")
+    message = arguments.get("message", "")
     query = query.replace(" ", "-")
     asciiiar_url = f"https://emojicombos.com/{query}"
     response = await do_async_request(asciiiar_url, json=False)
@@ -264,3 +297,14 @@ async def send_ascii_art_image(
     combo = random.choice(combos)
     message = f"```\n{combo}```\n{message}"
     await message_in_channel_in_wich_to_send.channel.send(message)
+
+functions_matching = {
+    "add_reaction_to_last_message": add_reaction_to_last_message,
+    "reply_to_last_message": reply_to_last_message,
+    "send_a_stock_image": send_a_stock_image,
+    "send_a_gif": send_a_gif,
+    "send_ascii_art_text": send_ascii_art_text,
+    "send_ascii_art_image": send_ascii_art_image,
+    "create_a_thread": create_a_thread,
+
+}

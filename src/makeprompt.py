@@ -141,14 +141,16 @@ async def chatgpt_process(
         model=model,
         messages=msgs,
         functions=called_functions,
-        # function_call="auto",
+        function_call="auto",
     )
-    print(msgs)
+    print(f"messages: {msgs}")
     response = response["choices"][0]["message"]  # type: ignore
+    print(f"response: {response}")
     if response.get("function_call"):
         function_call = response.get("function_call")
         name = function_call.get("name", "")
         arguments = function_call.get("arguments", {})
+        print(f"arguments: {arguments}")
         arguments = json.loads(arguments)
         if name == "add_reaction_to_last_message":
             if arguments.get("emoji"):
