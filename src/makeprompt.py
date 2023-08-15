@@ -44,9 +44,7 @@ async def fetch_messages_history(channel: discord.TextChannel, limit, original_m
     return messages
 
 
-async def chatgpt_process(
-    self, messages, message: discord.Message, api_key, prompt, model
-):
+async def prepare_messages(self, messages, message: discord.Message, api_key, prompt):
     async def error_call(error=""):
         try:
             if error != "":
@@ -116,6 +114,20 @@ async def chatgpt_process(
         )
         await message.channel.trigger_typing()
 
+    return msgs
+
+
+async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt, model):
+    async def error_call(error=""):
+        try:
+            if error != "":
+                await message.channel.send(
+                    f"An error occured: {error}", delete_after=10
+                )
+            await message.channel.trigger_typing()
+        except:
+            pass
+
     response = str()
     caller = openai_caller()
     called_functions = (
@@ -134,7 +146,16 @@ async def chatgpt_process(
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
         function_call = response.get("function_call")
-        await call_function(message, function_call)
+        returned = await call_function(message, function_call)
+        if returned != None:
+            msgs.append(
+                {
+                    "role": "function",
+                    "content": returned,
+                    "name": function_call.get("name"),
+                }
+            )
+            await chatgpt_process(self, msgs, message, api_key, prompt, model)
     else:
         content = response.get("content", "")
         while len(content) != 0:
@@ -283,4 +304,5 @@ async def chat_process(self, message):
             )
             .replace("[pretend-to-be]", pretend_to_be)
         )
-    await chatgpt_process(self, messages, message, api_key, prompt, model)
+    emesgs = await prepare_messages(self, messages, message, api_key, prompt)
+    await chatgpt_process(self, emesgs, message, api_key, prompt, model)

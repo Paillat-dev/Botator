@@ -1,8 +1,11 @@
 import discord
 import asyncio
+import orjson
 import aiohttp
 import random
 import time
+
+from simpleeval import simple_eval
 from bs4 import BeautifulSoup
 from src.config import tenor_api_key
 
@@ -115,6 +118,20 @@ functions = [
                 },
             },
             "required": ["query"],
+        },
+    },
+    {
+        "name": "evaluate_math",
+        "description": "Get the result of a math expression. Only math expressions are supported, no variables, no functions.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string",
+                    "description": "The string to evaluate",
+                }
+            },
+            "required": ["string"],
         },
     },
 ]
@@ -253,7 +270,6 @@ async def send_ascii_art_text(
     asciiiar_url = (
         f"https://asciified.thelicato.io/api/v2/ascii?text={text}&font={font}"
     )
-    print(asciiiar_url)
     ascii_art = await do_async_request(asciiiar_url, json=False)
     final_message = f"```\n{ascii_art}```\n{message}"
     if len(final_message) < 2000:
@@ -299,15 +315,31 @@ async def send_ascii_art_image(
     await message_in_channel_in_wich_to_send.channel.send(message)
 
 
+async def evaluate_math(
+    message_in_channel_in_wich_to_send: discord.Message, arguments: dict
+):
+    evaluable = arguments.get("string", "")
+    if evaluable == "":
+        raise FuntionCallError("No string provided")
+    try:
+        result = simple_eval(evaluable)
+    except Exception as e:
+        result = f"Error: {e}"
+    return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
+
+
 async def call_function(message: discord.Message, function_call):
     name = function_call.get("name", "")
     if name == "":
         raise FuntionCallError("No name provided")
     arguments = function_call.get("arguments", {})
+    # load the function call arguments json
+    arguments = orjson.loads(arguments)
     if name not in functions_matching:
         raise FuntionCallError("Invalid function name")
     function = functions_matching[name]
-    await function(message, arguments)
+    returnable = await function(message, arguments)
+    return returnable
 
 
 functions_matching = {
@@ -318,4 +350,5 @@ functions_matching = {
     "send_ascii_art_text": send_ascii_art_text,
     "send_ascii_art_image": send_ascii_art_image,
     "create_a_thread": create_a_thread,
+    "evaluate_math": evaluate_math,
 }
