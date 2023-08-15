@@ -181,11 +181,9 @@ async def chatgpt_process(
 
 
 async def chat_process(self, message):
-    # if the message is from a bot, we ignore it
-    if message.author.bot:
+    if message.author.id == self.bot.user.id:
         return
 
-    # if the guild or the dm channel is not in the database, we ignore it
     if isinstance(message.channel, discord.DMChannel):
         try:
             curs_data.execute(
