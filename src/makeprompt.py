@@ -63,7 +63,6 @@ async def chatgpt_process(
             await message.channel.send(
                 f"{msg.author.mention}", embed=embed, delete_after=10
             )
-            await message.delete()
         else:  # if the message is not flagged as inappropriate
             if msg.author.id == self.bot.user.id:
                 role = "assistant"
