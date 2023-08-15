@@ -1,10 +1,11 @@
 import asyncio
 import os
-from src.config import curs_data, max_uses, curs_premium
 import re
 import discord
 import datetime
 import json
+
+from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
 from src.utils.misc import moderate
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import (
@@ -303,9 +304,7 @@ async def chat_process(self, message):
     prompt_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), f"./prompts/{model}.txt")
     )
-    with open(prompt_path, "r") as f:
-        prompt = f.read()
-        f.close()
+    prompt = gpt_3_5_turbo_prompt[:] # copy the prompt but to dnot reference it
 
     prompt = (
         prompt.replace("[prompt-prefix]", prompt_prefix)
