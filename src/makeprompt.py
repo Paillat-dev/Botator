@@ -292,7 +292,7 @@ async def chat_process(self, message):
         return
 
     # if the message starts with - or // it's a comment and we return
-    if message.content.startswith("-") or message.content.startswith("//"):
+    if is_ignorable(message.content):
         return
     try:
         await message.channel.trigger_typing()
