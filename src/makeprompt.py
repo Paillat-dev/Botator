@@ -39,19 +39,20 @@ def is_ignorable(content):
 async def fetch_messages_history(channel: discord.TextChannel, limit, original_message):
     messages = []
     if original_message == None:
-        async for msg in channel.history(limit=100, oldest_first=True):
+        async for msg in channel.history(limit=100):
             if not is_ignorable(msg.content):
                 messages.append(msg)
             if len(messages) == limit:
                 break
     else:
         async for msg in channel.history(
-            limit=100, before=original_message, oldest_first=True
+            limit=100, before=original_message
         ):
             if not is_ignorable(msg.content):
                 messages.append(msg)
             if len(messages) == limit:
                 break
+    messages.reverse()
     return messages
 
 
@@ -142,6 +143,7 @@ async def chatgpt_process(
         functions=called_functions,
         # function_call="auto",
     )
+    print(msgs)
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
         function_call = response.get("function_call")
