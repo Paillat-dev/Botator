@@ -102,7 +102,7 @@ curs_premium.execute(
 )
 
 with open(
-    os.path.abspath(os.path.dirname(__file__), "./prompts/gpt-3.5-turbo.txt"),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "./prompts/gpt-3.5-turbo.txt")),
     "r",
     encoding="utf-8",
 ) as file:
