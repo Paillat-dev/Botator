@@ -8,7 +8,7 @@ import json
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
 from src.utils.misc import moderate
 from src.utils.openaicaller import openai_caller
-from src.functionscalls import call_function, functions, server_normal_channel_functions
+from src.functionscalls import call_function, functions, server_normal_channel_functions, FuntionCallError
 
 
 async def replace_mentions(content, bot):
@@ -117,7 +117,7 @@ async def prepare_messages(self, messages, message: discord.Message, api_key, pr
     return msgs
 
 
-async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt, model):
+async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt, model, depth=0):
     async def error_call(error=""):
         try:
             if error != "":
@@ -155,6 +155,12 @@ async def chatgpt_process(self, msgs, message: discord.Message, api_key, prompt,
                     "name": function_call.get("name"),
                 }
             )
+            depth += 1
+            if depth > 2:
+                await message.channel.send(
+                    "Oh uh, it seems like i am calling functions recursively. I will stop now."
+                )
+                raise FuntionCallError("Too many recursive function calls")
             await chatgpt_process(self, msgs, message, api_key, prompt, model)
     else:
         content = response.get("content", "")
