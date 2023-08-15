@@ -131,9 +131,7 @@ async def chatgpt_process(
         functions=called_functions,
         function_call="auto",
     )
-    print(f"messages: {msgs}")
     response = response["choices"][0]["message"]  # type: ignore
-    print(f"response: {response}")
     if response.get("function_call"):
         function_call = response.get("function_call")
         await call_function(message, function_call)
