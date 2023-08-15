@@ -149,8 +149,10 @@ font_matches = {
 
 unsplash_random_image_url = "https://source.unsplash.com/random"
 
+
 class FuntionCallError(Exception):
     pass
+
 
 async def get_final_url(url):
     async with aiohttp.ClientSession() as session:
@@ -171,7 +173,7 @@ async def do_async_request(url, json=True):
 
 async def add_reaction_to_last_message(
     message_to_react_to: discord.Message, arguments: dict
-):  
+):
     emoji = arguments.get("emoji", "")
     if emoji == "":
         raise FuntionCallError("No emoji provided")
@@ -204,9 +206,7 @@ async def send_a_stock_image(
     await message_in_channel_in_wich_to_send.channel.send(message)
 
 
-async def create_a_thread(
-    called_by: discord.Message, arguments: dict
-):
+async def create_a_thread(called_by: discord.Message, arguments: dict):
     name = arguments.get("name", "")
     if name == "":
         raise FuntionCallError("No name provided")
@@ -247,7 +247,7 @@ async def send_ascii_art_text(
     message = arguments.get("message", "")
     if font not in font_matches:
         raise FuntionCallError("Invalid font")
-    
+
     font = font_matches[font]
     text = text.replace(" ", "+")
     asciiiar_url = (
@@ -298,6 +298,7 @@ async def send_ascii_art_image(
     message = f"```\n{combo}```\n{message}"
     await message_in_channel_in_wich_to_send.channel.send(message)
 
+
 functions_matching = {
     "add_reaction_to_last_message": add_reaction_to_last_message,
     "reply_to_last_message": reply_to_last_message,
@@ -306,5 +307,4 @@ functions_matching = {
     "send_ascii_art_text": send_ascii_art_text,
     "send_ascii_art_image": send_ascii_art_image,
     "create_a_thread": create_a_thread,
-
 }
