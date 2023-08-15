@@ -8,17 +8,7 @@ import json
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
 from src.utils.misc import moderate
 from src.utils.openaicaller import openai_caller
-from src.functionscalls import (
-    add_reaction_to_last_message,
-    reply_to_last_message,
-    send_a_stock_image,
-    create_a_thread,
-    send_a_gif,
-    send_ascii_art_text,
-    send_ascii_art_image,
-    functions,
-    server_normal_channel_functions,
-)
+from src.functionscalls import call_function, functions, server_normal_channel_functions
 
 
 async def replace_mentions(content, bot):
@@ -146,56 +136,7 @@ async def chatgpt_process(
     print(f"response: {response}")
     if response.get("function_call"):
         function_call = response.get("function_call")
-        name = function_call.get("name", "")
-        arguments = function_call.get("arguments", {})
-        print(f"arguments: {arguments}")
-        arguments = json.loads(arguments)
-        if name == "add_reaction_to_last_message":
-            if arguments.get("emoji"):
-                emoji = arguments.get("emoji")
-                reply = arguments.get("message", "")
-                await add_reaction_to_last_message(message, emoji, reply)
-        if name == "reply_to_last_message":
-            if arguments.get("message"):
-                reply = arguments.get("message")
-                await reply_to_last_message(message, reply)
-        if name == "send_a_stock_image":
-            if arguments.get("query"):
-                query = arguments.get("query")
-                reply = arguments.get("message", "")
-                await send_a_stock_image(message, query, reply)
-        if name == "create_a_thread":
-            if arguments.get("name") and arguments.get("message"):
-                name = arguments.get("name")
-                reply = arguments.get("message", "")
-                if isinstance(message.channel, discord.TextChannel):
-                    await create_a_thread(message.channel, name, reply)
-                else:
-                    await message.channel.send(
-                        "`A server normal text channel only function has been called in a non standard channel. Please retry`",
-                        delete_after=10,
-                    )
-        if name == "send_a_gif":
-            if arguments.get("query"):
-                query = arguments.get("query")
-                reply = arguments.get("message", "")
-                limit = arguments.get("limit", 15)
-                await send_a_gif(message, query, reply, limit)
-        if name == "send_ascii_art_text":
-            if arguments.get("text"):
-                text = arguments.get("text")
-                font = arguments.get("font", "standard")
-                reply = arguments.get("message", "")
-                await send_ascii_art_text(message, text, font, reply)
-        if name == "send_ascii_art_image":
-            if arguments.get("query"):
-                query = arguments.get("query")
-                reply = arguments.get("message", "")
-                await send_ascii_art_image(message, query, reply)
-        if name == "":
-            await message.channel.send(
-                "The function call is empty. Please retry.", delete_after=10
-            )
+        await call_function(message, function_call)
     else:
         content = response.get("content", "")
         while len(content) != 0:

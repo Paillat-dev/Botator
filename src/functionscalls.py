@@ -299,6 +299,17 @@ async def send_ascii_art_image(
     await message_in_channel_in_wich_to_send.channel.send(message)
 
 
+async def call_function(message: discord.Message, function_call):
+    name = function_call.get("name", "")
+    if name == "":
+        raise FuntionCallError("No name provided")
+    arguments = function_call.get("arguments", {})
+    if name not in functions_matching:
+        raise FuntionCallError("Invalid function name")
+    function = functions_matching[name]
+    await function(message, arguments)
+
+
 functions_matching = {
     "add_reaction_to_last_message": add_reaction_to_last_message,
     "reply_to_last_message": reply_to_last_message,
