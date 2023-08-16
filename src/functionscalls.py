@@ -342,11 +342,11 @@ async def call_function(message: discord.Message, function_call, api_key):
     if name not in functions_matching:
         raise FuntionCallError("Invalid function name")
     function = functions_matching[name]
-    if arguments.get("message", "") != "" and moderate(
+    if arguments.get("message", "") != "" and await moderate(
         api_key=api_key, text=arguments["message"]
     ):
         return "Message blocked by the moderation system. Please try again."
-    if arguments.get("query", "") != "" and moderate(
+    if arguments.get("query", "") != "" and await moderate(
         api_key=api_key, text=arguments["query"]
     ):
         return "Query blocked by the moderation system. If the user asked for something edgy, please tell them in a funny way that you won't do it, but do not specify that it was blocked by the moderation system."
