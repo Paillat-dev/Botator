@@ -135,7 +135,7 @@ async def chatgpt_process(
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
         function_call = response.get("function_call")
-        returned = await call_function(message, function_call)
+        returned = await call_function(message, function_call, api_key)
         if returned != None:
             msgs.append(
                 {
@@ -153,13 +153,23 @@ async def chatgpt_process(
             await chatgpt_process(self, msgs, message, api_key, prompt, model, depth)
     else:
         content = response.get("content", "")
-        while len(content) != 0:
-            if len(content) > 2000:
-                await message.channel.send(content[:2000])
-                content = content[2000:]
-            else:
-                await message.channel.send(content)
-                content = ""
+        if moderate(api_key, content, error_call):
+            depth += 1
+            if depth > 2:
+                await message.channel.send(
+                    "Oh uh, it seems like i am answering recursively. I will stop now."
+                )
+            await chatgpt_process(
+                self, msgs, message, api_key, prompt, model, error_call, depth
+            )
+        else:
+            while len(content) != 0:
+                if len(content) > 2000:
+                    await message.channel.send(content[:2000])
+                    content = content[2000:]
+                else:
+                    await message.channel.send(content)
+                    content = ""
 
 
 async def chat_process(self, message):

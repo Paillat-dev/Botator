@@ -5,6 +5,7 @@ import aiohttp
 import random
 import time
 
+from utils.misc import moderate
 from simpleeval import simple_eval
 from bs4 import BeautifulSoup
 from src.config import tenor_api_key
@@ -331,7 +332,7 @@ async def evaluate_math(
     return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
 
 
-async def call_function(message: discord.Message, function_call):
+async def call_function(message: discord.Message, function_call, api_key):
     name = function_call.get("name", "")
     if name == "":
         raise FuntionCallError("No name provided")
@@ -341,6 +342,14 @@ async def call_function(message: discord.Message, function_call):
     if name not in functions_matching:
         raise FuntionCallError("Invalid function name")
     function = functions_matching[name]
+    if arguments.get("message", "") != "" and moderate(
+        api_key=api_key, text=arguments["message"]
+    ):
+        return "Message blocked by the moderation system. Please try again."
+    if arguments.get("query", "") != "" and moderate(
+        api_key=api_key, text=arguments["query"]
+    ):
+        return "Query blocked by the moderation system. If the user asked for something edgy, please tell them in a funny way that you won't do it, but do not specify that it was blocked by the moderation system."
     returnable = await function(message, arguments)
     return returnable
 
