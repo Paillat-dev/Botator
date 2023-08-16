@@ -131,7 +131,7 @@ async def chatgpt_process(
         messages=msgs,
         functions=called_functions,
         function_call="auto",
-        user=Hasher(str(message.author.id)), #for user banning in case of abuse
+        user=Hasher(str(message.author.id)),  # for user banning in case of abuse
     )
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
