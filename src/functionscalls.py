@@ -5,7 +5,7 @@ import aiohttp
 import random
 import time
 
-from utils.misc import moderate
+from src.utils.misc import moderate
 from simpleeval import simple_eval
 from bs4 import BeautifulSoup
 from src.config import tenor_api_key
