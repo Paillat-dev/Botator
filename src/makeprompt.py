@@ -153,7 +153,7 @@ async def chatgpt_process(
             await chatgpt_process(self, msgs, message, api_key, prompt, model, depth)
     else:
         content = response.get("content", "")
-        if moderate(api_key, content, error_call):
+        if await moderate(api_key, content, error_call):
             depth += 1
             if depth > 2:
                 await message.channel.send(
