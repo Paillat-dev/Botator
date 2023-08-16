@@ -6,7 +6,7 @@ import datetime
 import json
 
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
-from src.utils.misc import moderate
+from src.utils.misc import moderate, ModerationError
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import (
     call_function,
@@ -159,6 +159,7 @@ async def chatgpt_process(
                 await message.channel.send(
                     "Oh uh, it seems like i am answering recursively. I will stop now."
                 )
+                raise ModerationError("Too many recursive messages")
             await chatgpt_process(
                 self, msgs, message, api_key, prompt, model, error_call, depth
             )

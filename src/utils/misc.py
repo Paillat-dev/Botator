@@ -9,3 +9,7 @@ async def moderate(api_key, text, recall_func=None):
         input=text,
     )
     return response["results"][0]["flagged"]  # type: ignore
+
+
+class ModerationError(Exception):
+    pass
