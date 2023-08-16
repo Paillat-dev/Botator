@@ -6,7 +6,7 @@ import datetime
 import json
 
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
-from src.utils.misc import moderate, ModerationError
+from src.utils.misc import moderate, ModerationError, Hasher
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import (
     call_function,
@@ -131,6 +131,7 @@ async def chatgpt_process(
         messages=msgs,
         functions=called_functions,
         function_call="auto",
+        user=Hasher(str(message.author.id)), #for user banning in case of abuse
     )
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
