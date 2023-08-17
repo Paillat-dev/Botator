@@ -107,18 +107,13 @@ class Chat(discord.Cog):
             if message.content.startswith("botator!unban"):
                 user2ban = message.content.split(" ")[1]
                 await banusr.unbanuser(user2ban)
-                await message.channel.send(f"User {user2ban} unbanned !")
+                await message.chafnnel.send(f"User {user2ban} unbanned !")
                 return
         if str(message.author.id) in banusr.banend_users:
             await asyncio.sleep(2)
             await message.channel.send(message.content)
             return
         await mp.chat_process(self, message)
-
-    @discord.slash_command(name="say", description="Say a message")
-    async def say(self, ctx: discord.ApplicationContext, message: str):
-        await ctx.respond("Message sent !", ephemeral=True)
-        await ctx.send(message)
 
     @discord.slash_command(name="redo", description="Redo a message")
     async def redo(self, ctx: discord.ApplicationContext):

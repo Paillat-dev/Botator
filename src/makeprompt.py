@@ -6,7 +6,7 @@ import datetime
 import json
 
 from src.config import curs_data, max_uses, curs_premium, gpt_3_5_turbo_prompt
-from src.utils.misc import moderate
+from src.utils.misc import moderate, ModerationError, Hasher
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import (
     call_function,
@@ -131,11 +131,12 @@ async def chatgpt_process(
         messages=msgs,
         functions=called_functions,
         function_call="auto",
+        user=Hasher(str(message.author.id)),  # for user banning in case of abuse
     )
     response = response["choices"][0]["message"]  # type: ignore
     if response.get("function_call"):
         function_call = response.get("function_call")
-        returned = await call_function(message, function_call)
+        returned = await call_function(message, function_call, api_key)
         if returned != None:
             msgs.append(
                 {
@@ -153,13 +154,24 @@ async def chatgpt_process(
             await chatgpt_process(self, msgs, message, api_key, prompt, model, depth)
     else:
         content = response.get("content", "")
-        while len(content) != 0:
-            if len(content) > 2000:
-                await message.channel.send(content[:2000])
-                content = content[2000:]
-            else:
-                await message.channel.send(content)
-                content = ""
+        if await moderate(api_key, content, error_call):
+            depth += 1
+            if depth > 2:
+                await message.channel.send(
+                    "Oh uh, it seems like i am answering recursively. I will stop now."
+                )
+                raise ModerationError("Too many recursive messages")
+            await chatgpt_process(
+                self, msgs, message, api_key, prompt, model, error_call, depth
+            )
+        else:
+            while len(content) != 0:
+                if len(content) > 2000:
+                    await message.channel.send(content[:2000])
+                    content = content[2000:]
+                else:
+                    await message.channel.send(content)
+                    content = ""
 
 
 async def chat_process(self, message):
