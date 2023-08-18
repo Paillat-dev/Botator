@@ -155,15 +155,25 @@ server_normal_channel_functions = [
     },
 ]
 
-font_matches = {
-    "standard": "ANSI Regular",
-    "shadow": "ANSI Shadow",
-    "money": random.choice(
-        ["Big Money-ne", "Big Money-nw", "Big Money-se", "Big Money-sw"]
-    ),
-    "bloody": "Bloody",
-    "dos-rebel": "DOS Rebel",
-}
+class FontMatches:
+    def __getitem__(self, key):
+        if key == "standard":
+            return "ANSI Regular"
+        elif key == "shadow":
+            return "ANSI Shadow"
+        elif key == "money":
+            return random.choice(
+                ["Big Money-ne", "Big Money-nw", "Big Money-se", "Big Money-sw"]
+            )
+        elif key == "bloody":
+            return "Bloody"
+        elif key == "dos-rebel":
+            return "DOS Rebel"
+        else:
+            raise ValueError(f"Invalid key: {key}")
+
+# Example usage:
+font_matches = FontMatches()
 
 unsplash_random_image_url = "https://source.unsplash.com/random"
 
