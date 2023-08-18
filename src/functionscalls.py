@@ -155,6 +155,7 @@ server_normal_channel_functions = [
     },
 ]
 
+
 class FontMatches:
     def __getitem__(self, key):
         if key == "standard":
@@ -171,6 +172,7 @@ class FontMatches:
             return "DOS Rebel"
         else:
             raise ValueError(f"Invalid key: {key}")
+
 
 # Example usage:
 font_matches = FontMatches()
