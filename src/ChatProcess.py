@@ -8,6 +8,7 @@ import json
 from src.utils.misc import moderate, ModerationError, Hasher
 from src.utils.variousclasses import models, characters, apis
 from src.guild import Guild
+from src.chatUtils.Chat import fetch_messages_history
 from src.utils.openaicaller import openai_caller
 from src.functionscalls import (
     call_function,
@@ -15,6 +16,7 @@ from src.functionscalls import (
     server_normal_channel_functions,
     FuntionCallError,
 )
+from utils.misc import moderate, ModerationError
 
 
 class Chat:
@@ -84,3 +86,29 @@ class Chat:
         self.model = self.settings["model"]
         self.character = self.settings["character"]
         self.openai_api_key = self.guild.api_keys.get("openai", None)
+        if self.openai_api_key == None:
+            raise Exception("No openai api key is set")
+
+    async def formatContext(self):
+        """
+        This function formats the context for the bot to use
+        """
+        messages: list[discord.Message] = await fetch_messages_history(
+            self.message.channel, 10, self.original_message
+        )
+        self.context = []
+        for msg in messages:
+            if msg.author.id == self.bot.user.id:
+                role = "assistant"
+                name = "assistant"
+            else:
+                role = "user"
+                name = msg.author.global_name
+            if not moderate(self.openai_api_key, msg.content):
+                self.context.append(
+                    {
+                        "role": role,
+                        "content": msg.content,
+                        "name": name,
+                    }
+                )
