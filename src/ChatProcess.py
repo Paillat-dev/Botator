@@ -68,7 +68,9 @@ class Chat:
         This checks if the bot should actuallly respond to the message or if the message doesn't concern the bot
         """
         returnCriterias = []
-        returnCriterias.append(self.guild.sanitizedChannels.get(str(self.message.channel.id), None) != None)
+        returnCriterias.append(
+            self.guild.sanitizedChannels.get(str(self.message.channel.id), None) != None
+        )
         returnCriterias.append(
             self.message.content.find("<@" + str(self.bot.user.id) + ">") != -1
         )
@@ -82,5 +84,3 @@ class Chat:
         self.model = self.settings["model"]
         self.character = self.settings["character"]
         self.openai_api_key = self.guild.api_keys.get("openai", None)
-    
-    

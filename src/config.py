@@ -54,7 +54,9 @@ curs_data.execute(
     """CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)"""
 )
 
-con_data.execute('CREATE TABLE IF NOT EXISTS setup_data (guild_id text, guild_settings text)')
+con_data.execute(
+    "CREATE TABLE IF NOT EXISTS setup_data (guild_id text, guild_settings text)"
+)
 
 # This code creates the model table if it does not exist
 curs_data.execute(

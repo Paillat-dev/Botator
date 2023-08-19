@@ -29,6 +29,7 @@ class Setup(discord.Cog):
     def __init__(self, bot: discord.Bot):
         super().__init__()
         self.bot = bot
+
     """
     @discord.slash_command(name="setup", description="Setup the bot")
     @discord.option(name="channel_id", description="The channel id", required=True)
@@ -140,6 +141,7 @@ class Setup(discord.Cog):
             con_data.commit()
             await ctx.respond("The api key has been added", ephemeral=True)
     """
+
     @discord.slash_command(
         name="delete", description="Delete the information about this server"
     )
@@ -191,7 +193,7 @@ class Setup(discord.Cog):
         await ctx.respond("Disabled", ephemeral=True)
 
     # create a command calles "add channel" that can only be used in premium servers
-    
+
     """
     @discord.slash_command(
         name="setup_channel",
@@ -261,6 +263,7 @@ class Setup(discord.Cog):
                 return
         await ctx.respond("You can only add 5 channels", ephemeral=True)
     """
+
     # create a command called "remove channel" that can only be used in premium servers
     @discord.slash_command(
         name="remove_channel",
