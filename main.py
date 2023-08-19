@@ -13,6 +13,7 @@ bot.add_cog(cogs.Help(bot))
 bot.add_cog(cogs.Chat(bot))
 bot.add_cog(cogs.ManageChat(bot))
 bot.add_cog(cogs.Moderation(bot))
+bot.add_cog(cogs.ChannelSetup(bot))
 
 
 # set the bot's watching status to watcing your messages to answer you
@@ -36,9 +37,9 @@ async def on_guild_join(guild):
 
 
 @bot.event
-async def on_application_command_error(ctx, error):
-    debug(error)
+async def on_application_command_error(ctx, error: discord.DiscordException):
     await ctx.respond(error, ephemeral=True)
+    raise error
 
 
 bot.run(discord_token)  # run the bot

@@ -53,33 +53,8 @@ curs_premium = con_premium.cursor()
 curs_data.execute(
     """CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)"""
 )
-# we delete the moderation table and create a new one, with all theese parameters as floats: TOXICITY: {result[0]}; SEVERE_TOXICITY: {result[1]}; IDENTITY ATTACK: {result[2]}; INSULT: {result[3]}; PROFANITY: {result[4]}; THREAT: {result[5]}; SEXUALLY EXPLICIT: {result[6]}; FLIRTATION: {result[7]}; OBSCENE: {result[8]}; SPAM: {result[9]}
-expected_columns = 14
 
-# we delete the moderation table and create a new one
-curs_data.execute(
-    """CREATE TABLE IF NOT EXISTS moderation (guild_id text, logs_channel_id text, is_enabled boolean, mod_role_id text, toxicity real, severe_toxicity real, identity_attack real, insult real, profanity real, threat real, sexually_explicit real, flirtation real, obscene real, spam real)"""
-)
-
-# This code returns the number of columns in the table "moderation" in the database "data.db".
-curs_data.execute("PRAGMA table_info(moderation)")
-result = curs_data.fetchall()
-actual_columns = len(result)
-
-if actual_columns != expected_columns:
-    # we add the new columns
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN toxicity real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN severe_toxicity real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN identity_attack real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN insult real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN profanity real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN threat real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN sexually_explicit real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN flirtation real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN obscene real")
-    curs_data.execute("ALTER TABLE moderation ADD COLUMN spam real")
-else:
-    print("Table already has the correct number of columns")
+con_data.execute('CREATE TABLE IF NOT EXISTS setup_data (guild_id text, guild_settings text)')
 
 # This code creates the model table if it does not exist
 curs_data.execute(

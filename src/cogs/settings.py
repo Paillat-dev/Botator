@@ -266,6 +266,12 @@ class Settings(discord.Cog):
     )
     @default_permissions(administrator=True)
     async def images(self, ctx: discord.ApplicationContext, enable_disable: str):
+        return await ctx.respond(
+            """
+Images recognition is under maintenance and will come back soon!
+            """
+        )
+
         try:
             curs_data.execute(
                 "SELECT * FROM images WHERE guild_id = ?", (ctx_to_guid(ctx),)
