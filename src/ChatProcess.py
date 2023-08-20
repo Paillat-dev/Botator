@@ -5,27 +5,27 @@ import discord
 import datetime
 import json
 
-from src.utils.misc import moderate, ModerationError, Hasher
-from src.utils.variousclasses import models, characters, apis
+from src.utils.misc import moderate
+from src.utils.variousclasses import models
 from src.guild import Guild
 from src.chatUtils.Chat import fetch_messages_history
-from src.utils.openaicaller import openai_caller
+from src.chatUtils.prompts import createPrompt
 from src.functionscalls import (
     call_function,
-    functions,
     server_normal_channel_functions,
-    FuntionCallError,
 )
-from utils.misc import moderate, ModerationError
+from src.config import debug
+from src.chatUtils.requesters.request import request
 
 
 class Chat:
-    def __init__(self, bot, message: discord.Message):
+    def __init__(self, bot: discord.bot, message: discord.Message):
         self.bot = bot
         self.message: discord.Message = message
         self.guild = Guild(self.message.guild.id)
         self.author = message.author
         self.is_bots_thread = False
+        self.depth = 0
 
     async def getSupplementaryData(self) -> None:
         """
@@ -36,9 +36,9 @@ class Chat:
         if isinstance(self.message.channel, discord.Thread):
             if self.message.channel.owner_id == self.bot.user.id:
                 self.is_bots_thread = True
-            self.channelIdForSettings = self.message.channel.parent_id
+            self.channelIdForSettings = str(self.message.channel.parent_id)
         else:
-            self.channelIdForSettings = self.message.channel.id
+            self.channelIdForSettings = str(self.message.channel.id)
 
         try:
             self.original_message = await self.message.channel.fetch_message(
@@ -60,8 +60,6 @@ class Chat:
         """
         returnCriterias = []
         returnCriterias.append(self.message.author.id == self.bot.user.id)
-        returnCriterias.append(self.api_key == None)
-        returnCriterias.append(self.is_active == 0)
         return any(returnCriterias)
 
     async def postExitCriteria(self) -> bool:
@@ -70,24 +68,28 @@ class Chat:
         This checks if the bot should actuallly respond to the message or if the message doesn't concern the bot
         """
         returnCriterias = []
-        returnCriterias.append(
-            self.guild.sanitizedChannels.get(str(self.message.channel.id), None) != None
-        )
+        returnCriterias.append(self.openai_api_key != None)
         returnCriterias.append(
             self.message.content.find("<@" + str(self.bot.user.id) + ">") != -1
         )
         returnCriterias.append(self.original_message != None)
         returnCriterias.append(self.is_bots_thread)
-
+        returnCriterias.append(
+            self.guild.sanitizedChannels.get(str(self.channelIdForSettings), None)
+            != None
+        )
         return not any(returnCriterias)
 
     async def getSettings(self):
-        self.settings = self.guild.getChannelInfo(str(self.channelIdForSettings))
+        self.settings = self.guild.getChannelInfo(
+            str(self.channelIdForSettings)
+        ) or self.guild.getChannelInfo("serverwide")
         self.model = self.settings["model"]
         self.character = self.settings["character"]
         self.openai_api_key = self.guild.api_keys.get("openai", None)
         if self.openai_api_key == None:
             raise Exception("No openai api key is set")
+        self.type = "chat" if self.model in models.chatModels else "text"
 
     async def formatContext(self):
         """
@@ -104,7 +106,7 @@ class Chat:
             else:
                 role = "user"
                 name = msg.author.global_name
-            if not moderate(self.openai_api_key, msg.content):
+            if not await moderate(self.openai_api_key, msg.content):
                 self.context.append(
                     {
                         "role": role,
@@ -112,3 +114,66 @@ class Chat:
                         "name": name,
                     }
                 )
+
+    async def createThePrompt(self):
+        self.prompt = createPrompt(
+            messages=self.context,
+            model=self.model,
+            character=self.character,
+            modeltype=self.type,
+            guildName=self.message.guild.name,
+            channelName=self.message.channel.name,
+        )
+
+    async def getResponse(self):
+        """
+        This function gets the response from the ai
+        """
+        self.response = await request(
+            model=self.model,
+            prompt=self.prompt,
+            openai_api_key=self.openai_api_key,
+            funtcions=server_normal_channel_functions,
+        )
+
+    async def processResponse(self):
+        response = await call_function(
+            message=self.message,
+            function_call=self.response,
+            api_key=self.openai_api_key,
+        )
+        if response != None:
+            await self.processFunctioncallResponse(response)
+
+    async def processFunctioncallResponse(self, response):
+        self.context.append(
+            {
+                "role": "function",
+                "content": response,
+            }
+        )
+        if self.depth < 3:
+            await self.createThePrompt()
+            await self.getResponse()
+            await self.processResponse()
+        else:
+            await self.message.channel.send(
+                "It looks like I'm stuck in a loop. Sorry about that."
+            )
+
+    async def process(self):
+        """
+        This function processes the message
+        """
+        if await self.preExitCriteria():
+            print("pre exit criteria")
+            return
+        await self.getSupplementaryData()
+        await self.getSettings()
+        if await self.postExitCriteria():
+            return
+        await self.message.channel.trigger_typing()
+        await self.formatContext()
+        await self.createThePrompt()
+        await self.getResponse()
+        await self.processResponse()

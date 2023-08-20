@@ -77,6 +77,7 @@ curs_premium.execute(
 curs_premium.execute(
     """CREATE TABLE IF NOT EXISTS channels (guild_id text, channel0 text, channel1 text, channel2 text, channel3 text, channel4 text)"""
 )
+"""
 
 with open(
     os.path.abspath(
@@ -86,3 +87,4 @@ with open(
     encoding="utf-8",
 ) as file:
     gpt_3_5_turbo_prompt = file.read()
+"""

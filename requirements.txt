@@ -12,3 +12,4 @@ discord-oauth2.py
 black
 orjson # for speed
 simpleeval
+replicate

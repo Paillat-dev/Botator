@@ -82,18 +82,21 @@ class Guild:
     def load(self):
         self.getDbData()
 
-    def addChannel(self, channel: discord.TextChannel, model: str, character: str):
-        print(
-            f"Adding channel {channel.id} to guild {self.id} with model {model} and character {character}"
-        )
-        self.channels[str(channel.id)] = {
+    def addChannel(
+        self, channel: discord.TextChannel | str, model: str, character: str
+    ):
+        if isinstance(channel, discord.TextChannel):
+            channel = channel.id
+        self.channels[str(channel)] = {
             "model": model,
             "character": character,
         }
         self.updateDbData()
 
-    def delChannel(self, channel: discord.TextChannel):
-        del self.channels[str(channel.id)]
+    def delChannel(self, channel: discord.TextChannel | str):
+        if isinstance(channel, discord.TextChannel):
+            channel = channel.id
+        del self.channels[str(channel)]
         self.updateDbData()
 
     @property
@@ -102,14 +105,17 @@ class Guild:
             return self.channels
         if len(self.channels) == 0:
             return {}
-        return {
+        dictionary = {
             list(self.channels.keys())[0]: {
                 "model": models.matchingDict[models.default],
                 "character": characters.matchingDict[characters.default],
             }
         }
+        if self.channels.get("serverwide", None) is not None:
+            dictionary["serverwide"] = self.channels["serverwide"]
+        return dictionary
 
-    def getChannelInfo(self, channel: str):
+    def getChannelInfo(self, channel: str) -> dict:
         return self.sanitizedChannels.get(channel, None)
 
     def addApiKey(self, api: str, key: str):

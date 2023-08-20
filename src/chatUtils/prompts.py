@@ -7,6 +7,7 @@ for character in characters.reverseMatchingDict.keys():
     with open(
         f"src/chatUtils/prompts/{character}/chat.txt", "r", encoding="utf-8"
     ) as f:
+        promts[character] = {}
         promts[character]["chat"] = f.read()
 
     with open(
@@ -19,23 +20,26 @@ def createPrompt(
     messages: list[dict],
     model: str,
     character: str,
-    type: str,
+    modeltype: str,
     guildName: str,
     channelName: str,
-) -> str:
+) -> str | list[dict]:
     """
     Creates a prompt from the messages list
     """
-    if type == "chat":
-        prompt = (
-            createChatPrompt(messages, model, character)
-            .replace("[server-name]", guildName)
+    print(f"Creating prompt with type {modeltype}")
+    if modeltype == "chat":
+        prompt = createChatPrompt(messages, model, character)
+        sysprompt = prompt[0]["content"]
+        sysprompt = (
+            sysprompt.replace("[server-name]", guildName)
             .replace("[channel-name]", channelName)
             .replace(
                 "[datetime]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
             )
         )
-    elif type == "text":
+        prompt[0]["content"] = sysprompt
+    elif modeltype == "text":
         prompt = (
             createTextPrompt(messages, model, character)
             .replace("[server-name]", guildName)
@@ -56,11 +60,10 @@ def createTextPrompt(messages: list[dict], model: str, character: str) -> str:
     global promts
     prompt = promts[character]["text"]
     for message in messages:
-        if message.name == "assistant":
-            message.name = character
+        if message["name"] == "assistant":
+            message["name"] = character
         prompt += f"{message['name']}: {message['content']} <|endofmessage|>\n"
     prompt += f"{character}:"
-
     return prompt
 
 
