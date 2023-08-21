@@ -92,6 +92,8 @@ class Chat:
         self.settings = self.guild.getChannelInfo(
             str(self.channelIdForSettings)
         ) or self.guild.getChannelInfo("serverwide")
+        if self.settings == None:
+            return True
         self.model = self.settings["model"]
         self.character = self.settings["character"]
         self.openai_api_key = self.guild.api_keys.get("openai", None)
@@ -180,7 +182,8 @@ class Chat:
         if await self.preExitCriteria():
             return
         await self.getSupplementaryData()
-        await self.getSettings()
+        if await self.getSettings():
+            return
         if await self.postExitCriteria():
             return
         await self.message.channel.trigger_typing()
