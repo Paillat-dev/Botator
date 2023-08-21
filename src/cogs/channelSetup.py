@@ -236,7 +236,7 @@ class ChannelSetup(commands.Cog):
     async def premium(self, ctx: discord.ApplicationContext):
         guild = Guild(ctx.guild.id)
         guild.load()
-        if self.bot.is_owner(ctx.author):
+        if await self.bot.is_owner(ctx.author):
             guild.premium = True
             # also set expiry date in 6 months isofromat
             guild.premium_expiration = datetime.datetime.now() + datetime.timedelta(

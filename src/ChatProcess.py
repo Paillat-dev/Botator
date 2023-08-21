@@ -10,10 +10,7 @@ from src.utils.variousclasses import models
 from src.guild import Guild
 from src.chatUtils.Chat import fetch_messages_history
 from src.chatUtils.prompts import createPrompt
-from src.functionscalls import (
-    call_function,
-    server_normal_channel_functions,
-)
+from src.functionscalls import call_function, server_normal_channel_functions, functions
 from src.config import debug
 from src.chatUtils.requesters.request import request
 
@@ -49,7 +46,7 @@ class Chat:
 
         if (
             self.original_message != None
-            and self.original_message.author.id == self.bot.user.id
+            and self.original_message.author.id != self.bot.user.id
         ):
             self.original_message = None
 
@@ -67,18 +64,29 @@ class Chat:
         Returns True if any of the exit criterias are met (their opposite is met but there is a not in front of the any() function)
         This checks if the bot should actuallly respond to the message or if the message doesn't concern the bot
         """
-        returnCriterias = []
-        returnCriterias.append(self.openai_api_key != None)
-        returnCriterias.append(
-            self.message.content.find("<@" + str(self.bot.user.id) + ">") != -1
+
+        serverwideReturnCriterias = []
+        serverwideReturnCriterias.append(self.original_message != None)
+        serverwideReturnCriterias.append(
+            self.message.content.find(f"<@{self.bot.user.id}>") != -1
         )
-        returnCriterias.append(self.original_message != None)
-        returnCriterias.append(self.is_bots_thread)
-        returnCriterias.append(
-            self.guild.sanitizedChannels.get(str(self.channelIdForSettings), None)
-            != None
+        serverwideReturnCriterias.append(self.is_bots_thread)
+
+        channelReturnCriterias = []
+        channelReturnCriterias.append(self.channelIdForSettings != "serverwide")
+        channelReturnCriterias.append(
+            self.guild.getChannelInfo(self.channelIdForSettings) != None
         )
-        return not any(returnCriterias)
+
+        messageReturnCriterias = []
+        messageReturnCriterias.append(
+            any(serverwideReturnCriterias)
+            and self.guild.getChannelInfo("serverwide") != None
+        )
+        messageReturnCriterias.append(all(channelReturnCriterias))
+
+        returnCriterias: bool = not any(messageReturnCriterias)
+        return returnCriterias
 
     async def getSettings(self):
         self.settings = self.guild.getChannelInfo(
@@ -129,11 +137,14 @@ class Chat:
         """
         This function gets the response from the ai
         """
+        funcs = functions
+        if isinstance(self.message.channel, discord.TextChannel):
+            funcs.extend(server_normal_channel_functions)
         self.response = await request(
             model=self.model,
             prompt=self.prompt,
             openai_api_key=self.openai_api_key,
-            funtcions=server_normal_channel_functions,
+            funtcions=funcs,
         )
 
     async def processResponse(self):
@@ -142,14 +153,15 @@ class Chat:
             function_call=self.response,
             api_key=self.openai_api_key,
         )
-        if response != None:
+        if response[0] != None:
             await self.processFunctioncallResponse(response)
 
     async def processFunctioncallResponse(self, response):
         self.context.append(
             {
                 "role": "function",
-                "content": response,
+                "content": response[0],
+                "name": response[1],
             }
         )
         if self.depth < 3:
@@ -166,7 +178,6 @@ class Chat:
         This function processes the message
         """
         if await self.preExitCriteria():
-            print("pre exit criteria")
             return
         await self.getSupplementaryData()
         await self.getSettings()

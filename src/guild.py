@@ -25,7 +25,10 @@ class Guild:
                     "SELECT * FROM setup_data WHERE guild_id = ?", (self.id,)
                 )
                 data = curs_data.fetchone()
-        data = orjson.loads(data[1])
+        if type(data[1]) == str and data[1].startswith("b'"):
+            data = orjson.loads(data[1][2:-1])
+        else:
+            data = orjson.loads(data[1])
         self.premium = data["premium"]
         self.channels = data["channels"]
         self.api_keys = data["api_keys"]

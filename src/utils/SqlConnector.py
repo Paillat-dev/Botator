@@ -22,3 +22,8 @@ class _sql:
 
 
 sql: _sql = _sql()
+
+command = "CREATE TABLE IF NOT EXISTS setup_data (guild_id text, guild_settings text)"
+
+with sql.mainDb as db:
+    db.execute(command)

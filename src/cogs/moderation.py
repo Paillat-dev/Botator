@@ -2,7 +2,6 @@ import discord
 from discord import default_permissions
 from discord.ext import commands
 import os
-from src.config import debug, curs_data, con_data
 import openai
 import requests
 
@@ -91,13 +90,6 @@ class Moderation(discord.Cog):
             "Our moderation capabilities have been switched to our new 100% free and open-source AI discord moderation bot! You add it to your server here: https://discord.com/api/oauth2/authorize?client_id=1071451913024974939&permissions=1377342450896&scope=bot and you can find the source code here: https://github.com/Paillat-dev/Moderator/ \n If you need help, you can join our support server here: https://discord.gg/pB6hXtUeDv",
             ephemeral=True,
         )
-        if enable == False:
-            curs_data.execute(
-                "DELETE FROM moderation WHERE guild_id = ?", (str(ctx.guild.id),)
-            )
-            con_data.commit()
-            await ctx.respond("Moderation disabled!", ephemeral=True)
-            return
 
     @discord.slash_command(
         name="get_toxicity", description="Get the toxicity of a message"

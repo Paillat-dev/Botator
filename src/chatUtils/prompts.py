@@ -27,7 +27,6 @@ def createPrompt(
     """
     Creates a prompt from the messages list
     """
-    print(f"Creating prompt with type {modeltype}")
     if modeltype == "chat":
         prompt = createChatPrompt(messages, model, character)
         sysprompt = prompt[0]["content"]

@@ -45,28 +45,8 @@ def mg_to_guid(mg):
         return mg.guild.id
 
 
-con_data = sqlite3.connect("./database/data.db")
-curs_data = con_data.cursor()
 con_premium = sqlite3.connect("./database/premium.db")
 curs_premium = con_premium.cursor()
-
-curs_data.execute(
-    """CREATE TABLE IF NOT EXISTS data (guild_id text, channel_id text, api_key text, is_active boolean, max_tokens integer, temperature real, frequency_penalty real, presence_penalty real, uses_count_today integer, prompt_size integer, prompt_prefix text, tts boolean, pretend_to_be text, pretend_enabled boolean)"""
-)
-
-con_data.execute(
-    "CREATE TABLE IF NOT EXISTS setup_data (guild_id text, guild_settings text)"
-)
-
-# This code creates the model table if it does not exist
-curs_data.execute(
-    """CREATE TABLE IF NOT EXISTS model (guild_id text, model_name text)"""
-)
-
-# This code creates the images table if it does not exist
-curs_data.execute(
-    """CREATE TABLE IF NOT EXISTS images (guild_id text, usage_count integer, is_enabled boolean)"""
-)
 
 # This code creates the data table if it does not exist
 curs_premium.execute(

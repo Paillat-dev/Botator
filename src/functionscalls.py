@@ -341,7 +341,9 @@ async def evaluate_math(
     return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
 
 
-async def call_function(message: discord.Message, function_call, api_key):
+async def call_function(
+    message: discord.Message, function_call, api_key
+) -> list[None | str]:
     name = function_call.get("name", "")
     if name == "":
         raise FuntionCallError("No name provided")
@@ -359,7 +361,7 @@ async def call_function(message: discord.Message, function_call, api_key):
     ):
         return "Query blocked by the moderation system. If the user asked for something edgy, please tell them in a funny way that you won't do it, but do not specify that it was blocked by the moderation system."
     returnable = await function(message, arguments)
-    return returnable
+    return [returnable, name]
 
 
 functions_matching = {
