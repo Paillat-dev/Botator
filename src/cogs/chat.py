@@ -5,7 +5,7 @@ from src.config import (
     webhook_url,
 )
 import asyncio
-import src.makeprompt as mp
+from src.ChatProcess import Chat as ChatClass
 import aiohttp
 
 from src.utils import banusr
@@ -113,8 +113,13 @@ class Chat(discord.Cog):
             await asyncio.sleep(2)
             await message.channel.send(message.content)
             return
-        await mp.chat_process(self, message)
+        if message.guild == None:
+            return
+        chatclass = ChatClass(self.bot, message)
+        await chatclass.process()
 
+
+"""
     @discord.slash_command(name="redo", description="Redo a message")
     async def redo(self, ctx: discord.ApplicationContext):
         history = await ctx.channel.history(limit=2).flatten()
@@ -145,3 +150,4 @@ class Chat(discord.Cog):
         else:
             debug(error)
             raise error
+"""
