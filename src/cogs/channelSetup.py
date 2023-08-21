@@ -233,14 +233,14 @@ class ChannelSetup(commands.Cog):
         await ctx.respond(f"Set API key for {api} to `secret`.", ephemeral=True)
 
     @setup.command(name="premium", description="Set the guild to premium.")
-    async def premium(self, ctx: discord.ApplicationContext):
-        guild = Guild(ctx.guild.id)
+    async def premium(self, ctx: discord.ApplicationContext, guild_id: int = None, days: int = 180):
+        guild = Guild(guild_id or ctx.guild.id)
         guild.load()
         if await self.bot.is_owner(ctx.author):
             guild.premium = True
             # also set expiry date in 6 months isofromat
             guild.premium_expiration = datetime.datetime.now() + datetime.timedelta(
-                days=180
+                days=days
             )
             guild.updateDbData()
             return await ctx.respond("Set guild to premium.", ephemeral=True)
