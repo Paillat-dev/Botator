@@ -8,7 +8,7 @@ import json
 from src.utils.misc import moderate
 from src.utils.variousclasses import models
 from src.guild import Guild
-from src.chatUtils.Chat import fetch_messages_history
+from src.chatUtils.Chat import fetch_messages_history, is_ignorable
 from src.chatUtils.prompts import createPrompt
 from src.functionscalls import call_function, server_normal_channel_functions, functions
 from src.config import debug
@@ -57,6 +57,7 @@ class Chat:
         """
         returnCriterias = []
         returnCriterias.append(self.message.author.id == self.bot.user.id)
+        returnCriterias.append(is_ignorable(self.message.content))
         return any(returnCriterias)
 
     async def postExitCriteria(self) -> bool:
