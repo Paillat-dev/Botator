@@ -1,4 +1,5 @@
-py-cord
+#py-cord
+git+https://github.com/Pycord-Development/pycord.git
 python-dotenv
 openai
 emoji
@@ -11,3 +12,4 @@ discord-oauth2.py
 black
 orjson # for speed
 simpleeval
+replicate

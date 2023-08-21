@@ -1,7 +1,6 @@
 import discord
 import re
 import os
-from src.config import debug, curs_data
 
 
 class ManageChat(discord.Cog):
@@ -10,33 +9,9 @@ class ManageChat(discord.Cog):
         self.bot = bot
 
     @discord.slash_command(
-        name="cancel", description="Cancel the last message sent into a channel"
-    )
-    async def cancel(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author} ran the cancel command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
-        # check if the guild is in the database
-        curs_data.execute("SELECT * FROM data WHERE guild_id = ?", (ctx.guild.id,))
-        if curs_data.fetchone() is None:
-            await ctx.respond(
-                "This server is not setup, please run /setup", ephemeral=True
-            )
-            return
-        # get the last message sent by the bot in the cha where the command was sent
-        last_message = await ctx.channel.fetch_message(ctx.channel.last_message_id)
-        # delete the message
-        await last_message.delete()
-        await ctx.respond("The last message has been deleted", ephemeral=True)
-
-    # add a slash command called "clear" that deletes all the messages in the channel
-    @discord.slash_command(
         name="clear", description="Clear all the messages in the channel"
     )
     async def clear(self, ctx: discord.ApplicationContext):
-        debug(
-            f"The user {ctx.author.name} ran the clear command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         await ctx.respond("messages deleted!", ephemeral=True)
         return await ctx.channel.purge()
 
@@ -52,9 +27,6 @@ class ManageChat(discord.Cog):
     async def transcript(
         self, ctx: discord.ApplicationContext, channel_send: discord.TextChannel = None
     ):
-        debug(
-            f"The user {ctx.author.name} ran the transcript command command in the channel {ctx.channel} of the guild {ctx.guild}, named {ctx.guild.name}"
-        )
         # save all the messages in the channel in a txt file and send it
         messages = await ctx.channel.history(limit=None).flatten()
         messages.reverse()

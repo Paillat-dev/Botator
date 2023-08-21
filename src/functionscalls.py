@@ -184,6 +184,15 @@ class FuntionCallError(Exception):
     pass
 
 
+async def send_message(
+    message_in_channel_in_wich_to_send: discord.Message, arguments: dict
+):
+    message = arguments.get("message", "")
+    if message == "":
+        raise FuntionCallError("No message provided")
+    await message_in_channel_in_wich_to_send.channel.send(message)
+
+
 async def get_final_url(url):
     async with aiohttp.ClientSession() as session:
         async with session.head(url, allow_redirects=True) as response:
@@ -344,13 +353,14 @@ async def evaluate_math(
     return f"Result to math eval of {evaluable}: ```\n{str(result)}```"
 
 
-async def call_function(message: discord.Message, function_call, api_key):
+async def call_function(
+    message: discord.Message, function_call, api_key
+) -> list[None | str]:
     name = function_call.get("name", "")
     if name == "":
         raise FuntionCallError("No name provided")
     arguments = function_call.get("arguments", {})
     # load the function call arguments json
-    arguments = orjson.loads(arguments)
     if name not in functions_matching:
         raise FuntionCallError("Invalid function name")
     function = functions_matching[name]
@@ -363,10 +373,11 @@ async def call_function(message: discord.Message, function_call, api_key):
     ):
         return "Query blocked by the moderation system. If the user asked for something edgy, please tell them in a funny way that you won't do it, but do not specify that it was blocked by the moderation system."
     returnable = await function(message, arguments)
-    return returnable
+    return [returnable, name]
 
 
 functions_matching = {
+    "send_message": send_message,
     "add_reaction_to_last_message": add_reaction_to_last_message,
     "reply_to_last_message": reply_to_last_message,
     "send_a_stock_image": send_a_stock_image,

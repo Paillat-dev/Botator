@@ -142,7 +142,6 @@ class openai_caller:
                     "`An APIError occurred. This is not your fault, it is OpenAI's fault. We apologize for the inconvenience. Retrying...`"
                 )
                 await asyncio.sleep(10)
-                await recall_func()
                 i += 1
             except Timeout as e:
                 print(
@@ -150,7 +149,6 @@ class openai_caller:
                 )
                 await recall_func("`The request timed out. Retrying...`")
                 await asyncio.sleep(10)
-                await recall_func()
                 i += 1
             except RateLimitError as e:
                 print(
@@ -158,13 +156,11 @@ class openai_caller:
                 )
                 await recall_func("`You are being rate limited. Retrying...`")
                 await asyncio.sleep(10)
-                await recall_func()
                 i += 1
             except APIConnectionError as e:
                 print(
                     f"\n\n{bcolors.BOLD}{bcolors.FAIL}APIConnectionError. There is an issue with your internet connection. Please check your connection.{bcolors.ENDC}"
                 )
-                await recall_func()
                 raise e
             except InvalidRequestError as e:
                 print(
