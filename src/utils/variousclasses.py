@@ -4,9 +4,7 @@ from discord import AutocompleteContext
 class models:
     matchingDict = {
         "chatGPT (default - free)": "gpt-3.5-turbo",
-        "davinci (premium)": "text-davinci-003",
         "llama (premium)": "text-llama",
-        "llama 2 (premium)": "text-llama-2",
     }
     reverseMatchingDict = {v: k for k, v in matchingDict.items()}
     default = list(matchingDict.keys())[0]
@@ -23,6 +21,7 @@ class characters:
     matchingDict = {
         "Botator (default - free)": "botator",
         "Quantum (premium)": "quantum",
+        "Botator roleplay (premium)": "botator-roleplay",
     }
     reverseMatchingDict = {v: k for k, v in matchingDict.items()}
     default = list(matchingDict.keys())[0]
