@@ -83,14 +83,20 @@ class openai_caller:
     # async def generate_response(self, error_call=None, **kwargs):
     async def generate_response(*args, **kwargs):
         self = args[0]
-        if args.get("error_call", None) != None:
-            error_call = args[1]
+        if len(args) > 1:
+            error_call = args[1] or nothing
         else:
 
             async def nothing(x):
                 return x
 
             error_call = nothing
+        if error_call == None:
+                
+                async def nothing(x):
+                    return x
+    
+                error_call = nothing
         if kwargs.get("model", "") in chat_models:
             return await self.chat_generate(error_call, **kwargs)
         elif kwargs.get("engine", "") in text_models:
