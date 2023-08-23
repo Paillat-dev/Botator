@@ -142,7 +142,7 @@ class Chat:
         """
         This function gets the response from the ai
         """
-        funcs = functions
+        funcs = functions.copy()
         if isinstance(self.message.channel, discord.TextChannel):
             funcs.extend(server_normal_channel_functions)
         self.response = await request(
