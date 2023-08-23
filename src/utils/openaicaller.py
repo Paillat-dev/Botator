@@ -83,7 +83,7 @@ class openai_caller:
     # async def generate_response(self, error_call=None, **kwargs):
     async def generate_response(*args, **kwargs):
         self = args[0]
-        if len(args) > 1:
+        if args.get("error_call", None) != None:
             error_call = args[1]
         else:
 
