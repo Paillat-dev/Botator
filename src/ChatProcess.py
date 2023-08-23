@@ -117,6 +117,8 @@ class Chat:
             else:
                 role = "user"
                 name = msg.author.global_name
+            # use re not make name match ^[a-zA-Z0-9_-]{1,64}$ by removing all non-alphanumeric characters
+            name = re.sub(r"[^a-zA-Z0-9_-]", "", name)
             if not await moderate(self.openai_api_key, msg.content):
                 self.context.append(
                     {
