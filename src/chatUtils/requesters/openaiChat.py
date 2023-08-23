@@ -7,6 +7,7 @@ async def openaiChat(messages, functions, openai_api_key, model="gpt-3.5-turbo")
     response = await caller.generate_response(
         api_key=openai_api_key,
         model=model,
+        temperature=1.3,
         messages=messages,
         functions=functions,
         function_call="auto",
