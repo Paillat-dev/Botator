@@ -43,8 +43,10 @@ async def fetch_messages_history(channel: discord.TextChannel, limit, original_m
         async for msg in channel.history(limit=100, before=original_message):
             if not is_ignorable(msg.content):
                 messages.append(msg)
-            if len(messages) == limit:
+            if len(messages) == limit-1:
                 break
+            
+        messages.append(original_message)
     messages.reverse()
     return messages
 
