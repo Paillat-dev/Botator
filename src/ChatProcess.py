@@ -189,8 +189,17 @@ class Chat:
             return
         if await self.postExitCriteria():
             return
-        await self.message.channel.trigger_typing()
-        await self.formatContext()
-        await self.createThePrompt()
-        await self.getResponse()
-        await self.processResponse()
+        try:
+            await self.message.channel.trigger_typing()
+            await self.formatContext()
+            await self.createThePrompt()
+            await self.getResponse()
+            await self.processResponse()
+        except Exception as e:
+            await self.message.channel.send(
+                f"""An error occured while processing your message. Please check your settings and try again. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
+```
+{e}
+```"""
+            )
+            raise e
