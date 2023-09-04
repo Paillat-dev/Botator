@@ -22,6 +22,7 @@ class characters:
         "Botator (default - free)": "botator",
         "Quantum (premium)": "quantum",
         "Botator roleplay (premium)": "botator-roleplay",
+        "Zenith - Asimov's Laws (premium)": "zenith",
     }
     reverseMatchingDict = {v: k for k, v in matchingDict.items()}
     default = list(matchingDict.keys())[0]
