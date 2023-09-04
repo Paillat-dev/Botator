@@ -2,12 +2,14 @@ import orjson
 from src.utils.openaicaller import openai_caller
 
 
-async def openaiChat(messages, functions, openai_api_key, model="gpt-3.5-turbo"):
+async def openaiChat(
+    messages, functions, openai_api_key, model="gpt-3.5-turbo", temperature=1.2
+):
     caller = openai_caller()
     response = await caller.generate_response(
         api_key=openai_api_key,
         model=model,
-        temperature=1.3,
+        temperature=temperature,
         messages=messages,
         functions=functions,
         function_call="auto",

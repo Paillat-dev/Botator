@@ -14,6 +14,7 @@ async def request(
     prompt: list[dict] | str,
     openai_api_key: str,
     funtcions: list[dict] = None,
+    custom_temp: float = 1.2,
 ):
     if model == "gpt-3.5-turbo":
         return await openaiChat(
@@ -21,6 +22,7 @@ async def request(
             openai_api_key=openai_api_key,
             functions=funtcions,
             model=model,
+            temperature=custom_temp,
         )
     elif model == "text-davinci-003":
         #        return await openaiText(prompt=prompt, openai_api_key=openai_api_key)

@@ -6,12 +6,11 @@ import datetime
 import json
 
 from src.utils.misc import moderate
-from src.utils.variousclasses import models
+from src.utils.variousclasses import models, characters
 from src.guild import Guild
 from src.chatUtils.Chat import fetch_messages_history, is_ignorable
 from src.chatUtils.prompts import createPrompt
 from src.functionscalls import call_function, server_normal_channel_functions, functions
-from src.config import debug
 from src.chatUtils.requesters.request import request
 
 
@@ -157,6 +156,7 @@ class Chat:
             prompt=self.prompt,
             openai_api_key=self.openai_api_key,
             funtcions=funcs,
+            custom_temp=characters.custom_temp.get(self.character, 1.2),
         )
 
     async def processResponse(self):
