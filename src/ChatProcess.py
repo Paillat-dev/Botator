@@ -129,7 +129,12 @@ class Chat:
                         "name": name,
                     }
                 )
-
+            else:
+                try:
+                    await msg.add_reaction("🤬")
+                except:
+                    pass
+    
     async def createThePrompt(self):
         self.prompt = createPrompt(
             messages=self.context,
@@ -205,10 +210,14 @@ class Chat:
             except:
                 pass
             await self.message.channel.send(
-                f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
+                f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again later. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
 ```
 {e}
 ```""",
                 delete_after=4,
             )
+            try:
+                await self.message.add_reaction("😞")
+            except:
+                pass
             raise e
