@@ -134,7 +134,7 @@ class Chat:
                     await msg.add_reaction("🤬")
                 except:
                     pass
-    
+
     async def createThePrompt(self):
         self.prompt = createPrompt(
             messages=self.context,
