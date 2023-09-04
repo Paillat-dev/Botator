@@ -5,6 +5,7 @@ import discord
 import datetime
 import json
 
+from openai.error import APIError
 from src.utils.misc import moderate
 from src.utils.variousclasses import models, characters
 from src.guild import Guild
@@ -209,13 +210,19 @@ class Chat:
                 self.message.remove_reaction("🤔", self.message.guild.me)
             except:
                 pass
-            await self.message.channel.send(
-                f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again later. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
-```
-{e}
-```""",
-                delete_after=4,
-            )
+            if isinstance(e, APIError):
+                await self.message.channel.send(
+                    "Due to OpenAI not doing their work, I can unfortunately not answer right now. Do retry soon!",
+                    delete_after=5,
+                )
+            else:
+                await self.message.channel.send(
+                    f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again later. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
+    ```
+    {e}
+    ```""",
+                    delete_after=4,
+                )
             try:
                 await self.message.add_reaction("😞")
             except:
