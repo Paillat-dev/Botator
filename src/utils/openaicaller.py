@@ -136,8 +136,10 @@ class openai_caller:
     async def retryal_call(self, recall_func, callable):
         i = 0
         response = None
+        print(f"{bcolors.BOLD}Calling OpenAI API...{bcolors.ENDC}")
         while i < 10:
             try:
+                print(f"{bcolors.BOLD}Retryal {i+1}...{bcolors.ENDC}")
                 response = await callable()
                 return response
             except APIError as e:
@@ -147,21 +149,18 @@ class openai_caller:
                 await recall_func(
                     "`An APIError occurred. This is not your fault, it is OpenAI's fault. We apologize for the inconvenience. Retrying...`"
                 )
-                await asyncio.sleep(5)
                 i += 1
             except Timeout as e:
                 print(
                     f"\n\n{bcolors.BOLD}{bcolors.WARNING}The request timed out. Retrying...{bcolors.ENDC}"
                 )
                 await recall_func("`The request timed out. Retrying...`")
-                await asyncio.sleep(5)
                 i += 1
             except RateLimitError as e:
                 print(
                     f"\n\n{bcolors.BOLD}{bcolors.WARNING}RateLimitError. You are being rate limited. Retrying...{bcolors.ENDC}"
                 )
                 await recall_func("`You are being rate limited. Retrying...`")
-                await asyncio.sleep(5)
                 i += 1
             except APIConnectionError as e:
                 print(
@@ -185,7 +184,6 @@ class openai_caller:
                     f"\n\n{bcolors.BOLD}{bcolors.WARNING}ServiceUnavailableError. The OpenAI API is not responding. Retrying...{bcolors.ENDC}"
                 )
                 await recall_func("`The OpenAI API is not responding. Retrying...`")
-                await asyncio.sleep(5)
                 await recall_func()
                 i += 1
             finally:
