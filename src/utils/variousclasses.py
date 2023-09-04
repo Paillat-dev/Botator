@@ -25,8 +25,8 @@ class characters:
         "Zenith - Asimov's Laws (premium)": "zenith",
     }
     custom_temp = {
-        "zenith": 1.8,
-        "botator-roleplay": 1.8,
+        "zenith": 1.7,
+        "botator-roleplay": 1.4,
     }
 
     reverseMatchingDict = {v: k for k, v in matchingDict.items()}
