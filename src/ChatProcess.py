@@ -193,15 +193,22 @@ class Chat:
             return
         try:
             await self.message.channel.trigger_typing()
+            await self.message.add_reaction("🤔")
             await self.formatContext()
             await self.createThePrompt()
             await self.getResponse()
             await self.processResponse()
+            await self.message.remove_reaction("🤔", self.message.guild.me)
         except Exception as e:
+            try:
+                self.message.remove_reaction("🤔", self.message.guild.me)
+            except:
+                pass
             await self.message.channel.send(
-                f"""An error occured while processing your message. Please check your settings and try again. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
+                f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
 ```
 {e}
-```"""
+```""",
+                delete_after=4,
             )
             raise e

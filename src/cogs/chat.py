@@ -107,7 +107,7 @@ class Chat(discord.Cog):
             if message.content.startswith("botator!unban"):
                 user2ban = message.content.split(" ")[1]
                 await banusr.unbanuser(user2ban)
-                await message.chafnnel.send(f"User {user2ban} unbanned !")
+                await message.channel.send(f"User {user2ban} unbanned !")
                 return
         if str(message.author.id) in banusr.banend_users:
             await asyncio.sleep(2)
