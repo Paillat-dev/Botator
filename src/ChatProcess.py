@@ -5,7 +5,6 @@ import discord
 import datetime
 import json
 
-from openai.error import APIError
 from src.utils.misc import moderate
 from src.utils.variousclasses import models, characters
 from src.guild import Guild
@@ -13,7 +12,6 @@ from src.chatUtils.Chat import fetch_messages_history, is_ignorable
 from src.chatUtils.prompts import createPrompt
 from src.functionscalls import call_function, server_normal_channel_functions, functions
 from src.chatUtils.requesters.request import request
-
 
 class Chat:
     def __init__(self, bot: discord.bot, message: discord.Message):
@@ -210,7 +208,7 @@ class Chat:
                 self.message.remove_reaction("🤔", self.message.guild.me)
             except:
                 pass
-            if isinstance(e, APIError):
+            if isinstance(e, TimeoutError):
                 await self.message.channel.send(
                     "Due to OpenAI not doing their work, I can unfortunately not answer right now. Do retry soon!",
                     delete_after=5,
@@ -218,9 +216,9 @@ class Chat:
             else:
                 await self.message.channel.send(
                     f"""An error occured while processing your message, we are sorry about that. Please check your settings and try again later. If the issue persists, please join uor discord server here: https://discord.gg/pB6hXtUeDv and send the following logs:
-    ```
-    {e}
-    ```""",
+```
+{e}
+```""",
                     delete_after=4,
                 )
             try:
