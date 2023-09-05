@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.10.0
+FROM python:3.10.13-slim-bullseye 
 # Keeps Python from generating .pyc files in the container
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
