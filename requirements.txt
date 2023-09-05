@@ -1,5 +1,4 @@
-#py-cord
-git+https://github.com/Pycord-Development/pycord.git
+py-cord-dev
 python-dotenv
 openai
 emoji
