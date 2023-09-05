@@ -13,6 +13,7 @@ from src.chatUtils.prompts import createPrompt
 from src.functionscalls import call_function, server_normal_channel_functions, functions
 from src.chatUtils.requesters.request import request
 
+
 class Chat:
     def __init__(self, bot: discord.bot, message: discord.Message):
         self.bot = bot
