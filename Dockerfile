@@ -1,8 +1,11 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.10.13-slim-bullseye 
-# Keeps Python from generating .pyc files in the container
+FROM python:3.10.13-slim-bullseye
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
+# Install git
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 # Install pip requirements
 COPY requirements.txt .
 RUN pip install -r requirements.txt
