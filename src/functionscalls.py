@@ -61,7 +61,7 @@ functions = [
     },
     {
         "name": "send_a_gif",
-        "description": "Send a gif in the channel.",
+        "description": "Send a gif in the channel. Refrain from using this function too much, as it can be annoying.",
         "parameters": {
             "type": "object",
             "properties": {
