@@ -23,6 +23,7 @@ class characters:
         "Quantum (premium)": "quantum",
         "Botator roleplay (premium)": "botator-roleplay",
         "Zenith - Asimov's Laws (premium)": "zenith",
+        "FizzIQ - (premium)": "fizziq",
     }
     custom_temp = {
         "zenith": 1.7,
