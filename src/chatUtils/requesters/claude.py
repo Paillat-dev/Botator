@@ -20,8 +20,7 @@ async def claude(messages):
         elif message["role"] == "function":
             ...
     prompt += AI_PROMPT
-    completion = await anthropic.completions.create(stop_sequences=["\n\nHuman (", "\n\nSYSTEM: "], model="claude-2", max_tokens_to_sample=300, prompt=prompt)
-    print(prompt)
+    completion = await anthropic.completions.create(stop_sequences=["\n\nHuman (", "\n\nSYSTEM: "], model="claude-2", max_tokens_to_sample=512, prompt=prompt)
     return {
         "name": "send_message",
         "arguments": {"message": completion.completion},
