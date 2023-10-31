@@ -7,8 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 ENV TZ=Europe/Paris
 # Install pip requirements
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /Botator
 WORKDIR /Botator
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /Botator
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
