@@ -6,16 +6,12 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 ENV TZ=Europe/Paris
-# Install git
-RUN apt-get update && \
-    apt-get install -y git && \
-    rm -rf /var/lib/apt/lists/*
 # Install pip requirements
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /Botator
+WORKDIR /Botator
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN git clone https://github.com/Paillat-dev/Botator.git
-WORKDIR /Botator
+COPY . .
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /Botator
 USER appuser
 CMD ["python", "main.py"]
