@@ -109,7 +109,7 @@ class Chat:
             self.message.channel, 10, self.original_message
         )
         # if latst item id is not original message id, add original message to messages
-        if messages[-1].id != self.original_message.id:
+        if messages[-1].content != self.original_message.content:
             messages.append(self.original_message)
         self.context = []
         for msg in messages:
