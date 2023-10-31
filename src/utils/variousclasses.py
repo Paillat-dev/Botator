@@ -5,11 +5,12 @@ class models:
     matchingDict = {
         "chatGPT (default - free)": "gpt-3.5-turbo",
         "llama (premium)": "text-llama",
+        "claude (premium)": "claude",
     }
     reverseMatchingDict = {v: k for k, v in matchingDict.items()}
     default = list(matchingDict.keys())[0]
     openaimodels = ["gpt-3.5-turbo", "text-davinci-003"]
-    chatModels = ["gpt-3.5-turbo"]
+    chatModels = ["gpt-3.5-turbo", "claude"]
 
     @classmethod
     async def autocomplete(cls, ctx: AutocompleteContext) -> list[str]:

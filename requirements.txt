@@ -2,13 +2,13 @@ py-cord-dev
 python-dotenv
 openai
 emoji
-# Google api
 google-api-python-client
 google-cloud-vision
 tiktoken
 bs4
 discord-oauth2.py
 black
-orjson # for speed
+orjson
 simpleeval
 replicate
+anthropic

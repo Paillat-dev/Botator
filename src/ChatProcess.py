@@ -206,7 +206,7 @@ class Chat:
             await self.message.remove_reaction("🤔", self.message.guild.me)
         except Exception as e:
             try:
-                self.message.remove_reaction("🤔", self.message.guild.me)
+                await self.message.remove_reaction("🤔", self.message.guild.me)
             except:
                 pass
             if isinstance(e, TimeoutError):

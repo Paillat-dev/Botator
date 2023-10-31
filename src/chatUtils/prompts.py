@@ -34,7 +34,7 @@ def createPrompt(
             sysprompt.replace("[server-name]", guildName)
             .replace("[channel-name]", channelName)
             .replace(
-                "[datetime]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
             )
         )
         prompt[0]["content"] = sysprompt
@@ -44,7 +44,7 @@ def createPrompt(
             .replace("[server-name]", guildName)
             .replace("[channel-name]", channelName)
             .replace(
-                "[datetime]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
+                "[date-and-time]", datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M:%S")
             )
         )
     else:
