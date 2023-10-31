@@ -1,7 +1,11 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.10.13-slim-bullseye
+FROM python:3.11-bookworm
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
+# Turns off pyc files
+ENV PYTHONDONTWRITEBYTECODE=1
+
+ENV TZ=Europe/Paris
 # Install git
 RUN apt-get update && \
     apt-get install -y git && \
