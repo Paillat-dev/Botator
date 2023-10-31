@@ -7,8 +7,9 @@ anthropic = AsyncAnthropic(
     api_key=os.getenv("ANTHROPIC_KEY"),
 )
 
+
 async def claude(messages):
-    #messages are a dict {} with content and roler.
+    # messages are a dict {} with content and roler.
     prompt = ""
     for message in messages:
         if message["role"] == "system":
@@ -20,7 +21,12 @@ async def claude(messages):
         elif message["role"] == "function":
             ...
     prompt += AI_PROMPT
-    completion = await anthropic.completions.create(stop_sequences=["\n\nHuman (", "\n\nSYSTEM: "], model="claude-2", max_tokens_to_sample=512, prompt=prompt)
+    completion = await anthropic.completions.create(
+        stop_sequences=["\n\nHuman (", "\n\nSYSTEM: "],
+        model="claude-2",
+        max_tokens_to_sample=512,
+        prompt=prompt,
+    )
     return {
         "name": "send_message",
         "arguments": {"message": completion.completion},

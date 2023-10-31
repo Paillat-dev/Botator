@@ -5,6 +5,7 @@ from src.chatUtils.requesters.llama import llama
 from src.chatUtils.requesters.llama2 import llama2
 from src.chatUtils.requesters.claude import claude
 
+
 class ModelNotFound(Exception):
     pass
 

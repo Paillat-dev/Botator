@@ -108,7 +108,7 @@ class Chat:
         messages: list[discord.Message] = await fetch_messages_history(
             self.message.channel, 10, self.original_message
         )
-        #if latst item id is not original message id, add original message to messages
+        # if latst item id is not original message id, add original message to messages
         if messages[-1].id != self.original_message.id:
             messages.append(self.original_message)
         self.context = []
