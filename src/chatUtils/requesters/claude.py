@@ -13,7 +13,7 @@ async def claude(messages):
     prompt = ""
     for message in messages:
         if message["role"] == "system":
-            prompt += f"{HUMAN_PROMPT} {message['content']}"
+            prompt += f"{HUMAN_PROMPT} The name in brackets after \"Human \" is the username of the person sending the message\n{message['content']}"
         elif message["role"] == "assistant":
             prompt += f"{AI_PROMPT} {message['content']}"
         elif message["role"] == "user":
