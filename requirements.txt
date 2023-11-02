@@ -10,5 +10,5 @@ discord-oauth2.py
 black
 orjson
 simpleeval
-replicate
+replicate==0.15.5
 anthropic
