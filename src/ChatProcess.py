@@ -118,7 +118,7 @@ class Chat:
                 name = "assistant"
             else:
                 role = "user"
-                name = msg.author.global_name
+                name = msg.author.display_name or msg.author.global_name or msg.author.name
                 # use re not make name match ^[a-zA-Z0-9_-]{1,64}$ by removing all non-alphanumeric characters
                 name = re.sub(r"[^a-zA-Z0-9_-]", "", name, flags=re.UNICODE)
                 if name == "":
