@@ -1,6 +1,6 @@
 py-cord-dev
 python-dotenv
-openai
+openai==0.28.1 
 emoji
 google-api-python-client
 google-cloud-vision
