@@ -1,4 +1,4 @@
-py-cord-dev
+py-cord
 python-dotenv
 openai==0.28.1 
 emoji
