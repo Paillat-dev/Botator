@@ -1,5 +1,4 @@
-py-cord
-python-dotenv
+git+https://github.com/Pycord-Development/pycordpython-dotenv
 openai==0.28.1 
 emoji
 google-api-python-client
