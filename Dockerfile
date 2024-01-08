@@ -13,7 +13,8 @@ WORKDIR /app
 # we copy just the requirements.txt first to leverage Docker cache
 COPY requirements.txt .
 
-# Install pip requirements
+# Install pip requirements + git
+RUN apt update && apt install git
 RUN pip install -r requirements.txt
 
 
