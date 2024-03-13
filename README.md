@@ -1,3 +1,6 @@
+# ⚠️Archived as of 13 March 2024
+I am archiving this project because I have not been working on it for a while and it is mainly dead. I might, one day, resurrect this, but as of now this is dead.
+Have a nice one :)
 # Botator
 Botator is a discord bot that binds [@openai](https://github.com/openai) 's chat-GPT AI with [@discord](https://github.com/discord). It also has images recognition and moderation features! 
 ![discord com_channels_1021872219888033903_1046119234033434734](https://user-images.githubusercontent.com/75439456/204105583-2abb2d77-9404-4558-bd3e-c1a70b939758.png)
